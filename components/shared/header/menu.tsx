@@ -1,7 +1,7 @@
-import { ShoppingCartIcon, UserIcon } from "lucide-react";
+import { ShoppingCartIcon } from "lucide-react";
 import Link from "next/link";
 
-const menu = () => {
+export default function Menu() {
   return (
     <div className="flex justify-end">
       <nav className="flex gap-3 w-full">
@@ -19,4 +19,3 @@ const menu = () => {
     </div>
   );
 };
-export default menu;

@@ -25,7 +25,7 @@
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
     --ring: 0 72.2% 50.6%;
-    --radius: 0.75rem;
+    --radius: 0.5rem;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -61,14 +61,20 @@
   }
 }
 
-
-
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .header-button {
+    @apply cursor-pointer p-1 border-transparent hover:border-white rounded-[2px];
+  }
+  .h1-bold {
+    @apply font-bold text-2xl lg:text-3xl;
   }
 }

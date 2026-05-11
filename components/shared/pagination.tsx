@@ -37,7 +37,7 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
         onClick={() => onClick('prev')}
         disabled={Number(page) <= 1}
       >
-        Previous
+        ก่อนหน้า
       </Button>
       <Button
         size='lg'
@@ -46,7 +46,7 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
         onClick={() => onClick('next')}
         disabled={Number(page) >= totalPages}
       >
-        Next
+        ถัดไป
       </Button>
     </div>
   )

@@ -1,6 +1,8 @@
 import Header from '@/components/shared/header'
 import Footer from '@/components/shared/footer'
 
+export const dynamic = 'force-dynamic'
+
 export default async function HomeLayout({
   children,
 }: {

@@ -29,13 +29,13 @@ export default function AddToCart({
   return minimal ? (
     <Button
       className='rounded-full w-auto'
-      onClick={() => {
+      onClick={async () => {
         try {
-          addItem(item, 1)
-          toast("Added to Cart", {
+          await addItem(item, 1)
+          toast('เพิ่มลงตะกร้าแล้ว', {
             action: (
               <Button onClick={() => router.push('/cart')}>
-                Go to Cart
+                ไปที่ตะกร้า
               </Button>
             ),
           })
@@ -53,7 +53,7 @@ export default function AddToCart({
         onValueChange={(i) => setQuantity(Number(i))}
       >
         <SelectTrigger>
-          <SelectValue>Quantity: {quantity}</SelectValue>
+          <SelectValue>จำนวน: {quantity}</SelectValue>
         </SelectTrigger>
         <SelectContent position='popper'>
           {Array.from({ length: item.countInStock }).map((_, i) => (
@@ -76,14 +76,14 @@ export default function AddToCart({
           }
         }}
       >
-        Add to Cart
+        เพิ่มลงตะกร้า
       </Button>
 
       <Button
         variant='secondary'
-        onClick={() => {
+        onClick={async () => {
           try {
-            addItem(item, quantity)
+            await addItem(item, quantity)
             router.push(`/checkout`)
           } catch (error: any) {
             toast.error(error.message)
@@ -91,7 +91,7 @@ export default function AddToCart({
         }}
         className='w-full rounded-full '
       >
-        Buy Now
+        ซื้อเลย
       </Button>
     </div>
   )

@@ -55,7 +55,7 @@ export default function CredentialsSignInForm() {
       if (isRedirectError(error)) {
         throw error
       }
-      toast.error('Invalid email or password')
+      toast.error('อีเมลหรือรหัสผ่านไม่ถูกต้อง')
 
     }
   }
@@ -70,9 +70,9 @@ export default function CredentialsSignInForm() {
             name='email'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>อีเมล</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter email address' {...field} />
+                  <Input placeholder='กรอกอีเมล' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -84,11 +84,11 @@ export default function CredentialsSignInForm() {
             name='password'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>รหัสผ่าน</FormLabel>
                 <FormControl>
                   <Input
                     type='password'
-                    placeholder='Enter password'
+                    placeholder='กรอกรหัสผ่าน'
                     {...field}
                   />
                 </FormControl>
@@ -98,12 +98,15 @@ export default function CredentialsSignInForm() {
           />
 
           <div>
-            <Button type='submit'>Sign In</Button>
+            <Button type='submit'>เข้าสู่ระบบ</Button>
           </div>
           <div className='text-sm'>
-            By signing in, you agree to {APP_NAME}&apos;s{' '}
-            <Link href='/page/conditions-of-use'>Conditions of Use</Link> and{' '}
-            <Link href='/page/privacy-policy'>Privacy Notice.</Link>
+            เมื่อคุณเข้าสู่ระบบ แปลว่าคุณยอมรับ
+            {' '}
+            <Link href='/page/conditions-of-use'>เงื่อนไขการใช้งาน</Link>
+            {' '}และ{' '}
+            <Link href='/page/privacy-policy'>นโยบายความเป็นส่วนตัว</Link>
+            {' '}ของ {APP_NAME}
           </div>
         </div>
       </form>

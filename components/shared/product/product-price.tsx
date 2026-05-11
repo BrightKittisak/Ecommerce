@@ -1,5 +1,6 @@
 'use client'
-import { cn, formatCurrency } from '@/lib/utils'
+
+import { cn, formatCurrency, formatCurrencyParts } from '@/lib/utils'
 
 const ProductPrice = ({
   price,
@@ -17,27 +18,24 @@ const ProductPrice = ({
   plain?: boolean
 }) => {
   const discountPercent = Math.round(100 - (price / listPrice) * 100)
-  const stringValue = price.toString()
-  const [intValue, floatValue] = stringValue.includes('.')
-    ? stringValue.split('.')
-    : [stringValue, '']
+  const { symbol, integer, fraction } = formatCurrencyParts(price)
 
   return plain ? (
     formatCurrency(price)
   ) : listPrice == 0 ? (
     <div className={cn('text-3xl', className)}>
-      <span className='text-xs align-super'>$</span>
-      {intValue}
-      <span className='text-xs align-super'>{floatValue}</span>
+      <span className='align-super text-xs'>{symbol}</span>
+      {integer}
+      <span className='align-super text-xs'>.{fraction}</span>
     </div>
   ) : isDeal ? (
     <div className='space-y-2'>
-      <div className='flex justify-center items-center gap-2'>
-        <span className='bg-red-700 rounded-sm p-1 text-white text-sm font-semibold'>
-          {discountPercent}% Off
+      <div className='flex items-center justify-center gap-2'>
+        <span className='rounded-full bg-primary px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground'>
+          ลด {discountPercent}%
         </span>
-        <span className='text-red-700 text-xs font-bold'>
-          Limited time deal
+        <span className='text-xs font-bold uppercase tracking-[0.22em] text-primary'>
+          ดีลช่วงเวลาจำกัด
         </span>
       </div>
       <div
@@ -46,28 +44,28 @@ const ProductPrice = ({
         } items-center gap-2`}
       >
         <div className={cn('text-3xl', className)}>
-          <span className='text-xs align-super'>$</span>
-          {intValue}
-          <span className='text-xs align-super'>{floatValue}</span>
+          <span className='align-super text-xs'>{symbol}</span>
+          {integer}
+          <span className='align-super text-xs'>.{fraction}</span>
         </div>
-        <div className='text-muted-foreground text-xs py-2'>
-          Was:{' '}
+        <div className='py-2 text-xs text-muted-foreground'>
+          จากราคา:{' '}
           <span className='line-through'>{formatCurrency(listPrice)}</span>
         </div>
       </div>
     </div>
   ) : (
-    <div className=''>
+    <div>
       <div className='flex justify-center gap-3'>
-        <div className='text-3xl text-orange-700'>-{discountPercent}%</div>
+        <div className='text-3xl text-primary'>-{discountPercent}%</div>
         <div className={cn('text-3xl', className)}>
-          <span className='text-xs align-super'>$</span>
-          {intValue}
-          <span className='text-xs align-super'>{floatValue}</span>
+          <span className='align-super text-xs'>{symbol}</span>
+          {integer}
+          <span className='align-super text-xs'>.{fraction}</span>
         </div>
       </div>
-      <div className='text-muted-foreground text-xs py-2'>
-        List price:{' '}
+      <div className='py-2 text-xs text-muted-foreground'>
+        ราคาป้าย:{' '}
         <span className='line-through'>{formatCurrency(listPrice)}</span>
       </div>
     </div>

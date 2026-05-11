@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { IProduct } from '@/lib/db/models/product.model'
+import { translateColor, translateSize } from '@/lib/i18n'
 import Link from 'next/link'
 
 export default function SelectVariant({
@@ -18,7 +19,7 @@ export default function SelectVariant({
     <>
       {product.colors.length > 0 && (
         <div className='space-x-2 space-y-2'>
-          <div>Color:</div>
+          <div>สี:</div>
           {product.colors.map((x: string) => (
             <Button
               asChild
@@ -41,7 +42,7 @@ export default function SelectVariant({
                   style={{ backgroundColor: x }}
                   className='h-4 w-4 rounded-full border border-muted-foreground'
                 ></div>
-                {x}
+                {translateColor(x)}
               </Link>
             </Button>
           ))}
@@ -49,7 +50,7 @@ export default function SelectVariant({
       )}
       {product.sizes.length > 0 && (
         <div className='mt-2 space-x-2 space-y-2'>
-          <div>Size:</div>
+          <div>ไซซ์:</div>
           {product.sizes.map((x: string) => (
             <Button
               asChild
@@ -69,7 +70,7 @@ export default function SelectVariant({
                   size: x,
                 })}`}
               >
-                {x}
+                {translateSize(x)}
               </Link>
             </Button>
           ))}

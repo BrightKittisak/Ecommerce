@@ -1,4 +1,4 @@
-import { Data, IProductInput, IUserInput } from '@/types'
+﻿import { Data, IProductInput, IUserInput } from '@/types'
 import { toSlug } from './utils'
 import bcrypt from 'bcryptjs'
 const users: IUserInput[] = [
@@ -263,13 +263,13 @@ const users: IUserInput[] = [
 const products: IProductInput[] = [
   // T-Shirts
   {
-    name: 'Nike Mens Slim-fit Long-Sleeve T-Shirt',
+    name: 'เสื้อยืดแขนยาวทรงสลิม Nike สำหรับผู้ชาย',
     slug: toSlug('Nike Mens Slim-fit Long-Sleeve T-Shirt'),
     category: 'T-Shirts',
     images: ['/images/p11-1.jpg', '/images/p11-2.jpg'],
     tags: ['new-arrival'],
     isPublished: true,
-    price: 21.8,
+    price: 699,
     listPrice: 0,
     brand: 'Nike',
     avgRating: 4.71,
@@ -284,14 +284,14 @@ const products: IProductInput[] = [
     numSales: 9,
     countInStock: 11,
     description:
-      'Made with chemicals safer for human health and the environment',
+      'ผลิตจากวัสดุที่คัดสรรให้ปลอดภัยต่อผู้สวมใส่และเป็นมิตรต่อสิ่งแวดล้อมมากขึ้น',
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     colors: ['Green', 'Red', 'Black'],
 
     reviews: [],
   },
   {
-    name: 'Jerzees Long-Sleeve Heavyweight Blend T-Shirt',
+    name: 'เสื้อยืดแขนยาวผ้าหนา Jerzees รุ่นผ้าผสม',
     slug: toSlug('Jerzees Long-Sleeve Heavyweight Blend T-Shirt'),
     category: 'T-Shirts',
     images: [
@@ -302,7 +302,7 @@ const products: IProductInput[] = [
     ],
     tags: ['featured'],
     isPublished: true,
-    price: 23.78,
+    price: 769,
     listPrice: 0,
     brand: 'Jerzees',
     avgRating: 4.2,
@@ -317,7 +317,7 @@ const products: IProductInput[] = [
     numSales: 29,
     countInStock: 12,
     description:
-      'Made with sustainably sourced USA grown cotton; Shoulder-to-shoulder tape; double-needle coverstitched front neck; Set-in sleeves; Rib cuffs with concealed seams; Seamless body for a wide printing area',
+      'ผลิตจากผ้าคอตตอนที่มาจากแหล่งผลิตอย่างยั่งยืนในสหรัฐฯ มาพร้อมเทปเสริมไหล่ เย็บคอเสื้อสองชั้น แขนเสื้อเข้ารูป ปลายแขนจั๊ม และลำตัวไร้ตะเข็บเพื่อความสบายในการสวมใส่',
 
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     colors: ['Yellow', 'Red', 'Black'],
@@ -325,15 +325,15 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
-    name: "Jerzees Men's Long-Sleeve T-Shirt",
+    name: 'เสื้อยืดแขนยาว Jerzees สำหรับผู้ชาย',
     slug: toSlug('Jerzees Men Long-Sleeve T-Shirt'),
     category: 'T-Shirts',
     brand: 'Jerzees',
     images: ['/images/p13-1.jpg', '/images/p13-2.jpg'],
     tags: ['best-seller'],
     isPublished: true,
-    price: 13.86,
-    listPrice: 16.03,
+    price: 449,
+    listPrice: 519,
     avgRating: 4,
     numReviews: 12,
     ratingDistribution: [
@@ -346,14 +346,14 @@ const products: IProductInput[] = [
     numSales: 55,
     countInStock: 13,
     description:
-      'The Jerzees long sleeve t-shirt is made with dri-power technology that wicks away moisture to keep you cool and dry throughout your day. We also included a rib collar and cuffs for added durability, and a lay-flat collar for comfort. If you are looking for a versatile shirt that you can wear throughout the transitioning seasons, then look no further.',
+      'เสื้อยืดแขนยาวรุ่นนี้ใช้เทคโนโลยี Dri-Power ช่วยระบายความชื้น ให้ใส่สบายและแห้งไวตลอดวัน พร้อมคอและปลายแขนแบบจั๊มเพื่อเพิ่มความทนทาน เหมาะกับการใส่ได้หลายฤดูกาล',
     sizes: ['XL', 'XXL'],
     colors: ['Green', 'White'],
 
     reviews: [],
   },
   {
-    name: 'Decrum Mens Plain Long Sleeve T-Shirt - Comfortable Soft Fashion V Neck Full Sleeves Jersey Shirts',
+    name: 'เสื้อยืดแขนยาวคอวี Decrum เนื้อนุ่ม',
     slug: toSlug(
       'Decrum Mens Plain Long Sleeve T-Shirt - Comfortable Soft Fashion V Neck Full Sleeves Jersey Shirts'
     ),
@@ -362,8 +362,8 @@ const products: IProductInput[] = [
     images: ['/images/p14-1.jpg', '/images/p14-2.jpg'],
     tags: ['todays-deal'],
     isPublished: true,
-    price: 26.95,
-    listPrice: 46.03,
+    price: 869,
+    listPrice: 1490,
     avgRating: 3.85,
     numReviews: 14,
     ratingDistribution: [
@@ -376,14 +376,14 @@ const products: IProductInput[] = [
     numSales: 54,
     countInStock: 14,
     description:
-      'Elevate your outfit with this soft long sleeve t shirt men. This full sleeves tee is the ultimate upgrade from your regular cotton t-shirt. ',
+      'ยกระดับลุคประจำวันด้วยเสื้อยืดแขนยาวคอวีเนื้อนุ่ม ใส่สบายกว่าเสื้อคอตตอนทั่วไป และแมตช์ได้ง่ายทั้งวันทำงานและวันสบาย ๆ',
     sizes: ['XL', 'XXL'],
     colors: ['Yellow', 'White'],
 
     reviews: [],
   },
   {
-    name: "Muscle Cmdr Men's Slim Fit Henley Shirt Long&Short Business Sleeve Casual 3 Metal Buton Placket Casual Stylish T-Shirt",
+    name: 'เสื้อเฮนลีย์ทรงสลิม Muscle Cmdr สำหรับผู้ชาย',
     slug: toSlug(
       "Muscle Cmdr Men's Slim Fit Henley Shirt Long&Short Business Sleeve Casual 3 Metal Buton Placket Casual Stylish T-Shirt"
     ),
@@ -392,8 +392,8 @@ const products: IProductInput[] = [
     images: ['/images/p15-1.jpg', '/images/p15-2.jpg'],
     tags: ['new-arrival', 'featured'],
     isPublished: true,
-    price: 29.99,
-    listPrice: 35.99,
+    price: 969,
+    listPrice: 1190,
     avgRating: 3.66,
     numReviews: 15,
     ratingDistribution: [
@@ -406,22 +406,22 @@ const products: IProductInput[] = [
     numSales: 54,
     countInStock: 15,
     description:
-      "Slim Fit Design:Men's Muscle Slim Fit Button Henley Shirts are designed to fit snugly against your body, accentuating your muscles and creating a sleek silhouette that's perfect for any occasion. ",
+      'ดีไซน์ทรงสลิมช่วยให้เสื้อแนบลำตัวอย่างพอดี ขับสัดส่วนให้ดูคมขึ้น พร้อมกระดุมด้านหน้าสไตล์ Henley ที่ใส่ได้ทั้งลุคแคชชวลและกึ่งทางการ',
     sizes: ['XL', 'XXL'],
     colors: ['Green', 'Yellow'],
 
     reviews: [],
   },
   {
-    name: 'Hanes Mens Long Sleeve Beefy Henley Shirt',
+    name: 'เสื้อเฮนลีย์แขนยาว Hanes รุ่นผ้าหนา',
     slug: toSlug('Hanes Mens Long Sleeve Beefy Henley Shirt'),
     category: 'T-Shirts',
     brand: 'Jerzees',
     images: ['/images/p16-1.jpg', '/images/p16-2.jpg'],
     tags: ['best-seller', 'todays-deal'],
     isPublished: true,
-    price: 25.3,
-    listPrice: 32.99,
+    price: 819,
+    listPrice: 1090,
     avgRating: 3.46,
     numReviews: 13,
     ratingDistribution: [
@@ -434,7 +434,7 @@ const products: IProductInput[] = [
     countInStock: 16,
     numSales: 56,
     description:
-      'Heavyweight cotton (Heathers are 60% cotton/40% polyester; Pebblestone is 75% cotton/25% polyester)',
+      'เสื้อแขนยาวผ้าคอตตอนเนื้อหนา ให้สัมผัสแน่นและทนทาน รุ่นสีผสมบางเฉดใช้ผ้าคอตตอนผสมโพลีเอสเตอร์เพื่อเพิ่มความยืดหยุ่นและดูแลง่าย',
     sizes: ['XL', 'XXL'],
     colors: ['Grey', 'White'],
 
@@ -442,14 +442,14 @@ const products: IProductInput[] = [
   },
   // Jeans
   {
-    name: 'Silver Jeans Co. Mens Jace Slim Fit Bootcut Jeans',
+    name: 'กางเกงยีนส์บูทคัตทรงสลิม Silver Jeans Co. Jace',
     slug: toSlug('Silver Jeans Co. Mens Jace Slim Fit Bootcut Jeans'),
     category: 'Jeans',
     brand: 'Silver Jeans Co',
     images: ['/images/p21-1.jpg', '/images/p21-2.jpg'],
     tags: ['new-arrival'],
     isPublished: true,
-    price: 95.34,
+    price: 3090,
     listPrice: 0,
     avgRating: 4.71,
     numReviews: 7,
@@ -463,14 +463,14 @@ const products: IProductInput[] = [
     countInStock: 54,
     numSales: 21,
     description:
-      'Silver Jeans Co. Jace Slim Fit Bootcut Jeans - Consider Jace a modern cowboy jean. It sits below the waist and features a slim fit through the hip and thigh. Finished with an 18” bootcut leg opening that complements the slimmer silhouette while still fitting over boots',
+      'กางเกงยีนส์ทรงคาวบอยสมัยใหม่ เอวอยู่ต่ำกว่าระดับปกติเล็กน้อย เข้ารูปช่วงสะโพกและต้นขา พร้อมปลายขาแบบบูทคัตที่ยังสวมทับรองเท้าบูทได้สบาย',
     sizes: ['30Wx30L', '34Wx30L', '36Wx30L'],
     colors: ['Blue', 'Grey'],
 
     reviews: [],
   },
   {
-    name: "Levi's mens 505 Regular Fit Jeans (Also Available in Big & Tall)",
+    name: "กางเกงยีนส์ Levi's 505 ทรงเรกูลาร์",
     slug: toSlug(
       "Levi's mens 505 Regular Fit Jeans (Also Available in Big & Tall)"
     ),
@@ -479,8 +479,8 @@ const products: IProductInput[] = [
     images: ['/images/p22-1.jpg', '/images/p22-2.jpg'],
     tags: ['featured'],
     isPublished: true,
-    price: 59.99,
-    listPrice: 69.99,
+    price: 1890,
+    listPrice: 2290,
     avgRating: 4.2,
     numReviews: 10,
     ratingDistribution: [
@@ -493,22 +493,22 @@ const products: IProductInput[] = [
     countInStock: 22,
     numSales: 54,
     description:
-      'A veritable classic, this 505 is made to have a comfortable look and style.',
+      'ยีนส์คลาสสิกทรงเรกูลาร์ที่ใส่สบายและดูดีได้ง่าย เหมาะกับการแต่งตัวประจำวันแบบไม่ต้องคิดเยอะ',
     sizes: ['30Wx30L', '34Wx30L', '36Wx30L'],
     colors: ['Blue', 'Grey'],
 
     reviews: [],
   },
   {
-    name: 'Essentials Mens Straight-Fit Stretch Jean',
+    name: 'กางเกงยีนส์ทรงตรงผ้ายืด Essentials',
     slug: toSlug('Essentials Mens Straight-Fit Stretch Jean'),
     category: 'Jeans',
     brand: 'Essentials',
     images: ['/images/p23-1.jpg', '/images/p23-2.jpg'],
     tags: ['best-seller'],
     isPublished: true,
-    price: 38.9,
-    listPrice: 45,
+    price: 1290,
+    listPrice: 1490,
     avgRating: 4,
     numReviews: 12,
     ratingDistribution: [
@@ -521,14 +521,14 @@ const products: IProductInput[] = [
     countInStock: 23,
     numSales: 54,
     description:
-      'These classic 5-pocket straight-fit jeans are crafted with a bit of stretch for additional comfort and to help maintain their shape',
+      'กางเกงยีนส์ทรงตรงแบบ 5 กระเป๋าคลาสสิก เพิ่มผ้ายืดเล็กน้อยเพื่อให้ใส่สบายขึ้นและช่วยคงทรงได้ดีตลอดวัน',
     sizes: ['30Wx30L', '34Wx30L', '36Wx30L'],
     colors: ['Grey', 'Blue'],
 
     reviews: [],
   },
   {
-    name: "Buffalo David Bitton Mens Men's Driven Relaxed Denim JeansJeans",
+    name: 'กางเกงยีนส์เดนิมทรงรีแล็กซ์ Buffalo David Bitton',
     slug: toSlug(
       "Buffalo David Bitton Mens Men's Driven Relaxed Denim JeansJeans"
     ),
@@ -537,8 +537,8 @@ const products: IProductInput[] = [
     images: ['/images/p24-1.jpg', '/images/p24-2.jpg'],
     tags: ['todays-deal'],
     isPublished: true,
-    price: 69.99,
-    listPrice: 100,
+    price: 2290,
+    listPrice: 3190,
     avgRating: 3.85,
     numReviews: 14,
     ratingDistribution: [
@@ -551,21 +551,21 @@ const products: IProductInput[] = [
     countInStock: 24,
     numSales: 53,
     description:
-      'Stretch recycled denim jeans in an authentic and sanded wash blue. Features a comfortable low-rise waist with a relaxed fit at the leg. The distressed look gives these jeans an effortlessly worn-in feel. The eco-friendly logo patch in tan and red is at the back waistband. The signature maple leaf graphic is debossed at the zip-fly.',
+      'กางเกงยีนส์เดนิมรีไซเคิลทรงรีแล็กซ์ สีฟอกสไตล์วินเทจ เอวต่ำเล็กน้อย ใส่สบายช่วงขา พร้อมดีเทลลุคเซอร์แบบผ่านการใช้งานที่ช่วยให้การแต่งตัวดูเท่ขึ้นทันที',
     sizes: ['30Wx30L', '34Wx30L', '36Wx30L'],
     colors: ['Blue', 'Grey'],
 
     reviews: [],
   },
   {
-    name: 'Dickies Mens Relaxed Fit Carpenter Jean',
+    name: 'กางเกงยีนส์ช่างทรงหลวม Dickies',
     slug: toSlug('Dickies Mens Relaxed Fit Carpenter Jean'),
     category: 'Jeans',
     brand: 'Dickies',
     images: ['/images/p25-1.jpg', '/images/p25-2.jpg'],
     tags: ['new-arrival', 'featured'],
     isPublished: true,
-    price: 95.34,
+    price: 3090,
     listPrice: 0,
     avgRating: 3.66,
     numReviews: 15,
@@ -579,14 +579,14 @@ const products: IProductInput[] = [
     countInStock: 25,
     numSales: 48,
     description:
-      'Relaxed work jean with traditional carpenter-style pockets and logo patch at back pockets',
+      'กางเกงยีนส์ทรงทำงานแบบหลวม มาพร้อมกระเป๋าสไตล์ช่างดั้งเดิมและป้ายโลโก้ด้านหลังกระเป๋า ให้ลุคเวิร์กแวร์ชัดเจน',
     sizes: ['30Wx30L', '34Wx30L', '36Wx30L'],
     colors: ['Blue', 'Grey'],
 
     reviews: [],
   },
   {
-    name: 'Wrangler mens Premium Performance Cowboy Cut Slim Fit Jean',
+    name: 'กางเกงยีนส์คาวบอยทรงสลิม Wrangler Premium Performance',
     slug: toSlug(
       'Wrangler mens Premium Performance Cowboy Cut Slim Fit Jean'
     ),
@@ -595,8 +595,8 @@ const products: IProductInput[] = [
     images: ['/images/p26-1.jpg', '/images/p26-2.jpg'],
     tags: ['best-seller', 'todays-deal'],
     isPublished: true,
-    price: 81.78,
-    listPrice: 149.99,
+    price: 2590,
+    listPrice: 4790,
     avgRating: 3.46,
     numReviews: 13,
     ratingDistribution: [
@@ -609,7 +609,7 @@ const products: IProductInput[] = [
     countInStock: 26,
     numSales: 48,
     description:
-      'Designed with a functional fit in mind, these jeans are made to stack over your favorite pair of boots. Constructed with a slim fit in the waist, seat, and thigh, this jean is made for both function and comfort for long days in the saddle.',
+      'ออกแบบมาเพื่อใส่กับรองเท้าบูทได้พอดี ทรงสลิมช่วงเอว สะโพก และต้นขา ช่วยให้เคลื่อนไหวสะดวกและใส่สบายในวันใช้งานยาว ๆ',
     sizes: ['30Wx30L', '34Wx30L', '36Wx30L'],
     colors: ['Blue', 'Grey'],
 
@@ -617,14 +617,14 @@ const products: IProductInput[] = [
   },
   // Watches
   {
-    name: "Seiko Men's Analogue Watch with Black Dial",
+    name: 'นาฬิกา Seiko หน้าปัดดำสไตล์อะนาล็อก',
     slug: toSlug("Seiko Men's Analogue Watch with Black Dial"),
     category: 'Wrist Watches',
     brand: 'Seiko',
     images: ['/images/p31-1.jpg', '/images/p31-2.jpg'],
     tags: ['new-arrival'],
     isPublished: true,
-    price: 530.0,
+    price: 17090,
     listPrice: 0,
     avgRating: 4.71,
     numReviews: 7,
@@ -638,14 +638,14 @@ const products: IProductInput[] = [
     countInStock: 31,
     numSales: 48,
     description:
-      'Casing: Case made of stainless steel Case shape: round Case colour: silver Glass: Hardlex Clasp type: Fold over clasp with safety',
+      'ตัวเรือนสเตนเลสทรงกลมสีเงิน มาพร้อมกระจก Hardlex และตัวล็อกแบบพับพร้อมระบบนิรภัย ให้ลุคสุภาพและใช้งานได้ทุกวัน',
     sizes: [],
     colors: [],
 
     reviews: [],
   },
   {
-    name: 'SEIKO 5 Sport SRPJ83 Beige Dial Nylon Automatic Watch, Beige, Automatic Watch',
+    name: 'นาฬิกาอัตโนมัติ Seiko 5 Sport SRPJ83 หน้าปัดเบจ',
     slug: toSlug(
       'SEIKO 5 Sport SRPJ83 Beige Dial Nylon Automatic Watch, Beige, Automatic Watch'
     ),
@@ -654,8 +654,8 @@ const products: IProductInput[] = [
     images: ['/images/p32-1.jpg', '/images/p32-2.jpg'],
     tags: ['featured'],
     isPublished: true,
-    price: 375.83,
-    listPrice: 400,
+    price: 12090,
+    listPrice: 12890,
     avgRating: 4.2,
     numReviews: 10,
     ratingDistribution: [
@@ -668,14 +668,14 @@ const products: IProductInput[] = [
     countInStock: 32,
     numSales: 48,
     description:
-      'Seiko 5 Sports Collection Inspired by vintage field/aviator style: Automatic with manual winding capability',
+      'นาฬิกาจากคอลเลกชัน Seiko 5 Sports ที่ได้แรงบันดาลใจจากนาฬิกาภาคสนามและนักบินแบบวินเทจ ระบบอัตโนมัติพร้อมไขลานด้วยมือได้',
     sizes: [],
     colors: [],
 
     reviews: [],
   },
   {
-    name: "Casio Men's Heavy Duty Analog Quartz Stainless Steel Strap, Silver, 42 Casual Watch ",
+    name: 'นาฬิกา Casio สายสเตนเลสอะนาล็อกลุยงาน',
     slug: toSlug(
       "Casio Men's Heavy Duty Analog Quartz Stainless Steel Strap, Silver, 42 Casual Watch"
     ),
@@ -684,7 +684,7 @@ const products: IProductInput[] = [
     images: ['/images/p33-1.jpg', '/images/p33-2.jpg'],
     tags: ['best-seller'],
     isPublished: true,
-    price: 60.78,
+    price: 1990,
     listPrice: 0,
     avgRating: 4,
     numReviews: 12,
@@ -698,14 +698,14 @@ const products: IProductInput[] = [
     countInStock: 33,
     numSales: 48,
     description:
-      'The Casio range is growing with this model  MWA-100H-1AVEF. Sporting a stainless steel case with a brushed finish, it will easily withstand all the shocks of everyday life.',
+      'นาฬิกา Casio รุ่นลุยงานที่มาพร้อมตัวเรือนสเตนเลสผิวปัดด้าน แข็งแรง ทนทาน และเหมาะกับการใช้งานประจำวันแบบสมบุกสมบัน',
     sizes: [],
     colors: [],
 
     reviews: [],
   },
   {
-    name: 'Casio Classic Silver-Tone Stainless Steel Band Date Indicator Watch',
+    name: 'นาฬิกา Casio คลาสสิกสายสเตนเลสพร้อมช่องวันที่',
     slug: toSlug(
       'Casio Classic Silver-Tone Stainless Steel Band Date Indicator Watch'
     ),
@@ -714,8 +714,8 @@ const products: IProductInput[] = [
     images: ['/images/p34-1.jpg', '/images/p34-2.jpg'],
     tags: ['todays-deal'],
     isPublished: true,
-    price: 34.22,
-    listPrice: 54.99,
+    price: 1090,
+    listPrice: 1790,
     avgRating: 3.85,
     numReviews: 14,
     ratingDistribution: [
@@ -728,14 +728,14 @@ const products: IProductInput[] = [
     countInStock: 34,
     numSales: 48,
     description:
-      'The new MTPVD01D-7EV is a classic 50 meter water resistant stainless steel watch now updated with a white dial. This elegant 3 hand, date display timepiece is perfect for any setting.',
+      'นาฬิกาคลาสสิกกันน้ำลึก 50 เมตร พร้อมหน้าปัดสีขาวและช่องวันที่ ดีไซน์ 3 เข็มเรียบหรู เหมาะทั้งวันทำงานและโอกาสทางการ',
     sizes: [],
     colors: [],
 
     reviews: [],
   },
   {
-    name: "Fossil Men's Grant Stainless Steel Quartz Chronograph Watch",
+    name: 'นาฬิกาโครโนกราฟ Fossil Grant สเตนเลส',
     slug: toSlug(
       "Fossil Men's Grant Stainless Steel Quartz Chronograph Watch"
     ),
@@ -744,8 +744,8 @@ const products: IProductInput[] = [
     images: ['/images/p35-1.jpg', '/images/p35-2.jpg'],
     tags: ['new-arrival', 'featured'],
     isPublished: true,
-    price: 171.22,
-    listPrice: 225,
+    price: 5490,
+    listPrice: 7290,
     avgRating: 3.66,
     numReviews: 15,
     ratingDistribution: [
@@ -758,22 +758,22 @@ const products: IProductInput[] = [
     countInStock: 35,
     numSales: 48,
     description:
-      'Chronograph watch featuring silver- and blue-tone case, blue sunray dial, and silver-tone Roman numeral indices',
+      'นาฬิกาโครโนกราฟดีไซน์หรู ตัวเรือนโทนเงิน-น้ำเงิน หน้าปัดซันเรย์สีน้ำเงิน และเลขโรมันสีเงิน ช่วยยกระดับลุคได้ทันที',
     sizes: [],
     colors: ['Blue', 'Black', 'Sliver'],
 
     reviews: [],
   },
   {
-    name: "Fossil Men's Machine Stainless Steel Quartz Watch",
+    name: 'นาฬิกา Fossil Machine สเตนเลสสีดำ',
     slug: toSlug("Fossil Men's Machine Stainless Steel Quartz Watch"),
     category: 'Wrist Watches',
     brand: 'Fossil',
     images: ['/images/p36-1.jpg', '/images/p36-2.jpg'],
     tags: ['best-seller', 'todays-deal'],
     isPublished: true,
-    price: 158.21,
-    listPrice: 229.0,
+    price: 5090,
+    listPrice: 7390,
     avgRating: 3.46,
     numReviews: 13,
     ratingDistribution: [
@@ -786,7 +786,7 @@ const products: IProductInput[] = [
     countInStock: 36,
     numSales: 49,
     description:
-      'In masculine black-on-black, our industrial-inspired Machine watch will add a fresh, modern touch to your casual look. This Machine watch also features a three hand movement on a stainless steel bracelet.',
+      'นาฬิกาสีดำล้วนสไตล์อินดัสเทรียล ให้ลุคเท่ทันสมัย เหมาะกับการแต่งตัวแคชชวล พร้อมสายสเตนเลสและระบบ 3 เข็มใช้งานง่าย',
     sizes: [],
     colors: ['Brown', 'Sliver', 'Black'],
 
@@ -794,7 +794,7 @@ const products: IProductInput[] = [
   },
   // Sneakers
   {
-    name: 'adidas Mens Grand Court 2.0 Training Shoes Training Shoes',
+    name: 'รองเท้าผ้าใบ adidas Grand Court 2.0',
     slug: toSlug(
       'adidas Mens Grand Court 2.0 Training Shoes Training Shoes'
     ),
@@ -803,7 +803,7 @@ const products: IProductInput[] = [
     images: ['/images/p41-1.jpg', '/images/p41-2.jpg'],
     tags: ['new-arrival'],
     isPublished: true,
-    price: 81.99,
+    price: 2590,
     listPrice: 0,
     avgRating: 4.71,
     numReviews: 7,
@@ -817,14 +817,14 @@ const products: IProductInput[] = [
     countInStock: 41,
     numSales: 48,
     description:
-      'Cloudfoam Comfort sockliner is ultra-soft and plush, with two layers of cushioning topped with soft, breathable mesh',
+      'พื้นรองเท้า Cloudfoam Comfort นุ่มเป็นพิเศษ พร้อมชั้นรองรับแรงกระแทกสองชั้นและวัสดุตาข่ายระบายอากาศ ใส่เดินทั้งวันได้สบาย',
     sizes: ['8', '9', '10'],
     colors: ['White', 'Black', 'Grey'],
 
     reviews: [],
   },
   {
-    name: "ziitop Men's Running Walking Shoes Fashion Sneakers Mesh Dress Shoes Business Oxfords Shoes Lightweight Casual Breathable Work Formal Shoes",
+    name: 'รองเท้าผ้าใบและลำลอง ziitop ระบายอากาศ',
     slug: toSlug(
       "ziitop Men's Running Walking Shoes Fashion Sneakers Mesh Dress Shoes Business Oxfords Shoes Lightweight Casual Breathable Work Formal Shoes"
     ),
@@ -833,8 +833,8 @@ const products: IProductInput[] = [
     images: ['/images/p42-1.jpg', '/images/p42-2.jpg'],
     tags: ['featured'],
     isPublished: true,
-    price: 39.97,
-    listPrice: 49.96,
+    price: 1290,
+    listPrice: 1590,
     avgRating: 4.2,
     numReviews: 10,
     ratingDistribution: [
@@ -847,14 +847,14 @@ const products: IProductInput[] = [
     countInStock: 42,
     numSales: 50,
     description:
-      'Cloudfoam Comfort sockliner is ultra-soft and plush, with two layers of cushioning topped with soft, breathable mesh',
+      'รองเท้าน้ำหนักเบาที่ใส่ได้หลายโอกาส ทั้งเดิน ทำงาน และลุคกึ่งทางการ มาพร้อมพื้นนุ่มและผ้าตาข่ายช่วยระบายอากาศ',
     sizes: ['8', '9', '10'],
     colors: ['Beige', 'Black', 'Grey'],
 
     reviews: [],
   },
   {
-    name: 'Skechers mens Summits High Range Hands Free Slip-in Shoes Work shoe',
+    name: 'รองเท้า Skechers Summits High Range Slip-ins',
     slug: toSlug(
       'Skechers mens Summits High Range Hands Free Slip-in Shoes Work shoe'
     ),
@@ -863,7 +863,7 @@ const products: IProductInput[] = [
     images: ['/images/p43-1.jpg', '/images/p43-2.jpg'],
     tags: ['best-seller'],
     isPublished: true,
-    price: 99.99,
+    price: 3190,
     listPrice: 0,
     avgRating: 4,
     numReviews: 12,
@@ -877,14 +877,14 @@ const products: IProductInput[] = [
     countInStock: 43,
     numSales: 72,
     description:
-      'Step into easy-wearing comfort with Skechers Hands Free Slip-ins™: Summits - High Range. Along with our Exclusive Heel Pillow™ holds your foot securely in place, this vegan style features a unique pop-up Skechers Slip-ins™ molded heel panel, a mesh upper with fixed laces',
+      'รองเท้า Slip-ins ที่ใส่ง่ายโดยไม่ต้องก้มผูกเชือก มาพร้อม Heel Pillow ช่วยล็อกส้นเท้าให้อยู่ทรง และหน้าผ้าตาข่ายที่ใส่สบายระหว่างวัน',
     sizes: ['8', '9', '10'],
     colors: ['Navy', 'Black', 'Grey'],
 
     reviews: [],
   },
   {
-    name: 'DLWKIPV Mens Running Shoes Tennis Cross Training Sneakers Fashion Non Slip Outdoor Walking Jogging Shoes Mesh Light Flexible Comfortable Breathable Shoes',
+    name: 'รองเท้าวิ่งและเดิน DLWKIPV ระบายอากาศ',
     slug: toSlug(
       'DLWKIPV Mens Running Shoes Tennis Cross Training Sneakers Fashion Non Slip Outdoor Walking Jogging Shoes Mesh Light Flexible Comfortable Breathable Shoes'
     ),
@@ -893,8 +893,8 @@ const products: IProductInput[] = [
     images: ['/images/p44-1.jpg', '/images/p44-2.jpg'],
     tags: ['todays-deal'],
     isPublished: true,
-    price: 36.99,
-    listPrice: 56.9,
+    price: 1190,
+    listPrice: 1790,
     avgRating: 3.85,
     numReviews: 14,
     ratingDistribution: [
@@ -907,22 +907,22 @@ const products: IProductInput[] = [
     countInStock: 44,
     numSales: 72,
     description:
-      'Design: Mesh vamp, ventilation. Sole anti-slip groove design, shock absorption and anti-slip. The inside of the shoe is wide and soft, bringing you a good comfortable experience',
+      'รองเท้าตาข่ายระบายอากาศดี พื้นออกแบบร่องกันลื่นและช่วยซับแรงกระแทก ด้านในกว้างและนุ่ม เหมาะกับการเดิน วิ่ง หรือใช้งานกลางแจ้ง',
     sizes: ['8', '9', '10', '11', '12'],
     colors: ['Brown', 'Black', 'Grey'],
 
     reviews: [],
   },
   {
-    name: "ASICS Men's GT-2000 13 Running Shoes",
+    name: 'รองเท้าวิ่ง ASICS GT-2000 13',
     slug: toSlug("ASICS Men's GT-2000 13 Running Shoes"),
     category: 'Shoes',
     brand: 'ASICS',
     images: ['/images/p45-1.jpg', '/images/p45-2.jpg'],
     tags: ['new-arrival', 'featured'],
     isPublished: true,
-    price: 179.95,
-    listPrice: 200,
+    price: 5790,
+    listPrice: 6490,
     avgRating: 3.66,
     numReviews: 15,
     ratingDistribution: [
@@ -935,14 +935,14 @@ const products: IProductInput[] = [
     countInStock: 45,
     numSales: 64,
     description:
-      "At least 50% of the shoe's main upper material is made with recycled content to reduce waste and carbon emissions",
+      'รองเท้าวิ่งที่ใช้วัสดุรีไซเคิลอย่างน้อย 50% ในส่วนอัปเปอร์หลัก ช่วยลดของเสียและผลกระทบต่อสิ่งแวดล้อมโดยยังคงความสบายในการสวมใส่',
     sizes: ['8', '9', '10', '11'],
     colors: ['Blue', 'Black', 'Grey'],
 
     reviews: [],
   },
   {
-    name: "Mens Wearbreeze Shoes, Urban - Ultra Comfortable Shoes, Breeze Shoes for Men, Men's Mesh Dress Sneakers Business Shoes",
+    name: 'รองเท้าลำลอง Wearbreeze Urban สำหรับผู้ชาย',
     slug: toSlug(
       "Mens Wearbreeze Shoes, Urban - Ultra Comfortable Shoes, Breeze Shoes for Men, Men's Mesh Dress Sneakers Business Shoes"
     ),
@@ -951,8 +951,8 @@ const products: IProductInput[] = [
     images: ['/images/p46-1.jpg', '/images/p46-2.jpg'],
     tags: ['best-seller', 'todays-deal'],
     isPublished: true,
-    price: 32.99,
-    listPrice: 80,
+    price: 1090,
+    listPrice: 2590,
     avgRating: 3.46,
     numReviews: 13,
     ratingDistribution: [
@@ -965,7 +965,7 @@ const products: IProductInput[] = [
     countInStock: 46,
     numSales: 48,
     description:
-      'Cloudfoam Comfort sockliner is ultra-soft and plush, with two layers of cushioning topped with soft, breathable mesh',
+      'รองเท้าลำลองแนวสมาร์ตแคชชวลที่เน้นความนุ่มสบาย พื้นรองรับแรงกระแทกดีและผ้าตาข่ายช่วยให้ใส่ได้สบายตลอดวัน',
     sizes: ['8', '9', '10', '11'],
     colors: ['Green', 'Black', 'Grey'],
 
@@ -976,93 +976,93 @@ const products: IProductInput[] = [
 const reviews = [
   {
     rating: 1,
-    title: 'Poor quality',
+    title: 'เธเธธเธ“เธ เธฒเธเนเธกเนเธ”เธต',
     comment:
-      'Very disappointed. The item broke after just a few uses. Not worth the money.',
+      'เธเธดเธ”เธซเธงเธฑเธเธเธญเธชเธกเธเธงเธฃ เนเธเนเธเธฒเธเนเธ”เนเนเธกเนเธเธฒเธเธชเธดเธเธเนเธฒเธเนเน€เธฃเธดเนเธกเธกเธตเธเธฑเธเธซเธฒ เธฃเธนเนเธชเธถเธเธงเนเธฒเนเธกเนเธเธธเนเธกเธเธฑเธเธฃเธฒเธเธฒเธ—เธตเนเธเนเธฒเธขเนเธ',
   },
   {
     rating: 2,
-    title: 'Disappointed',
+    title: 'เธขเธฑเธเนเธกเนเธเธฃเธฐเธ—เธฑเธเนเธ',
     comment:
-      "Not as expected. The material feels cheap, and it didn't fit well. Wouldn't buy again.",
+      'เธชเธดเธเธเนเธฒเธเธฃเธดเธเนเธกเนเธ•เธฃเธเธเธฑเธเธ—เธตเนเธเธฒเธ”เนเธงเน เธงเธฑเธชเธ”เธธเธ”เธนเธเธฃเธฃเธกเธ”เธฒเนเธฅเธฐเธชเธงเธกเนเธชเนเนเธฅเนเธงเนเธกเนเธเนเธญเธขเธเธญเธ”เธต เนเธกเนเธเนเธฒเธเธฐเธชเธฑเนเธเธเนเธณ',
   },
   {
     rating: 2,
-    title: 'Needs improvement',
+    title: 'เธเธงเธฃเธเธฃเธฑเธเธเธฃเธธเธ',
     comment:
-      "It looks nice but doesn't perform as expected. Wouldn't recommend without upgrades.",
+      'เธซเธเนเธฒเธ•เธฒเธ”เธนเธ”เธตเนเธ•เนเธเธฒเธฃเนเธเนเธเธฒเธเธเธฃเธดเธเธขเธฑเธเนเธกเนเธ•เธญเธเนเธเธ—เธขเน เธ–เนเธฒเธเธฃเธฑเธเธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”เธญเธตเธเธซเธเนเธญเธขเธเธฐเธเนเธฒเนเธเนเธเธงเนเธฒเธเธตเนเธกเธฒเธ',
   },
   {
     rating: 3,
-    title: 'not bad',
+    title: 'เนเธเนเนเธ”เน',
     comment:
-      'This product is decent, the quality is good but it could use some improvements in the details.',
+      'เนเธ”เธขเธฃเธงเธกเธ–เธทเธญเธงเนเธฒเนเธญเน€เธ เธเธธเธ“เธ เธฒเธเธเธญเนเธเนเนเธ”เน เนเธ•เนเธขเธฑเธเธกเธตเธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”เน€เธฅเนเธ เน เธ—เธตเนเธเธงเธฃเน€เธเนเธเนเธซเนเน€เธฃเธตเธขเธเธฃเนเธญเธขเธเธถเนเธ',
   },
   {
     rating: 3,
-    title: 'Okay, not great',
+    title: 'เธเธญเนเธเน เนเธ•เนเธขเธฑเธเนเธกเนเธชเธธเธ”',
     comment:
-      'It works, but not as well as I hoped. Quality is average and lacks some finishing.',
+      'เนเธเนเธเธฒเธเนเธ”เนเธเธฃเธดเธ เนเธ•เนเธขเธฑเธเนเธกเนเธ”เธตเน€เธ—เนเธฒเธ—เธตเนเธซเธงเธฑเธเนเธงเน เธเธธเธ“เธ เธฒเธเธญเธขเธนเนเนเธเธฃเธฐเธ”เธฑเธเธเธฅเธฒเธเนเธฅเธฐเธเธฒเธเน€เธเนเธเธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”เธเนเธญเธขเนเธเธซเธเนเธญเธข',
   },
   {
     rating: 3,
-    title: 'Good product',
+    title: 'เธชเธดเธเธเนเธฒเนเธญเน€เธ',
     comment:
-      'This product is amazing, I love it! The quality is top notch, the material is comfortable and breathable.',
+      'เธ•เธฑเธงเธชเธดเธเธเนเธฒเธเนเธฒเนเธเน เธงเธฑเธชเธ”เธธเธเนเธญเธเธเนเธฒเธเธชเธเธฒเธขเนเธฅเธฐเธฃเธฐเธเธฒเธขเธญเธฒเธเธฒเธจเธ”เธต เน€เธซเธกเธฒเธฐเธเธฑเธเธเธฒเธฃเนเธเนเธเธฒเธเธเธฃเธฐเธเธณเธงเธฑเธ',
   },
   {
     rating: 4,
-    title: 'Pretty good',
+    title: 'เธ”เธตเน€เธเธดเธเธเธฒเธ”',
     comment:
-      "Solid product! Great value for the price, but there's room for minor improvements.",
+      'เน€เธเนเธเธชเธดเธเธเนเธฒเธ—เธตเนเธเธธเนเธกเธฃเธฒเธเธฒ เนเธเนเธเธฒเธเนเธ”เนเธ”เธตเธเธฃเธดเธ เธขเธฑเธเธกเธตเธเธธเธ”เน€เธฅเนเธเธเนเธญเธขเธ—เธตเนเธเธฃเธฑเธเนเธ”เน เนเธ•เนเธ เธฒเธเธฃเธงเธกเธ–เธทเธญเธงเนเธฒเธเนเธฒเธเธญเนเธเธกเธฒเธ',
   },
   {
     rating: 4,
-    title: 'Very satisfied',
+    title: 'เธเธญเนเธเธกเธฒเธ',
     comment:
-      'Good product! High quality and worth the price. Would consider buying again.',
+      'เธเธธเธ“เธ เธฒเธเธ”เธตเธชเธกเธฃเธฒเธเธฒ เนเธเนเธเธฒเธเนเธฅเนเธงเธเธฃเธฐเธ—เธฑเธเนเธ เธ–เนเธฒเธกเธตเธชเธตเธซเธฃเธทเธญเธฃเธธเนเธเธ—เธตเนเธเธญเธเน€เธเธดเนเธกเธเนเธกเธตเนเธญเธเธฒเธชเธเธฅเธฑเธเธกเธฒเธเธทเนเธญเธญเธตเธ',
   },
   {
     rating: 4,
-    title: 'Absolutely love it!',
+    title: 'เธเธญเธเธกเธฒเธ',
     comment:
-      'Perfect in every way! The quality, design, and comfort exceeded all my expectations.',
+      'เธ—เธฑเนเธเธ”เธตเนเธเธเน เธเธธเธ“เธ เธฒเธ เนเธฅเธฐเธเธงเธฒเธกเธชเธเธฒเธขเธ—เธณเธญเธญเธเธกเธฒเนเธ”เนเธ”เธตเน€เธเธดเธเธ—เธตเนเธเธฒเธ”เนเธงเน เนเธเนเนเธฅเนเธงเธฃเธนเนเธชเธถเธเธงเนเธฒเธ•เธฑเธ”เธชเธดเธเนเธเนเธกเนเธเธดเธ”',
   },
   {
     rating: 4,
-    title: 'Exceeded expectations!',
+    title: 'เน€เธเธดเธเธเธงเธฒเธกเธเธฒเธ”เธซเธกเธฒเธข',
     comment:
-      'Fantastic product! High quality, feels durable, and performs well. Highly recommend!',
+      'เธเธฒเธเธเธฃเธฐเธเธญเธเธ”เธต เธ”เธนเธ—เธเธ—เธฒเธ เนเธฅเธฐเนเธเนเธเธฒเธเนเธ”เนเธ•เธฒเธกเธ—เธตเนเธซเธงเธฑเธเนเธงเน เธ–เธทเธญเน€เธเนเธเธ•เธฑเธงเน€เธฅเธทเธญเธเธ—เธตเนเนเธเธฐเธเธณเนเธ”เนเธชเธเธฒเธข เน',
   },
   {
     rating: 5,
-    title: 'Perfect purchase!',
+    title: 'เธเธธเนเธกเธกเธฒเธ',
     comment:
-      "Couldn't be happier with this product. The quality is excellent, and it works flawlessly!",
+      'เธเธฃเธฐเธ—เธฑเธเนเธเธ•เธฑเนเธเนเธ•เนเธเธฃเธฑเนเธเนเธฃเธเธ—เธตเนเนเธเน เธเธธเธ“เธ เธฒเธเธ”เธตเธกเธฒเธเนเธฅเธฐเนเธเนเธเธฒเธเนเธ”เนเธฅเธทเนเธเนเธซเธฅ เนเธกเนเธกเธตเธเธธเธ”เนเธซเนเธเธฑเธเธงเธฅเน€เธฅเธข',
   },
   {
     rating: 5,
-    title: 'Highly recommend',
+    title: 'เนเธเธฐเธเธณเน€เธฅเธข',
     comment:
-      "Amazing product! Worth every penny, great design, and feels premium. I'm very satisfied.",
+      'เธเธธเนเธกเธเนเธฒเธ—เธธเธเธเธฒเธ— เธ”เธตเนเธเธเนเธชเธงเธข เธ”เธนเธเธฃเธตเน€เธกเธตเธขเธก เนเธฅเธฐเนเธเนเธเธฒเธเธเธฃเธดเธเนเธ”เนเธ”เธตเธกเธฒเธ เน€เธเนเธเธเธดเนเธเธ—เธตเนเธญเธขเธฒเธเธเธญเธเธ•เนเธญ',
   },
   {
     rating: 5,
-    title: 'Just what I needed',
+    title: 'เธ•เธฃเธเนเธเธเธญเธ”เธต',
     comment:
-      'Exactly as described! Quality exceeded my expectations, and it arrived quickly.',
+      'เธชเธดเธเธเนเธฒเธ•เธฃเธเธ•เธฒเธกเธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”เธ—เธตเนเนเธเนเธเนเธงเน เธเธธเธ“เธ เธฒเธเธ”เธตเธเธงเนเธฒเธ—เธตเนเธเธดเธ”เนเธฅเธฐเน€เธซเธกเธฒเธฐเธเธฑเธเธชเธดเนเธเธ—เธตเนเธเธณเธฅเธฑเธเธกเธญเธเธซเธฒเธญเธขเธนเนเธเธญเธ”เธต',
   },
   {
     rating: 5,
-    title: 'Excellent choice!',
+    title: 'เน€เธฅเธทเธญเธเนเธกเนเธเธดเธ”',
     comment:
-      'This product is outstanding! Everything about it feels top-notch, from material to functionality.',
+      'เธ—เธธเธเธญเธขเนเธฒเธเธฅเธเธ•เธฑเธงเธ•เธฑเนเธเนเธ•เนเธงเธฑเธชเธ”เธธเนเธเธเธเธ–เธถเธเธเธฒเธฃเนเธเนเธเธฒเธเธเธฃเธดเธ เธฃเธนเนเธชเธถเธเนเธ”เนเน€เธฅเธขเธงเนเธฒเน€เธเนเธเธชเธดเธเธเนเธฒเธ—เธตเนเนเธชเนเนเธเธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”',
   },
   {
     rating: 5,
-    title: "Couldn't ask for more!",
+    title: 'เธ”เธตเธกเธฒเธเธเธเนเธกเนเธญเธขเธฒเธเน€เธเธฅเธตเนเธขเธ',
     comment:
-      "Love this product! It's durable, stylish, and works great. Would buy again without hesitation.",
+      'เธ—เธฑเนเธเธ—เธ เธชเธงเธข เนเธฅเธฐเนเธเนเธเธฒเธเธ”เธตเธกเธฒเธ เนเธเนเนเธฅเนเธงเธเธญเธเธเธฃเธดเธ เธ–เนเธฒเธ•เนเธญเธเธเธทเนเธญเน€เธเธดเนเธกเธเนเธเธฃเนเธญเธกเธ•เธฑเธ”เธชเธดเธเนเธเธญเธตเธเธเธฃเธฑเนเธเนเธเธเนเธกเนเธฅเธฑเธเน€เธฅ',
   },
 ]
 
@@ -1072,62 +1072,61 @@ const data: Data = {
   reviews,
   headerMenus: [
     {
-      name: "Today's Deal",
+      name: 'ดีลวันนี้',
       href: '/search?tag=todays-deal',
     },
     {
-      name: 'New Arrivals',
+      name: 'ของเข้าใหม่',
       href: '/search?tag=new-arrival',
     },
     {
-      name: 'Featured Products',
+      name: 'สินค้าแนะนำ',
       href: '/search?tag=featured',
     },
     {
-      name: 'Best Sellers',
+      name: 'ขายดี',
       href: '/search?tag=best-seller',
     },
     {
-      name: 'Browsing History',
+      name: 'ประวัติการเข้าชม',
       href: '/#browsing-history',
     },
     {
-      name: 'Customer Service',
+      name: 'บริการลูกค้า',
       href: '/page/customer-service',
     },
     {
-      name: 'About Us',
+      name: 'เกี่ยวกับเรา',
       href: '/page/about-us',
     },
     {
-      name: 'Help',
+      name: 'ช่วยเหลือ',
       href: '/page/help',
     },
   ],
   carousels: [
     {
-      title: 'Most Popular Shoes For Sale',
-      buttonCaption: 'Shop Now',
+      title: 'รองเท้ายอดนิยมที่ลูกค้าหยิบใส่ตะกร้ามากที่สุดในช่วงนี้',
+      buttonCaption: 'เลือกซื้อเลย',
       image: '/images/banner3.jpg',
       url: '/search?category=Shoes',
       isPublished: true,
     },
     {
-      title: 'Best Sellers in T-Shirts',
-      buttonCaption: 'Shop Now',
+      title: 'เสื้อยืดขายดีที่แต่งง่าย ใส่สบาย และหยิบใช้ได้ทุกวัน',
+      buttonCaption: 'เลือกซื้อเลย',
       image: '/images/banner1.jpg',
       url: '/search?category=T-Shirts',
       isPublished: true,
     },
     {
-      title: 'Best Deals on Wrist Watches',
-      buttonCaption: 'See More',
+      title: 'ดีลนาฬิกาข้อมือสุดคุ้มที่ช่วยยกระดับลุคได้ในทุกโอกาส',
+      buttonCaption: 'ดูเพิ่มเติม',
       image: '/images/banner2.jpg',
       url: '/search?category=Wrist Watches',
       isPublished: true,
     },
   ],
-
 }
 
 export default data

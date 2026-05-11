@@ -35,7 +35,7 @@ export async function registerUser(userSignUp: IUserSignUp) {
       ...user,
       password: await bcrypt.hash(user.password, 5),
     })
-    return { success: true, message: 'User created successfully' }
+    return { success: true, message: 'สร้างบัญชีผู้ใช้เรียบร้อยแล้ว' }
   } catch (error) {
     return { success: false, error: formatError(error) }
   }
@@ -47,12 +47,12 @@ export async function updateUserName(user: IUserName) {
     await connectToDatabase()
     const session = await auth()
     const currentUser = await User.findById(session?.user?.id)
-    if (!currentUser) throw new Error('User not found')
+    if (!currentUser) throw new Error('ไม่พบบัญชีผู้ใช้')
     currentUser.name = user.name
     const updatedUser = await currentUser.save()
     return {
       success: true,
-      message: 'User updated successfully',
+      message: 'อัปเดตข้อมูลผู้ใช้เรียบร้อยแล้ว',
       data: JSON.parse(JSON.stringify(updatedUser)),
     }
   } catch (error) {

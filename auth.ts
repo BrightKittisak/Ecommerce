@@ -3,7 +3,7 @@ import Google from 'next-auth/providers/google'
 import bcrypt from 'bcryptjs'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { connectToDatabase } from './lib/db'
-import client from './lib/db/client'
+import getMongoClient from './lib/db/client'
 import User from './lib/db/models/user.model'
 
 import NextAuth, { type DefaultSession } from 'next-auth'
@@ -29,7 +29,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60,
   },
-  adapter: MongoDBAdapter(client),
+  adapter: MongoDBAdapter(() => getMongoClient()),
   providers: [
     Google({
       allowDangerousEmailAccountLinking: true,
@@ -72,16 +72,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           await connectToDatabase()
           await User.findByIdAndUpdate(user.id, {
             name: user.name || user.email!.split('@')[0],
-            role: 'user',
+            role: 'User',
           })
         }
         token.name = user.name || user.email!.split('@')[0]
-        token.role = (user as { role: string }).role
+        token.role = (user as { role?: string }).role
       }
 
       if (session?.user?.name && trigger === 'update') {
         token.name = session.user.name
       }
+
+      if (token.sub) {
+        await connectToDatabase()
+        const dbUser = await User.findById(token.sub)
+          .select('name email role')
+          .lean()
+
+        if (dbUser) {
+          token.name = dbUser.name || dbUser.email.split('@')[0]
+          token.role = dbUser.role || 'User'
+        }
+      }
+
       return token
     },
     session: async ({ session, user, trigger, token }) => {

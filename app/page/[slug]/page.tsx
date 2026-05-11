@@ -1,0 +1,227 @@
+import Link from 'next/link'
+import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react'
+
+import { exploreLinks, policyLinks } from '@/lib/site-navigation'
+
+type StaticPage = {
+  title: string
+  eyebrow: string
+  description: string
+  sections: { heading: string; body: string }[]
+}
+
+const staticPages: Record<string, StaticPage> = {
+  'about-us': {
+    title: 'เกี่ยวกับเรา',
+    eyebrow: 'เรื่องราวของเรา',
+    description:
+      'เราออกแบบประสบการณ์ช้อปปิงให้เรียบง่าย สบายตา และน่าเชื่อถือมากขึ้นสำหรับสินค้าที่ใช้งานได้จริงในทุกวัน',
+    sections: [
+      {
+        heading: 'สิ่งที่เราคัดเลือก',
+        body:
+          'คอลเลกชันของเรามุ่งไปที่สินค้าพื้นฐานที่ใส่ได้จริง จับคู่ได้ง่าย และค้นหาได้สะดวกโดยไม่รกสายตา',
+      },
+      {
+        heading: 'ทำไมเราถึงสร้างหน้าร้านนี้',
+        body:
+          'เราอยากให้การตัดสินใจซื้อมั่นใจขึ้น ด้วยการจัดลำดับข้อมูลสินค้าให้ชัด ราคาอ่านง่าย และการนำทางที่ลื่นกว่าเดิม',
+      },
+    ],
+  },
+  'customer-service': {
+    title: 'บริการลูกค้า',
+    eyebrow: 'ฝ่ายช่วยเหลือ',
+    description:
+      'หากมีคำถามเรื่องคำสั่งซื้อ การจัดส่ง การชำระเงิน หรือการคืนสินค้า คุณสามารถเริ่มต้นได้จากหน้านี้',
+    sections: [
+      {
+        heading: 'ช่วยเหลือเรื่องคำสั่งซื้อ',
+        body:
+          'คุณสามารถใช้หน้าบัญชีเพื่อติดตามคำสั่งซื้อ ตรวจสอบสถานะการชำระเงิน และย้อนดูรายละเอียดสินค้าที่เกี่ยวข้องได้',
+      },
+      {
+        heading: 'ข้อมูลที่ควรแจ้งเพื่อให้ช่วยได้เร็วขึ้น',
+        body:
+          'หากเป็นเรื่องเร่งด่วน กรุณาระบุเลขคำสั่งซื้อ วิธีชำระเงิน และสรุปปัญหาแบบสั้น ๆ เพื่อให้ทีมงานตรวจสอบได้เร็วขึ้น',
+      },
+    ],
+  },
+  help: {
+    title: 'ศูนย์ช่วยเหลือ',
+    eyebrow: 'คำตอบแบบรวดเร็ว',
+    description:
+      'รวมคำแนะนำสำหรับการค้นหาสินค้า จัดการตะกร้า เลือกวิธีชำระเงิน และติดตามสถานะคำสั่งซื้อ',
+    sections: [
+      {
+        heading: 'การช่วยเหลือระหว่างเลือกซื้อ',
+        body:
+          'คุณสามารถเลือกดูตามหมวดหมู่ เก็บสินค้าที่สนใจไว้ใน flow การซื้อ และย้อนกลับไปยังสินค้าที่เพิ่งดูผ่านประวัติการเข้าชมได้',
+      },
+      {
+        heading: 'การช่วยเหลือระหว่างชำระเงิน',
+        body:
+          'ระบบจะพาคุณเลือกที่อยู่ กำหนดความเร็วในการจัดส่ง และยืนยันการชำระเงินก่อนสั่งซื้อจริง',
+      },
+    ],
+  },
+  'privacy-policy': {
+    title: 'นโยบายความเป็นส่วนตัว',
+    eyebrow: 'ความเป็นส่วนตัว',
+    description:
+      'เราใช้ข้อมูลบัญชี คำสั่งซื้อ และการชำระเงินเท่าที่จำเป็นต่อการให้บริการและการทำรายการสั่งซื้อเท่านั้น',
+    sections: [
+      {
+        heading: 'ข้อมูลที่เราเก็บ',
+        body:
+          'เราเก็บข้อมูลบัญชีพื้นฐาน ที่อยู่จัดส่ง ประวัติคำสั่งซื้อ และสถานะการชำระเงิน เพื่อใช้ประมวลผลการซื้อและให้ลูกค้าตรวจสอบย้อนหลังได้',
+      },
+      {
+        heading: 'การนำข้อมูลไปใช้',
+        body:
+          'ข้อมูลจะถูกใช้เพื่อการชำระเงิน การจัดส่ง การช่วยเหลือหลังการขาย การยืนยันตัวตน และการส่งอีเมลที่เกี่ยวกับรายการสั่งซื้อ',
+      },
+    ],
+  },
+  'conditions-of-use': {
+    title: 'เงื่อนไขการใช้งาน',
+    eyebrow: 'ข้อตกลง',
+    description:
+      'เมื่อใช้งานเว็บไซต์นี้ ถือว่าคุณยอมรับกติกาการใช้งาน เงื่อนไขการซื้อ และข้อกำหนดเกี่ยวกับบัญชีตามที่ระบุไว้ด้านล่าง',
+    sections: [
+      {
+        heading: 'การใช้งานบัญชี',
+        body:
+          'ผู้ใช้มีหน้าที่ดูแลการเข้าถึงบัญชีของตนเอง และควรตรวจสอบรายละเอียดคำสั่งซื้อให้ครบถ้วนก่อนยืนยันการชำระเงิน',
+      },
+      {
+        heading: 'เงื่อนไขการสั่งซื้อ',
+        body:
+          'จำนวนสินค้า ราคา และการยืนยันการชำระเงินจะถูกตรวจสอบในขั้นตอนสั่งซื้อ และอาจเปลี่ยนแปลงได้ก่อนทำรายการเสร็จสมบูรณ์',
+      },
+    ],
+  },
+  'contact-us': {
+    title: 'ติดต่อเรา',
+    eyebrow: 'ส่งข้อความถึงเรา',
+    description:
+      'แจ้งคำถามพร้อมข้อมูลคำสั่งซื้อที่เกี่ยวข้อง แล้วเราจะช่วยติดตามเรื่องการซื้อ การจัดส่ง หรือปัญหาบัญชีได้รวดเร็วขึ้น',
+    sections: [
+      {
+        heading: 'ข้อมูลที่ควรแนบมา',
+        body:
+          'กรุณาระบุเลขคำสั่งซื้อ วิธีชำระเงิน และปัญหาที่พบ เพื่อช่วยให้ทีมงานประเมินและตอบกลับได้เร็วขึ้น',
+      },
+      {
+        heading: 'หัวข้อที่พบบ่อย',
+        body:
+          'คำถามเกี่ยวกับการชำระเงิน การคืนสินค้า และสถานะการจัดส่ง เป็นเรื่องที่พบบ่อยและมักตรวจสอบให้ได้รวดเร็ว',
+      },
+    ],
+  },
+  'returns-policy': {
+    title: 'นโยบายการคืนสินค้า',
+    eyebrow: 'การคืนสินค้า',
+    description:
+      'สินค้าที่ไม่ผ่านการใช้งานและยังอยู่ในสภาพดี โดยทั่วไปสามารถยื่นตรวจสอบสิทธิ์การคืนได้หลังจากได้รับสินค้าแล้ว',
+    sections: [
+      {
+        heading: 'เงื่อนไขเบื้องต้นในการคืนสินค้า',
+        body:
+          'ควรเก็บสินค้าให้อยู่ในสภาพเดิมเท่าที่เป็นไปได้ และตรวจสอบรายละเอียดคำสั่งซื้อให้ครบก่อนส่งคำขอคืนสินค้า',
+      },
+      {
+        heading: 'ขั้นตอนถัดไป',
+        body:
+          'เมื่อคุณติดต่อทีมช่วยเหลือ กรุณาระบุเลขคำสั่งซื้อและสินค้าที่ต้องการคืน เพื่อให้ตรวจสอบได้ถูกต้องมากขึ้น',
+      },
+    ],
+  },
+}
+
+const staticNavLinks = [...exploreLinks, ...policyLinks]
+
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await props.params
+  const page = staticPages[slug]
+
+  if (!page) {
+    return { title: 'ไม่พบหน้า' }
+  }
+
+  return {
+    title: page.title,
+    description: page.description,
+  }
+}
+
+export default async function StaticPage(props: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await props.params
+  const page = staticPages[slug]
+
+  if (!page) notFound()
+
+  return (
+    <div className='page-shell py-10'>
+      <div className='mx-auto mb-5 flex max-w-4xl flex-col gap-4'>
+        <div className='flex flex-wrap items-center gap-3'>
+          <Link
+            href='/'
+            className='inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/80 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted'
+          >
+            <ArrowLeft className='h-4 w-4' />
+            กลับหน้าหลัก
+          </Link>
+          <div className='text-sm text-muted-foreground'>
+            หน้าเหล่านี้ใช้เป็นศูนย์รวมข้อมูลช่วยเหลือและนโยบาย
+          </div>
+        </div>
+
+        <nav className='section-shell flex flex-wrap gap-2 p-3'>
+          {staticNavLinks.map((link) => {
+            const isActive = link.href === `/page/${slug}`
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`rounded-full px-4 py-2 text-sm transition-colors ${
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary/70 text-foreground hover:bg-muted'
+                }`}
+              >
+                {link.name}
+              </Link>
+            )
+          })}
+        </nav>
+      </div>
+
+      <div className='section-shell mx-auto max-w-4xl p-8 md:p-12'>
+        <p className='eyebrow mb-3'>{page.eyebrow}</p>
+        <h1 className='h1-bold'>{page.title}</h1>
+        <p className='mt-4 max-w-2xl text-sm leading-7 text-muted-foreground md:text-base'>
+          {page.description}
+        </p>
+
+        <div className='mt-10 space-y-8'>
+          {page.sections.map((section) => (
+            <section key={section.heading} className='space-y-3'>
+              <h2 className='text-2xl font-semibold'>{section.heading}</h2>
+              <p className='text-sm leading-7 text-foreground/80 md:text-base'>
+                {section.body}
+              </p>
+            </section>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}

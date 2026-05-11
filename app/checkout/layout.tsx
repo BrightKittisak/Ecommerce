@@ -3,6 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
+export const dynamic = 'force-dynamic'
+
 export default function CheckoutLayout({
   children,
 }: {
@@ -25,7 +27,7 @@ export default function CheckoutLayout({
             />
           </Link>
           <div>
-            <h1 className='text-3xl'>Checkout</h1>
+            <h1 className='text-3xl'>ชำระเงิน</h1>
           </div>
           <div>
             <Link href='/page/help'>

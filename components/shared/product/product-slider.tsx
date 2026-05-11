@@ -1,6 +1,6 @@
 'use client'
 
-import * as React from 'react'
+import { IProduct } from '@/lib/db/models/product.model'
 import {
   Carousel,
   CarouselContent,
@@ -8,8 +8,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
+
 import ProductCard from './product-card'
-import { IProduct } from '@/lib/db/models/product.model'
 
 export default function ProductSlider({
   title,
@@ -21,8 +21,13 @@ export default function ProductSlider({
   hideDetails?: boolean
 }) {
   return (
-    <div className='w-full bg-background'>
-      <h2 className='h2-bold mb-5'>{title}</h2>
+    <div className='w-full'>
+      <div className='mb-5 flex items-end justify-between gap-4'>
+        <div>
+          <p className='eyebrow mb-2'>คัดมาให้ดูต่อได้เลย</p>
+          <h2 className='h2-bold max-w-3xl'>{title}</h2>
+        </div>
+      </div>
       <Carousel
         opts={{
           align: 'start',
@@ -48,8 +53,8 @@ export default function ProductSlider({
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className='left-0' />
-        <CarouselNext className='right-0' />
+        <CarouselPrevious className='left-2 border-border/60 bg-card/90' />
+        <CarouselNext className='right-2 border-border/60 bg-card/90' />
       </Carousel>
     </div>
   )

@@ -1,5 +1,6 @@
 import { IOrderInput } from '@/types'
 import { Document, Model, model, models, Schema } from 'mongoose'
+import { CURRENCY_CODE } from '../../utils'
 
 export interface IOrder extends Document, IOrderInput {
   _id: string
@@ -44,11 +45,21 @@ const orderSchema = new Schema<IOrder>(
     },
     expectedDeliveryDate: { type: Date, required: true },
     paymentMethod: { type: String, required: true },
-    paymentResult: { id: String, status: String, email_address: String },
+    paymentResult: {
+      id: String,
+      status: String,
+      email_address: String,
+      pricePaid: String,
+    },
     itemsPrice: { type: Number, required: true },
     shippingPrice: { type: Number, required: true },
     taxPrice: { type: Number, required: true },
     totalPrice: { type: Number, required: true },
+    currencyCode: {
+      type: String,
+      required: true,
+      default: CURRENCY_CODE,
+    },
     isPaid: { type: Boolean, required: true, default: false },
     paidAt: { type: Date },
     isDelivered: { type: Boolean, required: true, default: false },

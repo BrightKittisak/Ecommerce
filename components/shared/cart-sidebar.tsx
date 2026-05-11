@@ -29,13 +29,13 @@ export default function CartSidebar() {
       <div className={`fixed border-l h-full`}>
         <div className='p-2 h-full flex flex-col gap-2 justify-start items-center'>
           <div className='text-center space-y-2'>
-            <div> Subtotal</div>
+            <div>ยอดรวมย่อย</div>
             <div className='font-bold'>
               <ProductPrice price={itemsPrice} plain />
             </div>
             {itemsPrice > FREE_SHIPPING_MIN_PRICE && (
               <div className=' text-center text-xs'>
-                Your order qualifies for FREE Shipping
+                คำสั่งซื้อนี้ได้รับสิทธิ์จัดส่งฟรีแล้ว
               </div>
             )}
 
@@ -46,7 +46,7 @@ export default function CartSidebar() {
               )}
               href='/cart'
             >
-              Go to Cart
+              ไปที่ตะกร้า
             </Link>
             <Separator className='mt-3' />
           </div>

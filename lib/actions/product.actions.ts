@@ -1,16 +1,41 @@
 'use server'
 
+import { cache } from 'react'
+
 import { connectToDatabase } from '@/lib/db'
 import Product, { IProduct } from '@/lib/db/models/product.model'
 import { PAGE_SIZE } from '../constants'
 
-export async function getAllCategories() {
+const getPublishedCategories = cache(async () => {
   await connectToDatabase()
-  const categories = await Product.find({ isPublished: true }).distinct(
-    'category'
+  return Product.find({ isPublished: true }).distinct('category')
+})
+
+const getPublishedTags = cache(async () => {
+  await connectToDatabase()
+  const tags = await Product.aggregate([
+    { $match: { isPublished: true } },
+    { $unwind: '$tags' },
+    { $group: { _id: null, uniqueTags: { $addToSet: '$tags' } } },
+    { $project: { _id: 0, uniqueTags: 1 } },
+  ])
+
+  return (
+    (tags[0]?.uniqueTags
+      .sort((a: string, b: string) => a.localeCompare(b))
+      .map((x: string) =>
+        x
+          .split('-')
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+      ) as string[]) || []
   )
-  return categories
+})
+
+export async function getAllCategories() {
+  return getPublishedCategories()
 }
+
 export async function getProductsForCard({
   tag,
   limit = 4,
@@ -21,15 +46,17 @@ export async function getProductsForCard({
   await connectToDatabase()
   const products = await Product.find(
     { tags: { $in: [tag] }, isPublished: true },
-    {
-      name: 1,
-      href: { $concat: ['/product/', '$slug'] },
-      image: { $arrayElemAt: ['$images', 0] },
-    }
+    { name: 1, slug: 1, images: 1 }
   )
     .sort({ createdAt: 'desc' })
     .limit(limit)
-  return JSON.parse(JSON.stringify(products)) as {
+    .lean()
+
+  return products.map((product) => ({
+    name: product.name,
+    href: `/product/${product.slug}`,
+    image: product.images[0],
+  })) as {
     name: string
     href: string
     image: string
@@ -50,14 +77,15 @@ export async function getProductsByTag({
     })
       .sort({ createdAt: 'desc' })
       .limit(limit)
+      .lean()
     return JSON.parse(JSON.stringify(products)) as IProduct[]
   }
 
   // GET ONE PRODUCT BY SLUG
 export async function getProductBySlug(slug: string) {
   await connectToDatabase()
-  const product = await Product.findOne({ slug, isPublished: true })
-  if (!product) throw new Error('Product not found')
+  const product = await Product.findOne({ slug, isPublished: true }).lean()
+  if (!product) throw new Error('ไม่พบสินค้า')
   return JSON.parse(JSON.stringify(product)) as IProduct
 }
 // GET RELATED PRODUCTS: PRODUCTS WITH SAME CATEGORY
@@ -83,6 +111,7 @@ export async function getRelatedProductsByCategory({
     .sort({ numSales: 'desc' })
     .skip(skipAmount)
     .limit(limit)
+    .lean()
   const productsCount = await Product.countDocuments(conditions)
   return {
     data: JSON.parse(JSON.stringify(products)) as IProduct[],
@@ -168,6 +197,7 @@ export async function getAllProducts({
     .lean()
 
   const countProducts = await Product.countDocuments({
+    ...isPublished,
     ...queryFilter,
     ...tagFilter,
     ...categoryFilter,
@@ -184,19 +214,5 @@ export async function getAllProducts({
 }
 
 export async function getAllTags() {
-  const tags = await Product.aggregate([
-    { $unwind: '$tags' },
-    { $group: { _id: null, uniqueTags: { $addToSet: '$tags' } } },
-    { $project: { _id: 0, uniqueTags: 1 } },
-  ])
-  return (
-    (tags[0]?.uniqueTags
-      .sort((a: string, b: string) => a.localeCompare(b))
-      .map((x: string) =>
-        x
-          .split('-')
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ')
-      ) as string[]) || []
-  )
+  return getPublishedTags()
 }

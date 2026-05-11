@@ -16,12 +16,12 @@ export default function BrowsingHistoryList({
       <div className='bg-background'>
         <Separator className={cn('mb-4', className)} />
         <ProductList
-          title={"Related to items that you've viewed"}
+          title='ใกล้เคียงกับสินค้าที่คุณเคยดู'
           type='related'
         />
         <Separator className='mb-4' />
         <ProductList
-          title={'Your browsing history'}
+          title='ประวัติการเข้าชมของคุณ'
           hideDetails
           type='history'
         />

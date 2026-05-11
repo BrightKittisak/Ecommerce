@@ -1,4 +1,5 @@
 'use client'
+
 import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
@@ -32,10 +33,10 @@ export default function CollapsibleOnMobile({
         {deviceType === 'mobile' && (
           <Button
             onClick={() => setOpen(!open)}
-            variant={'outline'}
+            variant='outline'
             className='w-full'
           >
-            {title}
+            {open ? `ซ่อน${title}` : `แสดง${title}`}
           </Button>
         )}
       </CollapsibleTrigger>

@@ -1,7 +1,10 @@
 import Link from 'next/link'
 
+import CollapsibleOnMobile from '@/components/shared/collapsible-on-mobile'
 import Pagination from '@/components/shared/pagination'
 import ProductCard from '@/components/shared/product/product-card'
+import ProductSortSelector from '@/components/shared/product/product-sort-selector'
+import Rating from '@/components/shared/product/rating'
 import { Button } from '@/components/ui/button'
 import {
   getAllCategories,
@@ -9,31 +12,28 @@ import {
   getAllTags,
 } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
-import ProductSortSelector from '@/components/shared/product/product-sort-selector'
+import { translateCategory, translateTag } from '@/lib/i18n'
 import { getFilterUrl, toSlug } from '@/lib/utils'
-import Rating from '@/components/shared/product/rating'
-
-import CollapsibleOnMobile from '@/components/shared/collapsible-on-mobile'
 
 const sortOrders = [
-  { value: 'price-low-to-high', name: 'Price: Low to high' },
-  { value: 'price-high-to-low', name: 'Price: High to low' },
-  { value: 'newest-arrivals', name: 'Newest arrivals' },
-  { value: 'avg-customer-review', name: 'Avg. customer review' },
-  { value: 'best-selling', name: 'Best selling' },
+  { value: 'price-low-to-high', name: 'ราคาต่ำไปสูง' },
+  { value: 'price-high-to-low', name: 'ราคาสูงไปต่ำ' },
+  { value: 'newest-arrivals', name: 'มาใหม่ล่าสุด' },
+  { value: 'avg-customer-review', name: 'คะแนนรีวิวเฉลี่ย' },
+  { value: 'best-selling', name: 'ขายดีที่สุด' },
 ]
 
 const prices = [
   {
-    name: '$1 to $20',
+    name: '$1 ถึง $20',
     value: '1-20',
   },
   {
-    name: '$21 to $50',
+    name: '$21 ถึง $50',
     value: '21-50',
   },
   {
-    name: '$51 to $1000',
+    name: '$51 ถึง $1000',
     value: '51-1000',
   },
 ]
@@ -66,15 +66,15 @@ export async function generateMetadata(props: {
     price !== 'all'
   ) {
     return {
-      title: `Search ${q !== 'all' ? q : ''}
-          ${category !== 'all' ? ` : Category ${category}` : ''}
-          ${tag !== 'all' ? ` : Tag ${tag}` : ''}
-          ${price !== 'all' ? ` : Price ${price}` : ''}
-          ${rating !== 'all' ? ` : Rating ${rating}` : ''}`,
+      title: `ค้นหา ${q !== 'all' ? q : ''}
+          ${category !== 'all' ? ` : หมวด ${translateCategory(category)}` : ''}
+          ${tag !== 'all' ? ` : แท็ก ${translateTag(tag)}` : ''}
+          ${price !== 'all' ? ` : ราคา ${price}` : ''}
+          ${rating !== 'all' ? ` : คะแนน ${rating}` : ''}`,
     }
   } else {
     return {
-      title: 'Search Products',
+      title: 'ค้นหาสินค้า',
     }
   }
 }
@@ -115,26 +115,29 @@ export default async function SearchPage(props: {
     page: Number(page),
     sort,
   })
+
   return (
-    <div>
-      <div className='mb-2 py-2 md:border-b flex-between flex-col md:flex-row '>
+    <div className='space-y-4'>
+      <div className='section-shell flex-between flex-col gap-3 px-5 py-4 md:flex-row'>
         <div className='flex items-center'>
           {data.totalProducts === 0
-            ? 'No'
+            ? 'ไม่พบ'
             : `${data.from}-${data.to} of ${data.totalProducts}`}{' '}
-          results
+          รายการ
           {(q !== 'all' && q !== '') ||
           (category !== 'all' && category !== '') ||
           (tag !== 'all' && tag !== '') ||
           rating !== 'all' ||
           price !== 'all'
-            ? ` for `
+            ? ` สำหรับ `
             : null}
           {q !== 'all' && q !== '' && '"' + q + '"'}
-          {category !== 'all' && category !== '' && `  Category: ` + category}
-          {tag !== 'all' && tag !== '' && `   Tag: ` + tag}
-          {price !== 'all' && `    Price: ` + price}
-          {rating !== 'all' && `   Rating: ` + rating + ` & up`}
+          {category !== 'all' &&
+            category !== '' &&
+            `  หมวด: ` + translateCategory(category)}
+          {tag !== 'all' && tag !== '' && `   แท็ก: ` + translateTag(tag)}
+          {price !== 'all' && `    ราคา: ` + price}
+          {rating !== 'all' && `   คะแนน: ` + rating + ` ดาวขึ้นไป`}
           &nbsp;
           {(q !== 'all' && q !== '') ||
           (category !== 'all' && category !== '') ||
@@ -142,7 +145,7 @@ export default async function SearchPage(props: {
           rating !== 'all' ||
           price !== 'all' ? (
             <Button variant={'link'} asChild>
-              <Link href='/search'>Clear</Link>
+              <Link href='/search'>ล้างตัวกรอง</Link>
             </Button>
           ) : null}
         </div>
@@ -154,11 +157,11 @@ export default async function SearchPage(props: {
           />
         </div>
       </div>
-      <div className='bg-card grid md:grid-cols-5 md:gap-4'>
-        <CollapsibleOnMobile title='Filters'>
-          <div className='space-y-4'>
+      <div className='grid gap-4 md:grid-cols-5'>
+        <CollapsibleOnMobile title='ตัวกรอง'>
+          <div className='section-shell space-y-4 p-5'>
             <div>
-              <div className='font-bold'>Department</div>
+              <div className='font-bold'>หมวดหมู่</div>
               <ul>
                 <li>
                   <Link
@@ -167,30 +170,30 @@ export default async function SearchPage(props: {
                     }`}
                     href={getFilterUrl({ category: 'all', params })}
                   >
-                    All
+                    ทั้งหมด
                   </Link>
                 </li>
                 {categories.map((c: string) => (
                   <li key={c}>
                     <Link
-                      className={`${c === category && 'text-primary'}`}
-                      href={getFilterUrl({ category: c, params })}
-                    >
-                      {c}
+                    className={`${c === category && 'text-primary'}`}
+                    href={getFilterUrl({ category: c, params })}
+                  >
+                      {translateCategory(c)}
                     </Link>
                   </li>
                 ))}
               </ul>
             </div>
             <div>
-              <div className='font-bold'>Price</div>
+              <div className='font-bold'>ราคา</div>
               <ul>
                 <li>
                   <Link
                     className={`${'all' === price && 'text-primary'}`}
                     href={getFilterUrl({ price: 'all', params })}
                   >
-                    All
+                    ทั้งหมด
                   </Link>
                 </li>
                 {prices.map((p) => (
@@ -206,14 +209,14 @@ export default async function SearchPage(props: {
               </ul>
             </div>
             <div>
-              <div className='font-bold'>Customer Review</div>
+              <div className='font-bold'>คะแนนรีวิว</div>
               <ul>
                 <li>
                   <Link
                     href={getFilterUrl({ rating: 'all', params })}
                     className={`${'all' === rating && 'text-primary'}`}
                   >
-                    All
+                    ทั้งหมด
                   </Link>
                 </li>
 
@@ -223,14 +226,14 @@ export default async function SearchPage(props: {
                     className={`${'4' === rating && 'text-primary'}`}
                   >
                     <div className='flex'>
-                      <Rating size={4} rating={4} /> & Up
+                      <Rating size={4} rating={4} /> ขึ้นไป
                     </div>
                   </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <div className='font-bold'>Tag</div>
+              <div className='font-bold'>แท็ก</div>
               <ul>
                 <li>
                   <Link
@@ -239,7 +242,7 @@ export default async function SearchPage(props: {
                     }`}
                     href={getFilterUrl({ tag: 'all', params })}
                   >
-                    All
+                    ทั้งหมด
                   </Link>
                 </li>
                 {tags.map((t: string) => (
@@ -248,7 +251,7 @@ export default async function SearchPage(props: {
                       className={`${toSlug(t) === tag && 'text-primary'}`}
                       href={getFilterUrl({ tag: t, params })}
                     >
-                      {t}
+                      {translateTag(t)}
                     </Link>
                   </li>
                 ))}
@@ -257,20 +260,20 @@ export default async function SearchPage(props: {
           </div>
         </CollapsibleOnMobile>
 
-        <div className='md:col-span-4 space-y-4'>
-          <div>
-            <div className='font-bold text-xl'>Results</div>
-            <div>Check each product page for other buying options</div>
+        <div className='section-shell space-y-4 p-5 md:col-span-4'>
+          <div className='border-b border-border/60 pb-4'>
+            <div className='font-bold text-xl'>ผลการค้นหา</div>
+            <div>กดเข้าแต่ละสินค้าเพื่อดูตัวเลือกการซื้อเพิ่มเติม</div>
           </div>
 
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-2  lg:grid-cols-3  '>
-            {data.products.length === 0 && <div>No product found</div>}
+          <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+            {data.products.length === 0 && <div>ไม่พบสินค้าที่ตรงกับเงื่อนไข</div>}
             {data.products.map((product: IProduct) => (
               <ProductCard key={product._id} product={product} />
             ))}
           </div>
-          {data!.totalPages! > 1 && (
-            <Pagination page={page} totalPages={data!.totalPages} />
+          {data.totalPages > 1 && (
+            <Pagination page={page} totalPages={data.totalPages} />
           )}
         </div>
       </div>

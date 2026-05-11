@@ -24,7 +24,7 @@ export async function createUpdateReview({
   try {
     const session = await auth()
     if (!session) {
-      throw new Error('User is not authenticated')
+      throw new Error('กรุณาเข้าสู่ระบบก่อนรีวิวสินค้า')
     }
 
     const review = ReviewInputSchema.parse({
@@ -47,7 +47,7 @@ export async function createUpdateReview({
       revalidatePath(path)
       return {
         success: true,
-        message: 'Review updated successfully',
+        message: 'อัปเดตรีวิวเรียบร้อยแล้ว',
         // data: JSON.parse(JSON.stringify(existReview)),
       }
     } else {
@@ -56,7 +56,7 @@ export async function createUpdateReview({
       revalidatePath(path)
       return {
         success: true,
-        message: 'Review created successfully',
+        message: 'ส่งรีวิวเรียบร้อยแล้ว',
         // data: JSON.parse(JSON.stringify(newReview)),
       }
     }
@@ -82,7 +82,10 @@ const updateProductReview = async (productId: string) => {
   // Calculate the total number of reviews and average rating
   const totalReviews = result.reduce((sum, { count }) => sum + count, 0)
   const avgRating =
-    result.reduce((sum, { _id, count }) => sum + _id * count, 0) / totalReviews
+    totalReviews === 0
+      ? 0
+      : result.reduce((sum, { _id, count }) => sum + _id * count, 0) /
+        totalReviews
 
   // Convert aggregation result to a map for easier lookup
   const ratingMap = result.reduce((map, { _id, count }) => {
@@ -121,7 +124,6 @@ export async function getReviews({
     })
     .skip(skipAmount)
     .limit(limit)
-  console.log(reviews)
   const reviewsCount = await Review.countDocuments({ product: productId })
   return {
     data: JSON.parse(JSON.stringify(reviews)) as IReviewDetails[],
@@ -136,7 +138,7 @@ export const getReviewByProductId = async ({
   await connectToDatabase()
   const session = await auth()
   if (!session) {
-    throw new Error('User is not authenticated')
+    throw new Error('กรุณาเข้าสู่ระบบก่อนรีวิวสินค้า')
   }
   const review = await Review.findOne({
     product: productId,

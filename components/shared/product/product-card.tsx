@@ -1,21 +1,21 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import React from 'react'
 
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { IProduct } from '@/lib/db/models/product.model'
-
-import Rating from './rating'
+import { translateCategory } from '@/lib/i18n'
 import { formatNumber, generateId, round2 } from '@/lib/utils'
-import ProductPrice from './product-price'
-import ImageHover from './image-hover'
+
 import AddToCart from './add-to-cart'
+import ImageHover from './image-hover'
+import ProductPrice from './product-price'
+import Rating from './rating'
 
 const ProductCard = ({
   product,
   hideBorder = false,
   hideDetails = false,
-  hideAddToCart =false,
+  hideAddToCart = false,
 }: {
   product: IProduct
   hideDetails?: boolean
@@ -24,7 +24,7 @@ const ProductCard = ({
 }) => {
   const ProductImage = () => (
     <Link href={`/product/${product.slug}`}>
-      <div className='relative h-52'>
+      <div className='relative h-56 overflow-hidden rounded-[1.4rem] bg-secondary/50'>
         {product.images.length > 1 ? (
           <ImageHover
             src={product.images[0]}
@@ -32,25 +32,29 @@ const ProductCard = ({
             alt={product.name}
           />
         ) : (
-          <div className='relative h-52'>
+          <div className='relative h-56'>
             <Image
               src={product.images[0]}
               alt={product.name}
               fill
-              sizes='80vw'
-              className='object-contain'
+              sizes='(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 20vw'
+              className='object-contain p-5 transition-transform duration-500 hover:scale-105'
             />
           </div>
         )}
       </div>
     </Link>
   )
+
   const ProductDetails = () => (
-    <div className='flex-1 space-y-2'>
-      <p className='font-bold'>{product.brand}</p>
+    <div className='flex-1 space-y-3'>
+      <div className='flex items-center justify-between gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground'>
+        <p>{product.brand}</p>
+        <p>{translateCategory(product.category)}</p>
+      </div>
       <Link
         href={`/product/${product.slug}`}
-        className='overflow-hidden text-ellipsis'
+        className='overflow-hidden text-left text-base font-semibold text-foreground text-ellipsis'
         style={{
           display: '-webkit-box',
           WebkitLineClamp: 2,
@@ -59,7 +63,7 @@ const ProductCard = ({
       >
         {product.name}
       </Link>
-      <div className='flex gap-2 justify-center'>
+      <div className='flex justify-start gap-2'>
         <Rating rating={product.avgRating} />
         <span>({formatNumber(product.numReviews)})</span>
       </div>
@@ -72,6 +76,7 @@ const ProductCard = ({
       />
     </div>
   )
+
   const AddButton = () => (
     <div className='w-full text-center'>
       <AddToCart
@@ -98,7 +103,7 @@ const ProductCard = ({
       <ProductImage />
       {!hideDetails && (
         <>
-          <div className='p-3 flex-1 text-center'>
+          <div className='flex-1 p-3 text-center'>
             <ProductDetails />
           </div>
           {!hideAddToCart && <AddButton />}
@@ -106,16 +111,16 @@ const ProductCard = ({
       )}
     </div>
   ) : (
-    <Card className='flex flex-col  '>
+    <Card className='flex h-full flex-col overflow-hidden border-border/60 bg-card/90 shadow-[0_24px_80px_-48px_rgba(47,32,21,0.65)] transition-transform duration-300 hover:-translate-y-1'>
       <CardHeader className='p-3'>
         <ProductImage />
       </CardHeader>
       {!hideDetails && (
         <>
-          <CardContent className='p-3 flex-1  text-center'>
+          <CardContent className='flex-1 p-4 pt-1'>
             <ProductDetails />
           </CardContent>
-          <CardFooter className='P-3'>
+          <CardFooter className='p-4 pt-0'>
             {!hideAddToCart && <AddButton />}
           </CardFooter>
         </>

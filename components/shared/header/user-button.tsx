@@ -1,5 +1,9 @@
-import { auth } from '@/auth'
+import Link from 'next/link'
+import { ChevronDown } from 'lucide-react'
 
+import { auth } from '@/auth'
+import { SignOut } from '@/lib/actions/user.actions'
+import { cn } from '@/lib/utils'
 import { Button, buttonVariants } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -9,21 +13,20 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { SignOut } from '@/lib/actions/user.actions'
-import { cn } from '@/lib/utils'
-import { ChevronDown } from 'lucide-react'
-import Link from 'next/link'
 
 export default async function UserButton() {
   const session = await auth()
+
   return (
-    <div className='flex gap-2 items-center'>
+    <div className='flex items-center gap-2'>
       <DropdownMenu>
         <DropdownMenuTrigger className='header-button' asChild>
-          <div className='flex items-center'>
-            <div className='flex flex-col text-xs text-left'>
-              <span>Hello, {session ? session.user.name : 'sign in'}</span>
-              <span className='font-bold'>Account & Orders</span>
+          <div className='flex items-center gap-2'>
+            <div className='flex flex-col text-left text-xs'>
+              <span className='text-muted-foreground'>
+                สวัสดี, {session ? session.user.name : 'เข้าสู่ระบบ'}
+              </span>
+              <span className='font-bold text-foreground'>บัญชีและคำสั่งซื้อ</span>
             </div>
             <ChevronDown />
           </div>
@@ -42,25 +45,25 @@ export default async function UserButton() {
             </DropdownMenuLabel>
             <DropdownMenuGroup>
               <Link className='w-full' href='/account'>
-                <DropdownMenuItem>Your account</DropdownMenuItem>
+                <DropdownMenuItem>บัญชีของคุณ</DropdownMenuItem>
               </Link>
               <Link className='w-full' href='/account/orders'>
-                <DropdownMenuItem>Your orders</DropdownMenuItem>
+                <DropdownMenuItem>คำสั่งซื้อของคุณ</DropdownMenuItem>
               </Link>
 
               {session.user.role === 'Admin' && (
                 <Link className='w-full' href='/admin/overview'>
-                  <DropdownMenuItem>Admin</DropdownMenuItem>
+                  <DropdownMenuItem>ผู้ดูแลระบบ</DropdownMenuItem>
                 </Link>
               )}
             </DropdownMenuGroup>
-            <DropdownMenuItem className='p-0 mb-1'>
+            <DropdownMenuItem className='mb-1 p-0'>
               <form action={SignOut} className='w-full'>
                 <Button
-                  className='w-full py-4 px-2 h-4 justify-start'
+                  className='h-4 w-full justify-start px-2 py-4'
                   variant='ghost'
                 >
-                  Sign out
+                  ออกจากระบบ
                 </Button>
               </form>
             </DropdownMenuItem>
@@ -73,13 +76,13 @@ export default async function UserButton() {
                   className={cn(buttonVariants(), 'w-full')}
                   href='/sign-in'
                 >
-                  Sign in
+                  เข้าสู่ระบบ
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuLabel>
               <div className='font-normal'>
-                New Customer? <Link href='/sign-up'>Sign up</Link>
+                ลูกค้าใหม่? <Link href='/sign-up'>สมัครสมาชิก</Link>
               </div>
             </DropdownMenuLabel>
           </DropdownMenuContent>

@@ -1,55 +1,77 @@
-import { APP_NAME } from "@/lib/constants";
-import Image from "next/image";
-import Link from "next/link";
-import Menu from "./menu";
-import data from "@/lib/data";
-import Search from "./search";
-import { getAllCategories } from "@/lib/actions/product.actions";
-import Sidebar from "./sidebar";
+import Image from 'next/image'
+import Link from 'next/link'
+
+import Search from './search'
+import Menu from './menu'
+import Sidebar from './sidebar'
+import data from '@/lib/data'
+import { APP_NAME } from '@/lib/constants'
+import { getAllCategories } from '@/lib/actions/product.actions'
 
 export default async function Header() {
-  const categories = await getAllCategories();
+  const categories = await getAllCategories()
+
   return (
-    <header className="bg-black  text-white">
-      <div className="px-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
+    <header className='sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur-xl'>
+      <div className='bg-[linear-gradient(90deg,#18352c,#2f5a49,#b55b34)] text-white'>
+        <div className='page-shell flex min-h-10 items-center justify-between gap-4 text-xs font-medium'>
+          <span>คัดของใช้จำเป็นให้ดูดีขึ้น ใช้ง่ายขึ้น และคุ้มทุกวัน</span>
+          <span className='hidden md:block'>
+            ชำระเงินได้ทั้ง PayPal, Stripe และเก็บเงินปลายทาง
+          </span>
+        </div>
+      </div>
+
+      <div className='page-shell py-4'>
+        <div className='flex items-center justify-between gap-4'>
+          <div className='flex items-center'>
             <Link
-              href="/"
-              className="flex items-center header-button font-extrabold text-2xl m-1 "
+              href='/'
+              className='group flex items-center gap-3 rounded-full px-2 py-1'
             >
               <Image
-                src="/icons/logo.svg"
-                width={40}
-                height={40}
+                src='/icons/logo.svg'
+                width={46}
+                height={46}
                 alt={`${APP_NAME} logo`}
+                className='transition-transform duration-300 group-hover:rotate-6'
               />
-              {APP_NAME}
+              <div className='flex flex-col'>
+                <span className='font-serif text-2xl font-semibold tracking-tight text-foreground'>
+                  {APP_NAME}
+                </span>
+                <span className='text-[11px] uppercase tracking-[0.28em] text-muted-foreground'>
+                  ช้อปง่าย ดูดีทุกธีม
+                </span>
+              </div>
             </Link>
           </div>
-          <div className="hidden md:block flex-1 max-w-xl">
+          <div className='hidden max-w-xl flex-1 md:block'>
             <Search />
           </div>
           <Menu />
         </div>
-        <div className="md:hidden block py-2">
+        <div className='block pt-3 md:hidden'>
           <Search />
         </div>
       </div>
-      <div className="flex items-center px-3 mb-[1px]  bg-gray-800">
-        <Sidebar categories={categories} />
-        <div className="flex items-center flex-wrap gap-3 overflow-hidden   max-h-[42px]">
-          {data.headerMenus.map((menu) => (
-            <Link
-              href={menu.href}
-              key={menu.href}
-              className="header-button !p-2"
-            >
-              {menu.name}
-            </Link>
-          ))}
+
+      <div className='border-t border-border/60 bg-card/70'>
+        <div className='page-shell flex items-center gap-4 overflow-hidden py-2'>
+          <Sidebar categories={categories} />
+          <div className='flex max-h-[42px] flex-wrap items-center gap-2 overflow-hidden'>
+            {data.headerMenus.map((menu) => (
+              <Link
+                href={menu.href}
+                key={menu.href}
+                className='header-button !px-3 !py-1.5 text-sm text-muted-foreground hover:text-foreground'
+              >
+                {menu.name}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </header>
-  );
+  )
 }

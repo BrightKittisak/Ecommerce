@@ -1,8 +1,10 @@
-import * as React from 'react'
 import Link from 'next/link'
-import { X, ChevronRight, UserCircle, MenuIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { ChevronRight, MenuIcon, UserCircle, X } from 'lucide-react'
+
+import { auth } from '@/auth'
 import { SignOut } from '@/lib/actions/user.actions'
+import { translateCategory } from '@/lib/i18n'
+import { Button } from '@/components/ui/button'
 import {
   Drawer,
   DrawerClose,
@@ -12,7 +14,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer'
-import { auth } from '@/auth'
 
 export default async function Sidebar({
   categories,
@@ -23,31 +24,28 @@ export default async function Sidebar({
 
   return (
     <Drawer direction='left'>
-      <DrawerTrigger className='header-button flex items-center !p-2  '>
-        <MenuIcon className='h-5 w-5 mr-1' />
-        All
+      <DrawerTrigger className='header-button flex items-center !p-2'>
+        <MenuIcon className='mr-1 h-5 w-5' />
+        ทั้งหมด
       </DrawerTrigger>
-      <DrawerContent className='w-[350px] mt-0 top-0'>
-        <div className='flex flex-col h-full'>
-          {/* User Sign In Section */}
-          <div className='dark bg-gray-800 text-foreground flex items-center justify-between  '>
+      <DrawerContent className='top-0 mt-0 w-[350px] border-r border-border/70 bg-background'>
+        <div className='flex h-full flex-col'>
+          <div className='flex items-center justify-between bg-foreground text-background'>
             <DrawerHeader>
               <DrawerTitle className='flex items-center'>
-                <UserCircle className='h-6 w-6 mr-2' />
+                <UserCircle className='mr-2 h-6 w-6' />
                 {session ? (
                   <DrawerClose asChild>
                     <Link href='/account'>
                       <span className='text-lg font-semibold'>
-                        Hello, {session.user.name}
+                        สวัสดี, {session.user.name}
                       </span>
                     </Link>
                   </DrawerClose>
                 ) : (
                   <DrawerClose asChild>
                     <Link href='/sign-in'>
-                      <span className='text-lg font-semibold'>
-                        Hello, sign in
-                      </span>
+                      <span className='text-lg font-semibold'>สวัสดี, เข้าสู่ระบบ</span>
                     </Link>
                   </DrawerClose>
                 )}
@@ -55,26 +53,27 @@ export default async function Sidebar({
               <DrawerDescription></DrawerDescription>
             </DrawerHeader>
             <DrawerClose asChild>
-              <Button variant='ghost' size='icon' className='mr-2'>
+              <Button variant='ghost' size='icon' className='mr-2 text-background hover:bg-white/10 hover:text-background'>
                 <X className='h-5 w-5' />
                 <span className='sr-only'>Close</span>
               </Button>
             </DrawerClose>
           </div>
 
-          {/* Shop By Category */}
           <div className='flex-1 overflow-y-auto'>
-            <div className='p-4 border-b'>
-              <h2 className='text-lg font-semibold'>Shop By Department</h2>
+            <div className='border-b p-4'>
+              <h2 className='font-serif text-2xl font-semibold'>
+                เลือกช้อปตามหมวด
+              </h2>
             </div>
             <nav className='flex flex-col'>
               {categories.map((category) => (
                 <DrawerClose asChild key={category}>
                   <Link
                     href={`/search?category=${category}`}
-                    className={`flex items-center justify-between item-button`}
+                    className='item-button flex items-center justify-between'
                   >
-                    <span>{category}</span>
+                    <span>{translateCategory(category)}</span>
                     <ChevronRight className='h-4 w-4' />
                   </Link>
                 </DrawerClose>
@@ -82,33 +81,34 @@ export default async function Sidebar({
             </nav>
           </div>
 
-          {/* Setting and Help */}
-          <div className='border-t flex flex-col '>
+          <div className='flex flex-col border-t'>
             <div className='p-4'>
-              <h2 className='text-lg font-semibold'>Help & Settings</h2>
+              <h2 className='font-serif text-2xl font-semibold'>
+                ช่วยเหลือและการตั้งค่า
+              </h2>
             </div>
             <DrawerClose asChild>
               <Link href='/account' className='item-button'>
-                Your account
+                บัญชีของคุณ
               </Link>
-            </DrawerClose>{' '}
+            </DrawerClose>
             <DrawerClose asChild>
               <Link href='/page/customer-service' className='item-button'>
-                Customer Service
+                บริการลูกค้า
               </Link>
             </DrawerClose>
             {session ? (
               <form action={SignOut} className='w-full'>
                 <Button
-                  className='w-full justify-start item-button text-base'
+                  className='item-button w-full justify-start text-base'
                   variant='ghost'
                 >
-                  Sign out
+                  ออกจากระบบ
                 </Button>
               </form>
             ) : (
               <Link href='/sign-in' className='item-button'>
-                Sign in
+                เข้าสู่ระบบ
               </Link>
             )}
           </div>

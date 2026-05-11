@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import useCartStore from '@/hooks/use-cart-store'
 import { FREE_SHIPPING_MIN_PRICE } from '@/lib/constants'
-import { translateColor } from '@/lib/i18n'
+import { translateColor, translateSize } from '@/lib/i18n'
 import BrowsingHistoryList from '@/components/shared/browsing-history-list'
 
 export default function CartAddItem({ itemId }: { itemId: string }) {
@@ -47,7 +47,7 @@ export default function CartAddItem({ itemId }: { itemId: string }) {
               </p>
               <p className='text-sm'>
                 <span className='font-bold'>ไซซ์: </span>{' '}
-                {item.size ?? '-'}
+                {translateSize(item.size)}
               </p>
             </div>
           </CardContent>

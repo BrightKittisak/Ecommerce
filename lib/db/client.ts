@@ -1,9 +1,9 @@
-import dns from 'node:dns'
 import { MongoClient, ServerApiVersion } from 'mongodb'
+
+import { configureMongoDns } from './configure-dns'
 
 // This approach is adapted from the official Next.js MongoDB example,
 // but delayed so builds do not fail before env vars are configured.
-dns.setServers(['1.1.1.1', '8.8.8.8'])
 
 const options = {
   serverApi: {
@@ -15,7 +15,6 @@ const options = {
 
 type GlobalMongo = typeof globalThis & {
   _mongoClient?: MongoClient
-  _mongoDnsConfigured?: boolean
 }
 
 export default function getMongoClient() {
@@ -27,17 +26,7 @@ export default function getMongoClient() {
 
   const globalWithMongo = global as GlobalMongo
 
-  if (!globalWithMongo._mongoDnsConfigured) {
-    const dnsServers = process.env.MONGODB_DNS_SERVERS?.split(',')
-      .map((server) => server.trim())
-      .filter(Boolean)
-
-    if (dnsServers && dnsServers.length > 0) {
-      dns.setServers(dnsServers)
-    }
-
-    globalWithMongo._mongoDnsConfigured = true
-  }
+  configureMongoDns()
 
   if (process.env.NODE_ENV === 'development') {
     if (!globalWithMongo._mongoClient) {

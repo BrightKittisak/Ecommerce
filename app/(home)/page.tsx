@@ -71,12 +71,12 @@ export default async function HomePage() {
       <HomeCarousel items={data.carousels} />
       <div className='page-shell mt-6 space-y-6'>
         <section className='section-shell grid gap-6 p-6 lg:grid-cols-[1.2fr_0.8fr] lg:p-8'>
-          <div className='space-y-4'>
+          <div className='space-y-7'>
             <p className='eyebrow'>ช้อปง่ายขึ้นในทุกวัน</p>
-            <h1 className='h1-bold max-w-2xl'>
+            <h1 className='max-w-2xl text-[1.75rem] font-semibold leading-[1.95] tracking-[-0.02em] sm:text-[2.15rem] lg:text-[2.2rem]'>
               หน้าร้านที่ดูละมุนขึ้น ค้นหาง่ายขึ้น และช่วยให้ตัดสินใจซื้อได้มั่นใจขึ้น
             </h1>
-            <p className='max-w-2xl text-sm leading-7 text-muted-foreground md:text-base'>
+            <p className='body-lg max-w-2xl'>
               เลือกดูเสื้อผ้า รองเท้า และแอ็กเซสซอรีได้ใน flow ที่เป็นระเบียบขึ้น รองรับทั้งภาษาไทยและธีมกลางวันกลางคืนแบบสบายตา
             </p>
           </div>
@@ -88,7 +88,7 @@ export default async function HomePage() {
             ].map((item) => (
               <div
                 key={item}
-                className='rounded-[1.5rem] border border-border/60 bg-secondary/60 px-4 py-4 text-sm font-medium text-foreground/80'
+                className='rounded-[1.5rem] border border-border/60 bg-secondary/60 px-4 py-4 text-sm leading-7 font-medium text-foreground/80 sm:text-[15px]'
               >
                 {item}
               </div>

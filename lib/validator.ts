@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { formatNumberWithDecimal } from './utils'
+import { CURRENCY_CODE, formatNumberWithDecimal } from './utils'
 
 const MongoId = z
   .string()
@@ -110,6 +110,7 @@ export const OrderInputSchema = z.object({
   shippingPrice: Price('ค่าจัดส่ง'),
   taxPrice: Price('ภาษี'),
   totalPrice: Price('ยอดรวม'),
+  currencyCode: z.string().default(CURRENCY_CODE),
   expectedDeliveryDate: z
     .date()
     .refine((value) => value > new Date(), 'วันที่คาดว่าจะจัดส่งต้องเป็นวันในอนาคต'),

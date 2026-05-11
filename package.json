@@ -5,6 +5,8 @@
   "scripts": {
     "email": "email dev",
     "seed": "npx tsx ./lib/db/seed.ts",
+    "sync:prices:thb": "npx tsx ./lib/db/sync-product-prices-thb.ts",
+    "sync:orders:thb": "npx tsx ./lib/db/sync-order-currency-thb.ts",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",

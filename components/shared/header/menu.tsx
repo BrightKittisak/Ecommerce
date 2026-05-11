@@ -1,6 +1,16 @@
+import Link from 'next/link'
 import { EllipsisVertical } from 'lucide-react'
 
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
+import { exploreLinks, policyLinks } from '@/lib/site-navigation'
 
 import CartButton from './cart-button'
 import ThemeSwitcher from './theme-switcher'
@@ -29,6 +39,44 @@ export default function Menu() {
             <ThemeSwitcher />
             <UserButton />
             <CartButton />
+
+            <div className='mt-4 w-full space-y-5 border-t border-border/60 pt-4'>
+              <div className='space-y-2'>
+                <p className='text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground'>
+                  สำรวจ
+                </p>
+                <div className='flex flex-col gap-1'>
+                  {exploreLinks.map((link) => (
+                    <SheetClose asChild key={link.href}>
+                      <Link
+                        href={link.href}
+                        className='rounded-2xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted'
+                      >
+                        {link.name}
+                      </Link>
+                    </SheetClose>
+                  ))}
+                </div>
+              </div>
+
+              <div className='space-y-2'>
+                <p className='text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground'>
+                  นโยบาย
+                </p>
+                <div className='flex flex-col gap-1'>
+                  {policyLinks.map((link) => (
+                    <SheetClose asChild key={link.href}>
+                      <Link
+                        href={link.href}
+                        className='rounded-2xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted'
+                      >
+                        {link.name}
+                      </Link>
+                    </SheetClose>
+                  ))}
+                </div>
+              </div>
+            </div>
           </SheetContent>
         </Sheet>
       </nav>

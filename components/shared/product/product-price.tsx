@@ -1,6 +1,6 @@
 'use client'
 
-import { cn, formatCurrency } from '@/lib/utils'
+import { cn, formatCurrency, formatCurrencyParts } from '@/lib/utils'
 
 const ProductPrice = ({
   price,
@@ -18,18 +18,15 @@ const ProductPrice = ({
   plain?: boolean
 }) => {
   const discountPercent = Math.round(100 - (price / listPrice) * 100)
-  const stringValue = price.toString()
-  const [intValue, floatValue] = stringValue.includes('.')
-    ? stringValue.split('.')
-    : [stringValue, '']
+  const { symbol, integer, fraction } = formatCurrencyParts(price)
 
   return plain ? (
     formatCurrency(price)
   ) : listPrice == 0 ? (
     <div className={cn('text-3xl', className)}>
-      <span className='align-super text-xs'>$</span>
-      {intValue}
-      <span className='align-super text-xs'>{floatValue}</span>
+      <span className='align-super text-xs'>{symbol}</span>
+      {integer}
+      <span className='align-super text-xs'>.{fraction}</span>
     </div>
   ) : isDeal ? (
     <div className='space-y-2'>
@@ -47,9 +44,9 @@ const ProductPrice = ({
         } items-center gap-2`}
       >
         <div className={cn('text-3xl', className)}>
-          <span className='align-super text-xs'>$</span>
-          {intValue}
-          <span className='align-super text-xs'>{floatValue}</span>
+          <span className='align-super text-xs'>{symbol}</span>
+          {integer}
+          <span className='align-super text-xs'>.{fraction}</span>
         </div>
         <div className='py-2 text-xs text-muted-foreground'>
           จากราคา:{' '}
@@ -62,9 +59,9 @@ const ProductPrice = ({
       <div className='flex justify-center gap-3'>
         <div className='text-3xl text-primary'>-{discountPercent}%</div>
         <div className={cn('text-3xl', className)}>
-          <span className='align-super text-xs'>$</span>
-          {intValue}
-          <span className='align-super text-xs'>{floatValue}</span>
+          <span className='align-super text-xs'>{symbol}</span>
+          {integer}
+          <span className='align-super text-xs'>.{fraction}</span>
         </div>
       </div>
       <div className='py-2 text-xs text-muted-foreground'>

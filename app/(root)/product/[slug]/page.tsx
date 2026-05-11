@@ -14,7 +14,7 @@ import {
   getProductBySlug,
   getRelatedProductsByCategory,
 } from '@/lib/actions/product.actions'
-import { translateCategory } from '@/lib/i18n'
+import { translateBrand, translateCategory } from '@/lib/i18n'
 import { generateId, round2 } from '@/lib/utils'
 
 import ReviewList from './review-list'
@@ -62,10 +62,11 @@ export default async function ProductDetails(props: {
 
           <div className='col-span-2 flex w-full flex-col gap-2 md:p-5'>
             <div className='flex flex-col gap-3'>
-              <p className='rounded-full bg-secondary/70 px-3 py-2 text-sm text-muted-foreground'>
-                แบรนด์ {product.brand} • {translateCategory(product.category)}
+              <p className='rounded-full bg-secondary/70 px-3 py-2 text-sm text-muted-foreground sm:text-[15px]'>
+                แบรนด์ {translateBrand(product.brand)} •{' '}
+                {translateCategory(product.category)}
               </p>
-              <h1 className='text-lg font-bold lg:text-xl'>{product.name}</h1>
+              <h1 className='text-2xl font-semibold leading-tight text-foreground sm:text-[2rem] lg:text-[2.2rem]'>{product.name}</h1>
               <div className='flex items-center gap-2'>
                 <RatingSummary
                   avgRating={product.avgRating}
@@ -95,10 +96,10 @@ export default async function ProductDetails(props: {
             </div>
             <Separator className='my-2' />
             <div className='flex flex-col gap-2'>
-              <p className='text-lg font-bold text-foreground'>
+              <p className='text-xl font-semibold text-foreground sm:text-2xl'>
                 รายละเอียดสินค้า:
               </p>
-              <p className='text-sm leading-7 text-muted-foreground lg:text-base'>
+              <p className='body-lg'>
                 {product.description}
               </p>
             </div>

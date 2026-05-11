@@ -38,6 +38,21 @@ const paymentMethodTranslations: Record<string, string> = {
   Stripe: 'บัตรเครดิต / เดบิต (Stripe)',
 }
 
+const brandTranslations: Record<string, string> = {
+  Generic: 'แบรนด์ทั่วไป',
+}
+
+const sizeTranslations: Record<string, string> = {
+  XS: 'XS (เล็กพิเศษ)',
+  S: 'S (เล็ก)',
+  M: 'M (มาตรฐาน)',
+  L: 'L (ใหญ่)',
+  XL: 'XL (เอ็กซ์แอล)',
+  XXL: 'XXL (2XL)',
+  '2XL': '2XL',
+  '3XL': '3XL',
+}
+
 export const translateCategory = (value: string) =>
   categoryTranslations[value] ?? value
 
@@ -48,3 +63,29 @@ export const translateTag = (value: string) => tagTranslations[value] ?? value
 
 export const translatePaymentMethod = (value?: string) =>
   value ? paymentMethodTranslations[value] ?? value : 'ยังไม่ได้เลือก'
+
+export const translateBrand = (value?: string) => {
+  if (!value) return '-'
+  const normalized = value.trim()
+  return brandTranslations[normalized] ?? normalized
+}
+
+export const translateSize = (value?: string) => {
+  if (!value) return '-'
+  const normalized = value.trim()
+  return sizeTranslations[normalized.toUpperCase()] ?? normalized
+}
+
+export const formatVariantSummary = ({
+  color,
+  size,
+}: {
+  color?: string
+  size?: string
+}) => {
+  const parts = [translateColor(color), translateSize(size)].filter(
+    (value) => value && value !== '-'
+  )
+
+  return parts.length > 0 ? parts.join(' • ') : '-'
+}

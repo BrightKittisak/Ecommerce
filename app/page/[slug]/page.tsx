@@ -1,5 +1,9 @@
+import Link from 'next/link'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react'
+
+import { exploreLinks, policyLinks } from '@/lib/site-navigation'
 
 type StaticPage = {
   title: string
@@ -54,7 +58,7 @@ const staticPages: Record<string, StaticPage> = {
       {
         heading: 'การช่วยเหลือระหว่างเลือกซื้อ',
         body:
-          'คุณสามารถเลือกดูตามหมวดหมู่ เก็บสินค้าไว้ใน flow การซื้อ และย้อนกลับไปยังสินค้าที่เพิ่งดูผ่านประวัติการเข้าชมได้',
+          'คุณสามารถเลือกดูตามหมวดหมู่ เก็บสินค้าที่สนใจไว้ใน flow การซื้อ และย้อนกลับไปยังสินค้าที่เพิ่งดูผ่านประวัติการเข้าชมได้',
       },
       {
         heading: 'การช่วยเหลือระหว่างชำระเงิน',
@@ -137,6 +141,8 @@ const staticPages: Record<string, StaticPage> = {
   },
 }
 
+const staticNavLinks = [...exploreLinks, ...policyLinks]
+
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
@@ -163,6 +169,41 @@ export default async function StaticPage(props: {
 
   return (
     <div className='page-shell py-10'>
+      <div className='mx-auto mb-5 flex max-w-4xl flex-col gap-4'>
+        <div className='flex flex-wrap items-center gap-3'>
+          <Link
+            href='/'
+            className='inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/80 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted'
+          >
+            <ArrowLeft className='h-4 w-4' />
+            กลับหน้าหลัก
+          </Link>
+          <div className='text-sm text-muted-foreground'>
+            หน้าเหล่านี้ใช้เป็นศูนย์รวมข้อมูลช่วยเหลือและนโยบาย
+          </div>
+        </div>
+
+        <nav className='section-shell flex flex-wrap gap-2 p-3'>
+          {staticNavLinks.map((link) => {
+            const isActive = link.href === `/page/${slug}`
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`rounded-full px-4 py-2 text-sm transition-colors ${
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary/70 text-foreground hover:bg-muted'
+                }`}
+              >
+                {link.name}
+              </Link>
+            )
+          })}
+        </nav>
+      </div>
+
       <div className='section-shell mx-auto max-w-4xl p-8 md:p-12'>
         <p className='eyebrow mb-3'>{page.eyebrow}</p>
         <h1 className='h1-bold'>{page.title}</h1>

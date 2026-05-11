@@ -3,6 +3,7 @@ import React from "react";
 import Stripe from "stripe";
 import { auth } from "@/auth";
 import { getOrderByIdForCurrentUser } from "@/lib/actions/order.actions";
+import { CURRENCY_CODE } from "@/lib/utils";
 import PaymentForm from "./payment-form";
 
 export const metadata = {
@@ -28,7 +29,7 @@ const CheckoutPaymentPage = async (props: {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(order.totalPrice * 100),
-      currency: 'USD',
+      currency: CURRENCY_CODE.toLowerCase(),
       metadata: { orderId: order._id.toString() },
     })
     client_secret = paymentIntent.client_secret

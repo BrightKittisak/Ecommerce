@@ -22,6 +22,12 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import StripeForm from './stripe-form'
 
+const paymentMethodLabel: Record<string, string> = {
+  'Cash On Delivery': 'เก็บเงินปลายทาง',
+  PayPal: 'PayPal',
+  Stripe: 'บัตรเครดิต / เดบิต (Stripe)',
+}
+
 export default function OrderPaymentForm({
   order,
   paypalClientId,
@@ -53,9 +59,9 @@ export default function OrderPaymentForm({
     const [{ isPending, isRejected }] = usePayPalScriptReducer()
     let status = ''
     if (isPending) {
-      status = 'Loading PayPal...'
+      status = 'กำลังโหลด PayPal...'
     } else if (isRejected) {
-      status = 'Error in loading PayPal.'
+      status = 'เกิดข้อผิดพลาดในการโหลด PayPal'
     }
     return status
   }
@@ -80,28 +86,28 @@ export default function OrderPaymentForm({
     <Card>
       <CardContent className='p-4'>
         <div>
-          <div className='text-lg font-bold'>Order Summary</div>
+          <div className='text-lg font-bold'>สรุปคำสั่งซื้อ</div>
           <div className='space-y-2'>
             <div className='flex justify-between'>
-              <span>Items:</span>
+              <span>ค่าสินค้า:</span>
               <span>
                 <ProductPrice price={itemsPrice} plain />
               </span>
             </div>
             <div className='flex justify-between'>
-              <span>Shipping & Handling:</span>
+              <span>ค่าจัดส่ง:</span>
               <span>
                 {shippingPrice === undefined ? (
                   '--'
                 ) : shippingPrice === 0 ? (
-                  'FREE'
+                  'ฟรี'
                 ) : (
                   <ProductPrice price={shippingPrice} plain />
                 )}
               </span>
             </div>
             <div className='flex justify-between'>
-              <span>Tax:</span>
+              <span>ภาษี:</span>
               <span>
                 {taxPrice === undefined ? (
                   '--'
@@ -111,7 +117,7 @@ export default function OrderPaymentForm({
               </span>
             </div>
             <div className='flex justify-between pt-1 font-bold text-lg'>
-              <span>Order Total:</span>
+              <span>ยอดรวมสุทธิ:</span>
               <span>
                 <ProductPrice price={totalPrice} plain />
               </span>
@@ -149,7 +155,7 @@ export default function OrderPaymentForm({
                 className='w-full rounded-full'
                 onClick={() => router.push(`/account/orders/${order._id}`)}
               >
-                View Order
+                ดูคำสั่งซื้อ
               </Button>
             )}
           </div>
@@ -170,7 +176,7 @@ export default function OrderPaymentForm({
           <div>
             <div className='grid md:grid-cols-3 my-3 pb-3'>
               <div className='text-lg font-bold'>
-                <span>Shipping Address</span>
+                <span>ที่อยู่จัดส่ง</span>
               </div>
               <div className='col-span-2'>
                 <p>
@@ -186,21 +192,22 @@ export default function OrderPaymentForm({
           <div className='border-y'>
             <div className='grid md:grid-cols-3 my-3 pb-3'>
               <div className='text-lg font-bold'>
-                <span>Payment Method</span>
+                <span>วิธีชำระเงิน</span>
               </div>
               <div className='col-span-2'>
-                <p>{paymentMethod}</p>
+                <p>{paymentMethodLabel[paymentMethod] ?? paymentMethod}</p>
               </div>
             </div>
           </div>
 
           <div className='grid md:grid-cols-3 my-3 pb-3'>
             <div className='flex text-lg font-bold'>
-              <span>Items and shipping</span>
+              <span>สินค้าและการจัดส่ง</span>
             </div>
             <div className='col-span-2'>
               <p>
-                Delivery date: {formatDateTime(expectedDeliveryDate).dateOnly}
+                วันที่จัดส่งโดยประมาณ:{' '}
+                {formatDateTime(expectedDeliveryDate).dateOnly}
               </p>
               <ul>
                 {items.map((item) => (

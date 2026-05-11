@@ -2,47 +2,46 @@ import { notFound } from "next/navigation";
 import React from "react";
 import Stripe from "stripe";
 import { auth } from "@/auth";
-import { getOrderById } from "@/lib/actions/order.actions";
+import { getOrderByIdForCurrentUser } from "@/lib/actions/order.actions";
 import PaymentForm from "./payment-form";
 
 export const metadata = {
-  title: "Payment",
-};
+  title: 'ชำระเงิน',
+}
 
 const CheckoutPaymentPage = async (props: {
   params: Promise<{
-    id: string;
-  }>;
+    id: string
+  }>
 }) => {
-  const params = await props.params;
+  const params = await props.params
 
-  const { id } = params;
+  const { id } = params
 
-  const order = await getOrderById(id);
-  if (!order) notFound();
+  const order = await getOrderByIdForCurrentUser(id)
+  if (!order) notFound()
 
-  const session = await auth();
+  const session = await auth()
 
-  let client_secret = null;
-  if (order.paymentMethod === "Stripe" && !order.isPaid) {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+  let client_secret = null
+  if (order.paymentMethod === 'Stripe' && !order.isPaid) {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(order.totalPrice * 100),
-      currency: "USD",
-      metadata: { orderId: order._id },
-    });
-    client_secret = paymentIntent.client_secret;
+      currency: 'USD',
+      metadata: { orderId: order._id.toString() },
+    })
+    client_secret = paymentIntent.client_secret
   }
-
 
   return (
     <PaymentForm
       order={order}
-      paypalClientId={process.env.PAYPAL_CLIENT_ID || "sb"}
+      paypalClientId={process.env.PAYPAL_CLIENT_ID || 'sb'}
       clientSecret={client_secret}
-      isAdmin={session?.user?.role === "Admin" || false}
+      isAdmin={session?.user?.role === 'Admin' || false}
     />
-  );
-};
+  )
+}
 
-export default CheckoutPaymentPage;
+export default CheckoutPaymentPage

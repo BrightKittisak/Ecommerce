@@ -19,7 +19,7 @@ interface CartState {
   cart: Cart
   addItem: (item: OrderItem, quantity: number) => Promise<string>
   updateItem: (item: OrderItem, quantity: number) => Promise<void>
-  removeItem: (item: OrderItem) => void
+  removeItem: (item: OrderItem) => Promise<void>
   clearCart: () => void
   setShippingAddress: (shippingAddress: ShippingAddress) => Promise<void>
   setPaymentMethod: (paymentMethod: string) => void
@@ -42,11 +42,11 @@ const useCartStore = create(
 
         if (existItem) {
           if (existItem.countInStock < quantity + existItem.quantity) {
-            throw new Error('Not enough items in stock')
+            throw new Error('จำนวนสินค้าในสต็อกไม่เพียงพอ')
           }
         } else {
           if (item.countInStock < item.quantity) {
-            throw new Error('Not enough items in stock')
+            throw new Error('จำนวนสินค้าในสต็อกไม่เพียงพอ')
           }
         }
 
@@ -77,7 +77,7 @@ const useCartStore = create(
             x.size === item.size
         )
         if (!foundItem) {
-          throw new Error('Item not found in cart')
+          throw new Error('ไม่พบสินค้าในตะกร้า')
         }
         return foundItem.clientId
       },
@@ -90,6 +90,9 @@ const useCartStore = create(
             x.size === item.size
         )
         if (!exist) return
+        if (quantity > exist.countInStock) {
+          throw new Error('จำนวนสินค้าในสต็อกไม่เพียงพอ')
+        }
         const updatedCartItems = items.map((x) =>
           x.product === item.product &&
           x.color === item.color &&
@@ -164,13 +167,9 @@ const useCartStore = create(
       },
       clearCart: () => {
         set({
-          cart: {
-            ...get().cart,
-            items: [],
-          },
+          cart: initialState,
         })
       },
-      init: () => set({ cart: initialState }),
     }),
 
     {

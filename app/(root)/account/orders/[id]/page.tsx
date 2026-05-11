@@ -1,10 +1,9 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import React from 'react'
 
 import { auth } from '@/auth'
-import { getOrderById } from '@/lib/actions/order.actions'
 import OrderDetailsForm from '@/components/shared/order/order-details-form'
-import Link from 'next/link'
+import { getOrderByIdForCurrentUser } from '@/lib/actions/order.actions'
 import { formatId } from '@/lib/utils'
 
 export async function generateMetadata(props: {
@@ -13,7 +12,7 @@ export async function generateMetadata(props: {
   const params = await props.params
 
   return {
-    title: `Order ${formatId(params.id)}`,
+    title: `คำสั่งซื้อ ${formatId(params.id)}`,
   }
 }
 
@@ -23,10 +22,9 @@ export default async function OrderDetailsPage(props: {
   }>
 }) {
   const params = await props.params
-
   const { id } = params
 
-  const order = await getOrderById(id)
+  const order = await getOrderByIdForCurrentUser(id)
   if (!order) notFound()
 
   const session = await auth()
@@ -34,13 +32,13 @@ export default async function OrderDetailsPage(props: {
   return (
     <>
       <div className='flex gap-2'>
-        <Link href='/account'>Your Account</Link>
-        <span>›</span>
-        <Link href='/account/orders'>Your Orders</Link>
-        <span>›</span>
-        <span>Order {formatId(order._id)}</span>
+        <Link href='/account'>บัญชีของคุณ</Link>
+        <span>/</span>
+        <Link href='/account/orders'>คำสั่งซื้อของคุณ</Link>
+        <span>/</span>
+        <span>คำสั่งซื้อ {formatId(order._id)}</span>
       </div>
-      <h1 className='h1-bold py-4'>Order {formatId(order._id)}</h1>
+      <h1 className='h1-bold py-4'>คำสั่งซื้อ {formatId(order._id)}</h1>
       <OrderDetailsForm
         order={order}
         isAdmin={session?.user?.role === 'Admin' || false}

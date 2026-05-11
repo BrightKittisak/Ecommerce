@@ -78,7 +78,7 @@ export default function ReviewList({
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      toast("Error in fetching reviews")
+      toast('เกิดข้อผิดพลาดในการโหลดรีวิว')
     }
   }
 
@@ -129,7 +129,7 @@ export default function ReviewList({
       reload()
       toast(res.message) 
     } catch {
-        toast("Error submitting review") 
+        toast('เกิดข้อผิดพลาดในการส่งรีวิว') 
     }
   }
   
@@ -148,7 +148,7 @@ export default function ReviewList({
   }
   return (
     <div className='space-y-2'>
-      {reviews.length === 0 && <div>No reviews yet</div>}
+      {reviews.length === 0 && <div>ยังไม่มีรีวิวสำหรับสินค้านี้</div>}
 
       <div className='grid grid-cols-1 md:grid-cols-4 gap-8'>
         <div className='flex flex-col gap-2'>
@@ -162,9 +162,9 @@ export default function ReviewList({
           <Separator className='my-3' />
           <div className='space-y-3'>
             <h3 className='font-bold text-lg lg:text-xl'>
-              Review this product
+              รีวิวสินค้านี้
             </h3>
-            <p className='text-sm'>Share your thoughts with other customers</p>
+            <p className='text-sm'>แบ่งปันประสบการณ์ของคุณให้ลูกค้าคนอื่นได้เห็น</p>
             {userId ? (
               <Dialog open={open} onOpenChange={setOpen}>
                 <Button
@@ -172,16 +172,16 @@ export default function ReviewList({
                   variant='outline'
                   className=' rounded-full w-full'
                 >
-                  Write a customer review
+                  เขียนรีวิวสินค้า
                 </Button>
 
                 <DialogContent className='sm:max-w-[425px]'>
                   <Form {...form}>
                     <form method='post' onSubmit={form.handleSubmit(onSubmit)}>
                       <DialogHeader>
-                        <DialogTitle>Write a customer review</DialogTitle>
+                        <DialogTitle>เขียนรีวิวสินค้า</DialogTitle>
                         <DialogDescription>
-                          Share your thoughts with other customers
+                          บอกเล่าความคิดเห็นของคุณให้ลูกค้าคนอื่นได้อ่าน
                         </DialogDescription>
                       </DialogHeader>
                       <div className='grid gap-4 py-4'>
@@ -191,9 +191,9 @@ export default function ReviewList({
                             name='title'
                             render={({ field }) => (
                               <FormItem className='w-full'>
-                                <FormLabel>Title</FormLabel>
+                                <FormLabel>หัวข้อรีวิว</FormLabel>
                                 <FormControl>
-                                  <Input placeholder='Enter title' {...field} />
+                                  <Input placeholder='ตั้งชื่อหัวข้อรีวิว' {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -205,10 +205,10 @@ export default function ReviewList({
                             name='comment'
                             render={({ field }) => (
                               <FormItem className='w-full'>
-                                <FormLabel>Comment</FormLabel>
+                                <FormLabel>ความคิดเห็น</FormLabel>
                                 <FormControl>
                                   <Textarea
-                                    placeholder='Enter comment'
+                                    placeholder='เล่าประสบการณ์การใช้งานของคุณ'
                                     {...field}
                                   />
                                 </FormControl>
@@ -223,14 +223,14 @@ export default function ReviewList({
                             name='rating'
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Rating</FormLabel>
+                                <FormLabel>คะแนน</FormLabel>
                                 <Select
                                   onValueChange={field.onChange}
                                   value={field.value.toString()}
                                 >
                                   <FormControl>
                                     <SelectTrigger>
-                                      <SelectValue placeholder='Select a rating' />
+                                      <SelectValue placeholder='เลือกคะแนนรีวิว' />
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
@@ -264,8 +264,8 @@ export default function ReviewList({
                           disabled={form.formState.isSubmitting}
                         >
                           {form.formState.isSubmitting
-                            ? 'Submitting...'
-                            : 'Submit'}
+                            ? 'กำลังส่งรีวิว...'
+                            : 'ส่งรีวิว'}
                         </Button>
                       </DialogFooter>
                     </form>
@@ -274,14 +274,14 @@ export default function ReviewList({
               </Dialog>
             ) : (
               <div>
-                Please{' '}
+                กรุณา{' '}
                 <Link
                   href={`/sign-in?callbackUrl=/product/${product.slug}`}
                   className='highlight-link'
                 >
-                  sign in
-                </Link>{' '}
-                to write a review
+                  เข้าสู่ระบบ
+                </Link>
+                {' '}ก่อนเขียนรีวิว
               </div>
             )}
           </div>
@@ -293,7 +293,7 @@ export default function ReviewList({
                 <div className='flex-between'>
                   <CardTitle>{review.title}</CardTitle>
                   <div className='italic text-sm flex'>
-                    <Check className='h-4 w-4' /> Verified Purchase
+                    <Check className='h-4 w-4' /> ซื้อสินค้าจริง
                   </div>
                 </div>
                 <CardDescription>{review.comment}</CardDescription>
@@ -303,7 +303,7 @@ export default function ReviewList({
                   <Rating rating={review.rating} />
                   <div className='flex items-center'>
                     <User className='mr-1 h-3 w-3' />
-                    {review.user ? review.user.name : 'Deleted User'}
+                    {review.user ? review.user.name : 'ผู้ใช้ที่ถูกลบ'}
                   </div>
                   <div className='flex items-center'>
                     <Calendar className='mr-1 h-3 w-3' />
@@ -316,11 +316,11 @@ export default function ReviewList({
           <div ref={ref}>
             {page <= totalPages && (
               <Button variant={'link'} onClick={loadMoreReviews}>
-                See more reviews
+                ดูรีวิวเพิ่มเติม
               </Button>
             )}
 
-            {page < totalPages && loadingReviews && 'Loading'}
+            {page < totalPages && loadingReviews && 'กำลังโหลด'}
           </div>
         </div>
       </div>

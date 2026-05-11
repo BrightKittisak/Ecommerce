@@ -1,10 +1,11 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useRouter } from 'next/navigation'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -16,7 +17,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { toast } from 'sonner'
 import { updateUserName } from '@/lib/actions/user.actions'
 import { UserNameSchema } from '@/lib/validator'
 
@@ -33,8 +33,7 @@ export const ProfileForm = () => {
 
   async function onSubmit(values: z.infer<typeof UserNameSchema>) {
     const res = await updateUserName(values)
-    if (!res.success)
-      return toast(res.message)
+    if (!res.success) return toast(res.message)
 
     const { data, message } = res
     const newSession = {
@@ -48,11 +47,12 @@ export const ProfileForm = () => {
     toast(message)
     router.push('/account/manage')
   }
+
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className='  flex flex-col gap-5'
+        className='flex flex-col gap-5'
       >
         <div className='flex flex-col gap-5'>
           <FormField
@@ -60,10 +60,10 @@ export const ProfileForm = () => {
             name='name'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='font-bold'>New name</FormLabel>
+                <FormLabel className='font-bold'>ชื่อใหม่</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder='Name'
+                    placeholder='กรอกชื่อใหม่'
                     {...field}
                     className='input-field'
                   />
@@ -80,7 +80,9 @@ export const ProfileForm = () => {
           disabled={form.formState.isSubmitting}
           className='button col-span-2 w-full'
         >
-          {form.formState.isSubmitting ? 'Submitting...' : 'Save Changes'}
+          {form.formState.isSubmitting
+            ? 'กำลังบันทึก...'
+            : 'บันทึกการเปลี่ยนแปลง'}
         </Button>
       </form>
     </Form>

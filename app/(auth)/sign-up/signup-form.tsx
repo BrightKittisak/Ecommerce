@@ -57,7 +57,7 @@ export default function SignUpForm() {
       redirect(callbackUrl)
     } catch (error) {
       if (isRedirectError(error)) throw error
-      toast.error('Something went wrong, please try again.')
+      toast.error('เกิดปัญหาบางอย่าง กรุณาลองใหม่อีกครั้ง')
     } finally {
       setIsSubmitting(false)
     }
@@ -73,9 +73,9 @@ export default function SignUpForm() {
             name='name'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>ชื่อ</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter your name' {...field} />
+                  <Input placeholder='กรอกชื่อของคุณ' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -87,9 +87,9 @@ export default function SignUpForm() {
             name='email'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>อีเมล</FormLabel>
                 <FormControl>
-                  <Input type='email' placeholder='Enter your email' {...field} />
+                  <Input type='email' placeholder='กรอกอีเมล' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -101,9 +101,9 @@ export default function SignUpForm() {
             name='password'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>รหัสผ่าน</FormLabel>
                 <FormControl>
-                  <Input type='password' placeholder='Enter password' {...field} />
+                  <Input type='password' placeholder='กรอกรหัสผ่าน' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -115,9 +115,9 @@ export default function SignUpForm() {
             name='confirmPassword'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Confirm Password</FormLabel>
+                <FormLabel>ยืนยันรหัสผ่าน</FormLabel>
                 <FormControl>
-                  <Input type='password' placeholder='Confirm password' {...field} />
+                  <Input type='password' placeholder='กรอกรหัสผ่านอีกครั้ง' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -126,22 +126,25 @@ export default function SignUpForm() {
 
           <div>
             <Button type='submit' disabled={isSubmitting}>
-              {isSubmitting ? 'Signing Up...' : 'Sign Up'}
+              {isSubmitting ? 'กำลังสมัครสมาชิก...' : 'สมัครสมาชิก'}
             </Button>
           </div>
 
           <div className='text-sm'>
-            By creating an account, you agree to {APP_NAME}&apos;s{' '}
-            <Link href='/page/conditions-of-use'>Conditions of Use</Link> and{' '}
-            <Link href='/page/privacy-policy'>Privacy Notice</Link>.
+            เมื่อสร้างบัญชี แปลว่าคุณยอมรับ
+            {' '}
+            <Link href='/page/conditions-of-use'>เงื่อนไขการใช้งาน</Link>
+            {' '}และ{' '}
+            <Link href='/page/privacy-policy'>นโยบายความเป็นส่วนตัว</Link>
+            {' '}ของ {APP_NAME}
           </div>
 
           <Separator className='mb-4' />
 
           <div className='text-sm'>
-            Already have an account?{' '}
+            มีบัญชีอยู่แล้ว?{' '}
             <Link className='link' href={`/sign-in?callbackUrl=${callbackUrl}`}>
-              Sign In
+              เข้าสู่ระบบ
             </Link>
           </div>
         </div>

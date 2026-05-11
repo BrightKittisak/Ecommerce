@@ -12,28 +12,28 @@ import { APP_NAME } from "@/lib/constants";
 import { GoogleSignInForm } from "./google-signin-form";
 
 export const metadata: Metadata = {
-  title: "Sign In",
-};
+  title: 'เข้าสู่ระบบ',
+}
 
 export default async function SignIn(props: {
   searchParams: Promise<{
-    callbackUrl: string;
-  }>;
+    callbackUrl: string
+  }>
 }) {
-  const searchParams = await props.searchParams;
+  const searchParams = await props.searchParams
 
-  const { callbackUrl = "/" } = searchParams;
+  const { callbackUrl = '/' } = searchParams
 
-  const session = await auth();
+  const session = await auth()
   if (session) {
-    return redirect(callbackUrl);
+    return redirect(callbackUrl)
   }
 
   return (
-    <div className="w-full">
+    <div className='w-full'>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Sign In</CardTitle>
+          <CardTitle className='text-2xl'>เข้าสู่ระบบ</CardTitle>
         </CardHeader>
         <CardContent>
           <div>
@@ -45,13 +45,13 @@ export default async function SignIn(props: {
           </div>
         </CardContent>
       </Card>
-      <SeparatorWithOr>New to {APP_NAME}?</SeparatorWithOr>
+      <SeparatorWithOr>เพิ่งเคยใช้ {APP_NAME} ใช่ไหม?</SeparatorWithOr>
 
       <Link href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
-        <Button className="w-full" variant="outline">
-          Create your {APP_NAME} account
+        <Button className='w-full' variant='outline'>
+          สร้างบัญชี {APP_NAME}
         </Button>
       </Link>
     </div>
-  );
+  )
 }

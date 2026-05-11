@@ -1,4 +1,4 @@
-import { Data, IProductInput, IUserInput } from '@/types'
+﻿import { Data, IProductInput, IUserInput } from '@/types'
 import { toSlug } from './utils'
 import bcrypt from 'bcryptjs'
 const users: IUserInput[] = [
@@ -463,7 +463,7 @@ const products: IProductInput[] = [
     countInStock: 54,
     numSales: 21,
     description:
-      'Silver Jeans Co. Jace Slim Fit Bootcut Jeans - Consider Jace a modern cowboy jean. It sits below the waist and features a slim fit through the hip and thigh. Finished with an 18” bootcut leg opening that complements the slimmer silhouette while still fitting over boots',
+      'Silver Jeans Co. Jace Slim Fit Bootcut Jeans - Consider Jace a modern cowboy jean. It sits below the waist and features a slim fit through the hip and thigh. Finished with an 18โ€ bootcut leg opening that complements the slimmer silhouette while still fitting over boots',
     sizes: ['30Wx30L', '34Wx30L', '36Wx30L'],
     colors: ['Blue', 'Grey'],
 
@@ -877,7 +877,7 @@ const products: IProductInput[] = [
     countInStock: 43,
     numSales: 72,
     description:
-      'Step into easy-wearing comfort with Skechers Hands Free Slip-ins™: Summits - High Range. Along with our Exclusive Heel Pillow™ holds your foot securely in place, this vegan style features a unique pop-up Skechers Slip-ins™ molded heel panel, a mesh upper with fixed laces',
+      'Step into easy-wearing comfort with Skechers Hands Free Slip-insโข: Summits - High Range. Along with our Exclusive Heel Pillowโข holds your foot securely in place, this vegan style features a unique pop-up Skechers Slip-insโข molded heel panel, a mesh upper with fixed laces',
     sizes: ['8', '9', '10'],
     colors: ['Navy', 'Black', 'Grey'],
 
@@ -976,93 +976,93 @@ const products: IProductInput[] = [
 const reviews = [
   {
     rating: 1,
-    title: 'Poor quality',
+    title: 'เธเธธเธ“เธ เธฒเธเนเธกเนเธ”เธต',
     comment:
-      'Very disappointed. The item broke after just a few uses. Not worth the money.',
+      'เธเธดเธ”เธซเธงเธฑเธเธเธญเธชเธกเธเธงเธฃ เนเธเนเธเธฒเธเนเธ”เนเนเธกเนเธเธฒเธเธชเธดเธเธเนเธฒเธเนเน€เธฃเธดเนเธกเธกเธตเธเธฑเธเธซเธฒ เธฃเธนเนเธชเธถเธเธงเนเธฒเนเธกเนเธเธธเนเธกเธเธฑเธเธฃเธฒเธเธฒเธ—เธตเนเธเนเธฒเธขเนเธ',
   },
   {
     rating: 2,
-    title: 'Disappointed',
+    title: 'เธขเธฑเธเนเธกเนเธเธฃเธฐเธ—เธฑเธเนเธ',
     comment:
-      "Not as expected. The material feels cheap, and it didn't fit well. Wouldn't buy again.",
+      'เธชเธดเธเธเนเธฒเธเธฃเธดเธเนเธกเนเธ•เธฃเธเธเธฑเธเธ—เธตเนเธเธฒเธ”เนเธงเน เธงเธฑเธชเธ”เธธเธ”เธนเธเธฃเธฃเธกเธ”เธฒเนเธฅเธฐเธชเธงเธกเนเธชเนเนเธฅเนเธงเนเธกเนเธเนเธญเธขเธเธญเธ”เธต เนเธกเนเธเนเธฒเธเธฐเธชเธฑเนเธเธเนเธณ',
   },
   {
     rating: 2,
-    title: 'Needs improvement',
+    title: 'เธเธงเธฃเธเธฃเธฑเธเธเธฃเธธเธ',
     comment:
-      "It looks nice but doesn't perform as expected. Wouldn't recommend without upgrades.",
+      'เธซเธเนเธฒเธ•เธฒเธ”เธนเธ”เธตเนเธ•เนเธเธฒเธฃเนเธเนเธเธฒเธเธเธฃเธดเธเธขเธฑเธเนเธกเนเธ•เธญเธเนเธเธ—เธขเน เธ–เนเธฒเธเธฃเธฑเธเธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”เธญเธตเธเธซเธเนเธญเธขเธเธฐเธเนเธฒเนเธเนเธเธงเนเธฒเธเธตเนเธกเธฒเธ',
   },
   {
     rating: 3,
-    title: 'not bad',
+    title: 'เนเธเนเนเธ”เน',
     comment:
-      'This product is decent, the quality is good but it could use some improvements in the details.',
+      'เนเธ”เธขเธฃเธงเธกเธ–เธทเธญเธงเนเธฒเนเธญเน€เธ เธเธธเธ“เธ เธฒเธเธเธญเนเธเนเนเธ”เน เนเธ•เนเธขเธฑเธเธกเธตเธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”เน€เธฅเนเธ เน เธ—เธตเนเธเธงเธฃเน€เธเนเธเนเธซเนเน€เธฃเธตเธขเธเธฃเนเธญเธขเธเธถเนเธ',
   },
   {
     rating: 3,
-    title: 'Okay, not great',
+    title: 'เธเธญเนเธเน เนเธ•เนเธขเธฑเธเนเธกเนเธชเธธเธ”',
     comment:
-      'It works, but not as well as I hoped. Quality is average and lacks some finishing.',
+      'เนเธเนเธเธฒเธเนเธ”เนเธเธฃเธดเธ เนเธ•เนเธขเธฑเธเนเธกเนเธ”เธตเน€เธ—เนเธฒเธ—เธตเนเธซเธงเธฑเธเนเธงเน เธเธธเธ“เธ เธฒเธเธญเธขเธนเนเนเธเธฃเธฐเธ”เธฑเธเธเธฅเธฒเธเนเธฅเธฐเธเธฒเธเน€เธเนเธเธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”เธเนเธญเธขเนเธเธซเธเนเธญเธข',
   },
   {
     rating: 3,
-    title: 'Good product',
+    title: 'เธชเธดเธเธเนเธฒเนเธญเน€เธ',
     comment:
-      'This product is amazing, I love it! The quality is top notch, the material is comfortable and breathable.',
+      'เธ•เธฑเธงเธชเธดเธเธเนเธฒเธเนเธฒเนเธเน เธงเธฑเธชเธ”เธธเธเนเธญเธเธเนเธฒเธเธชเธเธฒเธขเนเธฅเธฐเธฃเธฐเธเธฒเธขเธญเธฒเธเธฒเธจเธ”เธต เน€เธซเธกเธฒเธฐเธเธฑเธเธเธฒเธฃเนเธเนเธเธฒเธเธเธฃเธฐเธเธณเธงเธฑเธ',
   },
   {
     rating: 4,
-    title: 'Pretty good',
+    title: 'เธ”เธตเน€เธเธดเธเธเธฒเธ”',
     comment:
-      "Solid product! Great value for the price, but there's room for minor improvements.",
+      'เน€เธเนเธเธชเธดเธเธเนเธฒเธ—เธตเนเธเธธเนเธกเธฃเธฒเธเธฒ เนเธเนเธเธฒเธเนเธ”เนเธ”เธตเธเธฃเธดเธ เธขเธฑเธเธกเธตเธเธธเธ”เน€เธฅเนเธเธเนเธญเธขเธ—เธตเนเธเธฃเธฑเธเนเธ”เน เนเธ•เนเธ เธฒเธเธฃเธงเธกเธ–เธทเธญเธงเนเธฒเธเนเธฒเธเธญเนเธเธกเธฒเธ',
   },
   {
     rating: 4,
-    title: 'Very satisfied',
+    title: 'เธเธญเนเธเธกเธฒเธ',
     comment:
-      'Good product! High quality and worth the price. Would consider buying again.',
+      'เธเธธเธ“เธ เธฒเธเธ”เธตเธชเธกเธฃเธฒเธเธฒ เนเธเนเธเธฒเธเนเธฅเนเธงเธเธฃเธฐเธ—เธฑเธเนเธ เธ–เนเธฒเธกเธตเธชเธตเธซเธฃเธทเธญเธฃเธธเนเธเธ—เธตเนเธเธญเธเน€เธเธดเนเธกเธเนเธกเธตเนเธญเธเธฒเธชเธเธฅเธฑเธเธกเธฒเธเธทเนเธญเธญเธตเธ',
   },
   {
     rating: 4,
-    title: 'Absolutely love it!',
+    title: 'เธเธญเธเธกเธฒเธ',
     comment:
-      'Perfect in every way! The quality, design, and comfort exceeded all my expectations.',
+      'เธ—เธฑเนเธเธ”เธตเนเธเธเน เธเธธเธ“เธ เธฒเธ เนเธฅเธฐเธเธงเธฒเธกเธชเธเธฒเธขเธ—เธณเธญเธญเธเธกเธฒเนเธ”เนเธ”เธตเน€เธเธดเธเธ—เธตเนเธเธฒเธ”เนเธงเน เนเธเนเนเธฅเนเธงเธฃเธนเนเธชเธถเธเธงเนเธฒเธ•เธฑเธ”เธชเธดเธเนเธเนเธกเนเธเธดเธ”',
   },
   {
     rating: 4,
-    title: 'Exceeded expectations!',
+    title: 'เน€เธเธดเธเธเธงเธฒเธกเธเธฒเธ”เธซเธกเธฒเธข',
     comment:
-      'Fantastic product! High quality, feels durable, and performs well. Highly recommend!',
+      'เธเธฒเธเธเธฃเธฐเธเธญเธเธ”เธต เธ”เธนเธ—เธเธ—เธฒเธ เนเธฅเธฐเนเธเนเธเธฒเธเนเธ”เนเธ•เธฒเธกเธ—เธตเนเธซเธงเธฑเธเนเธงเน เธ–เธทเธญเน€เธเนเธเธ•เธฑเธงเน€เธฅเธทเธญเธเธ—เธตเนเนเธเธฐเธเธณเนเธ”เนเธชเธเธฒเธข เน',
   },
   {
     rating: 5,
-    title: 'Perfect purchase!',
+    title: 'เธเธธเนเธกเธกเธฒเธ',
     comment:
-      "Couldn't be happier with this product. The quality is excellent, and it works flawlessly!",
+      'เธเธฃเธฐเธ—เธฑเธเนเธเธ•เธฑเนเธเนเธ•เนเธเธฃเธฑเนเธเนเธฃเธเธ—เธตเนเนเธเน เธเธธเธ“เธ เธฒเธเธ”เธตเธกเธฒเธเนเธฅเธฐเนเธเนเธเธฒเธเนเธ”เนเธฅเธทเนเธเนเธซเธฅ เนเธกเนเธกเธตเธเธธเธ”เนเธซเนเธเธฑเธเธงเธฅเน€เธฅเธข',
   },
   {
     rating: 5,
-    title: 'Highly recommend',
+    title: 'เนเธเธฐเธเธณเน€เธฅเธข',
     comment:
-      "Amazing product! Worth every penny, great design, and feels premium. I'm very satisfied.",
+      'เธเธธเนเธกเธเนเธฒเธ—เธธเธเธเธฒเธ— เธ”เธตเนเธเธเนเธชเธงเธข เธ”เธนเธเธฃเธตเน€เธกเธตเธขเธก เนเธฅเธฐเนเธเนเธเธฒเธเธเธฃเธดเธเนเธ”เนเธ”เธตเธกเธฒเธ เน€เธเนเธเธเธดเนเธเธ—เธตเนเธญเธขเธฒเธเธเธญเธเธ•เนเธญ',
   },
   {
     rating: 5,
-    title: 'Just what I needed',
+    title: 'เธ•เธฃเธเนเธเธเธญเธ”เธต',
     comment:
-      'Exactly as described! Quality exceeded my expectations, and it arrived quickly.',
+      'เธชเธดเธเธเนเธฒเธ•เธฃเธเธ•เธฒเธกเธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”เธ—เธตเนเนเธเนเธเนเธงเน เธเธธเธ“เธ เธฒเธเธ”เธตเธเธงเนเธฒเธ—เธตเนเธเธดเธ”เนเธฅเธฐเน€เธซเธกเธฒเธฐเธเธฑเธเธชเธดเนเธเธ—เธตเนเธเธณเธฅเธฑเธเธกเธญเธเธซเธฒเธญเธขเธนเนเธเธญเธ”เธต',
   },
   {
     rating: 5,
-    title: 'Excellent choice!',
+    title: 'เน€เธฅเธทเธญเธเนเธกเนเธเธดเธ”',
     comment:
-      'This product is outstanding! Everything about it feels top-notch, from material to functionality.',
+      'เธ—เธธเธเธญเธขเนเธฒเธเธฅเธเธ•เธฑเธงเธ•เธฑเนเธเนเธ•เนเธงเธฑเธชเธ”เธธเนเธเธเธเธ–เธถเธเธเธฒเธฃเนเธเนเธเธฒเธเธเธฃเธดเธ เธฃเธนเนเธชเธถเธเนเธ”เนเน€เธฅเธขเธงเนเธฒเน€เธเนเธเธชเธดเธเธเนเธฒเธ—เธตเนเนเธชเนเนเธเธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”',
   },
   {
     rating: 5,
-    title: "Couldn't ask for more!",
+    title: 'เธ”เธตเธกเธฒเธเธเธเนเธกเนเธญเธขเธฒเธเน€เธเธฅเธตเนเธขเธ',
     comment:
-      "Love this product! It's durable, stylish, and works great. Would buy again without hesitation.",
+      'เธ—เธฑเนเธเธ—เธ เธชเธงเธข เนเธฅเธฐเนเธเนเธเธฒเธเธ”เธตเธกเธฒเธ เนเธเนเนเธฅเนเธงเธเธญเธเธเธฃเธดเธ เธ–เนเธฒเธ•เนเธญเธเธเธทเนเธญเน€เธเธดเนเธกเธเนเธเธฃเนเธญเธกเธ•เธฑเธ”เธชเธดเธเนเธเธญเธตเธเธเธฃเธฑเนเธเนเธเธเนเธกเนเธฅเธฑเธเน€เธฅ',
   },
 ]
 
@@ -1072,62 +1072,61 @@ const data: Data = {
   reviews,
   headerMenus: [
     {
-      name: "Today's Deal",
+      name: 'ดีลวันนี้',
       href: '/search?tag=todays-deal',
     },
     {
-      name: 'New Arrivals',
+      name: 'ของเข้าใหม่',
       href: '/search?tag=new-arrival',
     },
     {
-      name: 'Featured Products',
+      name: 'สินค้าแนะนำ',
       href: '/search?tag=featured',
     },
     {
-      name: 'Best Sellers',
+      name: 'ขายดี',
       href: '/search?tag=best-seller',
     },
     {
-      name: 'Browsing History',
+      name: 'ประวัติการเข้าชม',
       href: '/#browsing-history',
     },
     {
-      name: 'Customer Service',
+      name: 'บริการลูกค้า',
       href: '/page/customer-service',
     },
     {
-      name: 'About Us',
+      name: 'เกี่ยวกับเรา',
       href: '/page/about-us',
     },
     {
-      name: 'Help',
+      name: 'ช่วยเหลือ',
       href: '/page/help',
     },
   ],
   carousels: [
     {
-      title: 'Most Popular Shoes For Sale',
-      buttonCaption: 'Shop Now',
+      title: 'รองเท้ายอดนิยมที่ลูกค้าหยิบใส่ตะกร้ามากที่สุดในช่วงนี้',
+      buttonCaption: 'เลือกซื้อเลย',
       image: '/images/banner3.jpg',
       url: '/search?category=Shoes',
       isPublished: true,
     },
     {
-      title: 'Best Sellers in T-Shirts',
-      buttonCaption: 'Shop Now',
+      title: 'เสื้อยืดขายดีที่แต่งง่าย ใส่สบาย และหยิบใช้ได้ทุกวัน',
+      buttonCaption: 'เลือกซื้อเลย',
       image: '/images/banner1.jpg',
       url: '/search?category=T-Shirts',
       isPublished: true,
     },
     {
-      title: 'Best Deals on Wrist Watches',
-      buttonCaption: 'See More',
+      title: 'ดีลนาฬิกาข้อมือสุดคุ้มที่ช่วยยกระดับลุคได้ในทุกโอกาส',
+      buttonCaption: 'ดูเพิ่มเติม',
       image: '/images/banner2.jpg',
       url: '/search?category=Wrist Watches',
       isPublished: true,
     },
   ],
-
 }
 
 export default data

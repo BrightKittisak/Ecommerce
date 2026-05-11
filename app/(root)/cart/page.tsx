@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/select'
 import useCartStore from '@/hooks/use-cart-store'
 import { APP_NAME, FREE_SHIPPING_MIN_PRICE } from '@/lib/constants'
+import { translateColor } from '@/lib/i18n'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -30,10 +31,10 @@ export default function CartPage() {
         {items.length === 0 ? (
           <Card className='col-span-4 rounded-none'>
             <CardHeader className='text-3xl  '>
-              Your Shopping Cart is empty
+              ตะกร้าสินค้าของคุณยังว่างอยู่
             </CardHeader>
             <CardContent>
-              Continue shopping on <Link href='/'>{APP_NAME}</Link>
+              กลับไปเลือกซื้อสินค้าต่อที่ <Link href='/'>{APP_NAME}</Link>
             </CardContent>
           </Card>
         ) : (
@@ -41,10 +42,10 @@ export default function CartPage() {
             <div className='col-span-3'>
               <Card className='rounded-none'>
                 <CardHeader className='text-3xl pb-0'>
-                  Shopping Cart
+                  ตะกร้าสินค้า
                 </CardHeader>
                 <CardContent className='p-4'>
-                  <div className='flex justify-end border-b mb-4'>Price</div>
+                  <div className='mb-4 flex justify-end border-b'>ราคา</div>
 
                   {items.map((item) => (
                     <div
@@ -74,11 +75,11 @@ export default function CartPage() {
                         </Link>
                         <div>
                           <p className='text-sm'>
-                            <span className='font-bold'>Color: </span>{' '}
-                            {item.color}
+                            <span className='font-bold'>สี: </span>{' '}
+                            {translateColor(item.color)}
                           </p>
                           <p className='text-sm'>
-                            <span className='font-bold'>Size: </span>{' '}
+                            <span className='font-bold'>ไซซ์: </span>{' '}
                             {item.size}
                           </p>
                         </div>
@@ -91,7 +92,7 @@ export default function CartPage() {
                           >
                             <SelectTrigger className='w-auto'>
                               <SelectValue>
-                                Quantity: {item.quantity}
+                                จำนวน: {item.quantity}
                               </SelectValue>
                             </SelectTrigger>
                             <SelectContent position='popper'>
@@ -108,7 +109,7 @@ export default function CartPage() {
                             variant={'outline'}
                             onClick={() => removeItem(item)}
                           >
-                            Delete
+                            ลบ
                           </Button>
                         </div>
                       </div>
@@ -134,9 +135,9 @@ export default function CartPage() {
                   ))}
 
                   <div className='flex justify-end text-lg my-2'>
-                    Subtotal (
+                    ยอดรวมย่อย (
                     {items.reduce((acc, item) => acc + item.quantity, 0)}{' '}
-                    Items):{' '}
+                    ชิ้น):{' '}
                     <span className='font-bold ml-1'>
                       <ProductPrice price={itemsPrice} plain />
                     </span>{' '}
@@ -149,28 +150,25 @@ export default function CartPage() {
                 <CardContent className='py-4 space-y-4'>
                   {itemsPrice < FREE_SHIPPING_MIN_PRICE ? (
                     <div className='flex-1'>
-                      Add{' '}
+                      เพิ่มสินค้าอีก{' '}
                       <span className='text-green-700'>
                         <ProductPrice
                           price={FREE_SHIPPING_MIN_PRICE - itemsPrice}
                           plain
                         />
-                      </span>{' '}
-                      of eligible items to your order to qualify for FREE
-                      Shipping
+                      </span>{' '}เพื่อรับสิทธิ์จัดส่งฟรี
                     </div>
                   ) : (
                     <div className='flex-1'>
                       <span className='text-green-700'>
-                        Your order qualifies for FREE Shipping
-                      </span>{' '}
-                      Choose this option at checkout
+                        คำสั่งซื้อนี้ได้รับสิทธิ์จัดส่งฟรีแล้ว
+                      </span>{' '}เลือกตัวเลือกนี้ในขั้นตอนชำระเงิน
                     </div>
                   )}
                   <div className='text-lg'>
-                    Subtotal (
+                    ยอดรวมย่อย (
                     {items.reduce((acc, item) => acc + item.quantity, 0)}{' '}
-                    items):{' '}
+                    ชิ้น):{' '}
                     <span className='font-bold'>
                       <ProductPrice price={itemsPrice} plain />
                     </span>{' '}
@@ -179,7 +177,7 @@ export default function CartPage() {
                     onClick={() => router.push('/checkout')}
                     className='rounded-full w-full'
                   >
-                    Proceed to Checkout
+                    ดำเนินการชำระเงิน
                   </Button>
                 </CardContent>
               </Card>

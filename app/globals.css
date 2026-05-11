@@ -78,7 +78,7 @@
 
   body {
     font-family: var(--font-body), sans-serif;
-    @apply bg-background text-foreground;
+    @apply bg-background text-[15px] leading-7 text-foreground antialiased sm:text-base;
     background-image:
       radial-gradient(circle at top, hsl(var(--glow-top) / 0.9), transparent 32rem),
       radial-gradient(circle at bottom right, hsl(var(--glow-bottom) / 0.65), transparent 28rem);
@@ -116,11 +116,15 @@
   }
 
   .h1-bold {
-    @apply text-3xl font-semibold lg:text-5xl;
+    @apply text-[2rem] font-semibold leading-[1.08] sm:text-[2.55rem] lg:text-[3.25rem];
   }
 
   .h2-bold {
-    @apply text-2xl font-semibold lg:text-3xl;
+    @apply text-[1.65rem] font-semibold leading-[1.14] sm:text-[2rem] lg:text-[2.35rem];
+  }
+
+  .h3-title {
+    @apply text-xl font-semibold leading-snug sm:text-[1.65rem];
   }
 
   .flex-between {
@@ -128,7 +132,15 @@
   }
 
   .eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.28em] text-primary/80;
+    @apply text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-primary/80 sm:text-xs;
+  }
+
+  .body-lg {
+    @apply text-sm leading-7 text-muted-foreground sm:text-base sm:leading-8;
+  }
+
+  .body-sm {
+    @apply text-sm leading-6 text-muted-foreground;
   }
 
   .page-shell {

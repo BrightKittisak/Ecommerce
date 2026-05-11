@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { IProduct } from '@/lib/db/models/product.model'
-import { translateCategory } from '@/lib/i18n'
+import { translateBrand, translateCategory } from '@/lib/i18n'
 import { formatNumber, generateId, round2 } from '@/lib/utils'
 
 import AddToCart from './add-to-cart'
@@ -48,13 +48,13 @@ const ProductCard = ({
 
   const ProductDetails = () => (
     <div className='flex-1 space-y-3'>
-      <div className='flex items-center justify-between gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground'>
-        <p>{product.brand}</p>
+      <div className='flex items-center justify-between gap-2 text-[11px] uppercase tracking-[0.16em] text-muted-foreground sm:text-xs'>
+        <p>{translateBrand(product.brand)}</p>
         <p>{translateCategory(product.category)}</p>
       </div>
       <Link
         href={`/product/${product.slug}`}
-        className='overflow-hidden text-left text-base font-semibold text-foreground text-ellipsis'
+        className='overflow-hidden text-left text-[1.02rem] font-semibold leading-7 text-foreground text-ellipsis sm:text-lg sm:leading-8'
         style={{
           display: '-webkit-box',
           WebkitLineClamp: 2,
@@ -63,7 +63,7 @@ const ProductCard = ({
       >
         {product.name}
       </Link>
-      <div className='flex justify-start gap-2'>
+      <div className='flex items-center justify-start gap-2 text-sm text-muted-foreground'>
         <Rating rating={product.avgRating} />
         <span>({formatNumber(product.numReviews)})</span>
       </div>
@@ -103,7 +103,7 @@ const ProductCard = ({
       <ProductImage />
       {!hideDetails && (
         <>
-          <div className='flex-1 p-3 text-center'>
+          <div className='flex-1 p-3 pt-4 text-center'>
             <ProductDetails />
           </div>
           {!hideAddToCart && <AddButton />}

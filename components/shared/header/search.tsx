@@ -18,7 +18,7 @@ export default async function Search() {
         <select
           name='category'
           defaultValue='all'
-          className='h-full appearance-none border-r border-border/70 bg-secondary px-4 pr-10 text-sm font-medium text-foreground focus:outline-none'
+          className='h-full appearance-none border-r border-border/70 bg-secondary px-4 pr-10 text-[13px] font-medium text-foreground focus:outline-none sm:text-sm'
         >
           <option value='all'>ทุกหมวดหมู่</option>
           {categories.map((category) => (
@@ -30,7 +30,7 @@ export default async function Search() {
         <ChevronDown className='pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
       </div>
       <Input
-        className='h-full flex-1 rounded-none border-0 bg-transparent px-5 text-sm shadow-none focus-visible:ring-0 md:text-sm'
+        className='h-full flex-1 rounded-none border-0 bg-transparent px-5 text-[15px] shadow-none focus-visible:ring-0 placeholder:text-sm placeholder:text-muted-foreground focus-visible:ring-offset-0 sm:text-base'
         placeholder={`ค้นหาสินค้าใน ${APP_NAME}`}
         name='q'
         type='search'

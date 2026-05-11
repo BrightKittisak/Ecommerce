@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select'
 import useCartStore from '@/hooks/use-cart-store'
 import { APP_NAME, FREE_SHIPPING_MIN_PRICE } from '@/lib/constants'
-import { translateColor } from '@/lib/i18n'
+import { translateColor, translateSize } from '@/lib/i18n'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -80,7 +80,7 @@ export default function CartPage() {
                           </p>
                           <p className='text-sm'>
                             <span className='font-bold'>ไซซ์: </span>{' '}
-                            {item.size}
+                            {translateSize(item.size)}
                           </p>
                         </div>
                         <div className='flex gap-2 items-center'>

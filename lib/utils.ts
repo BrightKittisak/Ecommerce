@@ -41,14 +41,32 @@ export const toSlug = (text: string): string =>
     .replace(/^-+|-+$/g, '')
     .replace(/-+/g, '-')
 
+export const CURRENCY_CODE = 'THB'
+export const CURRENCY_SYMBOL = '฿'
+
 const CURRENCY_FORMATTER = new Intl.NumberFormat('th-TH', {
-  currency: 'USD',
+  currency: CURRENCY_CODE,
   style: 'currency',
   minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
 })
 
 export function formatCurrency(amount: number) {
   return CURRENCY_FORMATTER.format(amount)
+}
+
+export function formatCurrencyParts(amount: number) {
+  const parts = CURRENCY_FORMATTER.formatToParts(amount)
+
+  return {
+    symbol:
+      parts.find((part) => part.type === 'currency')?.value || CURRENCY_SYMBOL,
+    integer: parts
+      .filter((part) => part.type === 'integer' || part.type === 'group')
+      .map((part) => part.value)
+      .join(''),
+    fraction: parts.find((part) => part.type === 'fraction')?.value || '00',
+  }
 }
 
 const NUMBER_FORMATTER = new Intl.NumberFormat('th-TH')

@@ -16,7 +16,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { IOrder } from '@/lib/db/models/order.model'
-import { cn, formatDateTime } from '@/lib/utils'
+import { formatVariantSummary, translatePaymentMethod } from '@/lib/i18n'
+import { cn, formatCurrency, formatDateTime } from '@/lib/utils'
 
 export default function OrderDetailsForm({
   order,
@@ -70,7 +71,7 @@ export default function OrderDetailsForm({
         <Card>
           <CardContent className='gap-4 p-4'>
             <h2 className='pb-4 text-xl'>วิธีชำระเงิน</h2>
-            <p>{paymentMethod}</p>
+            <p>{translatePaymentMethod(paymentMethod)}</p>
             {isPaid ? (
               <Badge>ชำระแล้วเมื่อ {formatDateTime(paidAt!).dateTime}</Badge>
             ) : (
@@ -103,13 +104,23 @@ export default function OrderDetailsForm({
                           width={50}
                           height={50}
                         />
-                        <span className='px-2'>{item.name}</span>
+                        <div className='px-2'>
+                          <div>{item.name}</div>
+                          <div className='text-xs text-muted-foreground'>
+                            {formatVariantSummary({
+                              color: item.color,
+                              size: item.size,
+                            })}
+                          </div>
+                        </div>
                       </Link>
                     </TableCell>
                     <TableCell>
                       <span className='px-2'>{item.quantity}</span>
                     </TableCell>
-                    <TableCell className='text-right'>${item.price}</TableCell>
+                    <TableCell className='text-right'>
+                      {formatCurrency(item.price)}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

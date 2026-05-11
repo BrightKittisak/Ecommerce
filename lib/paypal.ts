@@ -1,3 +1,5 @@
+import { CURRENCY_CODE } from './utils'
+
 const base = process.env.PAYPAL_API_URL || 'https://api-m.sandbox.paypal.com'
 
 export const paypal = {
@@ -15,7 +17,7 @@ export const paypal = {
         purchase_units: [
           {
             amount: {
-              currency_code: 'USD',
+              currency_code: CURRENCY_CODE,
               value: price,
             },
           },

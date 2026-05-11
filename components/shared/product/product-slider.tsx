@@ -25,7 +25,7 @@ export default function ProductSlider({
       <div className='mb-5 flex items-end justify-between gap-4'>
         <div>
           <p className='eyebrow mb-2'>คัดมาให้ดูต่อได้เลย</p>
-          <h2 className='h2-bold'>{title}</h2>
+          <h2 className='h2-bold max-w-3xl'>{title}</h2>
         </div>
       </div>
       <Carousel

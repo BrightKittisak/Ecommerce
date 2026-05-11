@@ -49,12 +49,12 @@ export function HomeCarousel({
                   sizes='(max-width: 768px) 100vw, 90vw'
                 />
                 <div className='absolute inset-0 bg-[linear-gradient(90deg,rgba(17,20,16,0.82),rgba(17,20,16,0.38),transparent)]' />
-                <div className='absolute inset-x-6 bottom-8 z-10 max-w-xl md:bottom-1/2 md:left-16 md:translate-y-1/2'>
+                <div className='absolute inset-x-6 bottom-8 z-10 max-w-xl space-y-5 md:bottom-1/2 md:left-16 md:translate-y-1/2'>
                   <p className='eyebrow mb-3 text-white/80'>คอลเลกชันคัดพิเศษ</p>
-                  <h2 className='mb-4 max-w-lg text-4xl font-semibold leading-none text-white md:text-6xl'>
+                  <h2 className='max-w-lg text-[1.9rem] font-semibold leading-[1.34] tracking-[-0.02em] text-white sm:text-[2.35rem] md:text-[3.15rem]'>
                     {item.title}
                   </h2>
-                  <p className='mb-5 hidden max-w-md text-sm text-white/80 md:block'>
+                  <p className='hidden max-w-md text-sm leading-7 text-white/80 md:block'>
                     เลือกชิ้นที่ใส่ง่าย ใช้ได้จริง และช่วยให้การช้อปในแต่ละวันเร็วขึ้นแบบไม่เสียความสวยงาม
                   </p>
                   <span className='hidden rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground md:inline-flex'>

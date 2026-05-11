@@ -24,7 +24,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
         >
           <CardContent className='flex-1 p-5'>
             <p className='eyebrow mb-3'>แนะนำสำหรับคุณ</p>
-            <h3 className='mb-5 text-2xl font-semibold'>{card.title}</h3>
+            <h3 className='h3-title mb-5'>{card.title}</h3>
             <div className='grid grid-cols-2 gap-4'>
               {card.items.map((item) => (
                 <Link
@@ -40,7 +40,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
                     width={120}
                     sizes='(max-width: 1024px) 40vw, 12vw'
                   />
-                  <p className='mt-2 overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium text-foreground/90'>
+                  <p className='mt-3 overflow-hidden text-ellipsis whitespace-nowrap text-[15px] font-medium text-foreground/90 sm:text-base'>
                     {item.name}
                   </p>
                 </Link>
@@ -49,7 +49,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
           </CardContent>
           {card.link && (
             <CardFooter className='pt-0'>
-              <Link href={card.link.href} className='mt-2 font-semibold text-primary'>
+              <Link href={card.link.href} className='mt-2 text-sm font-semibold text-primary sm:text-[15px]'>
                 {card.link.text}
               </Link>
             </CardFooter>

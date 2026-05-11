@@ -39,6 +39,10 @@ import {
   DEFAULT_PAYMENT_METHOD,
 } from '@/lib/constants'
 import {
+  formatVariantSummary,
+  translatePaymentMethod,
+} from '@/lib/i18n'
+import {
   calculateFutureDate,
   formatDateTime,
   timeUntilMidnight,
@@ -76,7 +80,9 @@ const paymentMethodLabel: Record<string, string> = {
 }
 
 const getPaymentMethodLabel = (method?: string) =>
-  method ? paymentMethodLabel[method] ?? method : 'ยังไม่ได้เลือก'
+  method
+    ? paymentMethodLabel[method] ?? translatePaymentMethod(method)
+    : 'ยังไม่ได้เลือก'
 
 const CheckoutForm = () => {
   const router = useRouter()
@@ -578,8 +584,12 @@ const CheckoutForm = () => {
                             </div>
 
                             <div className='flex-1'>
-                              <p className='font-semibold'>
-                                {item.name}, {item.color}, {item.size}
+                              <p className='font-semibold'>{item.name}</p>
+                              <p className='text-sm text-muted-foreground'>
+                                {formatVariantSummary({
+                                  color: item.color,
+                                  size: item.size,
+                                })}
                               </p>
                               <p className='font-bold'>
                                 <ProductPrice price={item.price} plain />

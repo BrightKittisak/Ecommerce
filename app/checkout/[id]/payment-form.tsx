@@ -12,6 +12,10 @@ import {
   createPayPalOrder,
 } from '@/lib/actions/order.actions'
 import { IOrder } from '@/lib/db/models/order.model'
+import {
+  formatVariantSummary,
+  translatePaymentMethod,
+} from '@/lib/i18n'
 import { formatDateTime } from '@/lib/utils'
 
 import CheckoutFooter from '../checkout-footer'
@@ -195,7 +199,10 @@ export default function OrderPaymentForm({
                 <span>วิธีชำระเงิน</span>
               </div>
               <div className='col-span-2'>
-                <p>{paymentMethodLabel[paymentMethod] ?? paymentMethod}</p>
+                <p>
+                  {paymentMethodLabel[paymentMethod] ??
+                    translatePaymentMethod(paymentMethod)}
+                </p>
               </div>
             </div>
           </div>
@@ -212,7 +219,12 @@ export default function OrderPaymentForm({
               <ul>
                 {items.map((item) => (
                   <li key={item.slug}>
-                    {item.name} x {item.quantity} = {item.price}
+                    {item.name} •{' '}
+                    {formatVariantSummary({
+                      color: item.color,
+                      size: item.size,
+                    })}{' '}
+                    x {item.quantity} = <ProductPrice price={item.price} plain />
                   </li>
                 ))}
               </ul>

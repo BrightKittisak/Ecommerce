@@ -13,7 +13,7 @@ import {
 } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
 import { translateCategory, translateTag } from '@/lib/i18n'
-import { getFilterUrl, toSlug } from '@/lib/utils'
+import { CURRENCY_SYMBOL, getFilterUrl, toSlug } from '@/lib/utils'
 
 const sortOrders = [
   { value: 'price-low-to-high', name: 'ราคาต่ำไปสูง' },
@@ -25,16 +25,16 @@ const sortOrders = [
 
 const prices = [
   {
-    name: '$1 ถึง $20',
-    value: '1-20',
+    name: `${CURRENCY_SYMBOL}0 ถึง ${CURRENCY_SYMBOL}999`,
+    value: '0-999',
   },
   {
-    name: '$21 ถึง $50',
-    value: '21-50',
+    name: `${CURRENCY_SYMBOL}1000 ถึง ${CURRENCY_SYMBOL}2999`,
+    value: '1000-2999',
   },
   {
-    name: '$51 ถึง $1000',
-    value: '51-1000',
+    name: `${CURRENCY_SYMBOL}3000 ถึง ${CURRENCY_SYMBOL}20000`,
+    value: '3000-20000',
   },
 ]
 
@@ -119,10 +119,10 @@ export default async function SearchPage(props: {
   return (
     <div className='space-y-4'>
       <div className='section-shell flex-between flex-col gap-3 px-5 py-4 md:flex-row'>
-        <div className='flex items-center'>
+        <div className='flex items-center text-sm leading-7 text-foreground/85 sm:text-[15px]'>
           {data.totalProducts === 0
             ? 'ไม่พบ'
-            : `${data.from}-${data.to} of ${data.totalProducts}`}{' '}
+            : `${data.from}-${data.to} จากทั้งหมด ${data.totalProducts}`}{' '}
           รายการ
           {(q !== 'all' && q !== '') ||
           (category !== 'all' && category !== '') ||

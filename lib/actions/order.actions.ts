@@ -1,7 +1,7 @@
 'use server'
 
 import { Cart, OrderItem, ShippingAddress } from '@/types'
-import { calculateFutureDate, formatError, round2 } from '../utils'
+import { CURRENCY_CODE, calculateFutureDate, formatError, round2 } from '../utils'
 import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
@@ -78,6 +78,7 @@ export const createOrderFromCart = async (
     shippingPrice: cart.shippingPrice,
     taxPrice: cart.taxPrice,
     totalPrice: cart.totalPrice,
+    currencyCode: CURRENCY_CODE,
     expectedDeliveryDate: cart.expectedDeliveryDate,
   })
   return await Order.create(order)

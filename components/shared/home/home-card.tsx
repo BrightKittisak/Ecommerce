@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-
+import React from 'react'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 
 type CardItem = {
@@ -16,31 +16,26 @@ type CardItem = {
 
 export function HomeCard({ cards }: { cards: CardItem[] }) {
   return (
-    <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
+    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 md:gap-4'>
       {cards.map((card) => (
-        <Card
-          key={card.title}
-          className='group flex h-full flex-col overflow-hidden border-border/60 bg-card/85 shadow-[0_24px_70px_-42px_rgba(49,34,21,0.55)] transition-transform duration-300 hover:-translate-y-1'
-        >
-          <CardContent className='flex-1 p-5'>
-            <p className='eyebrow mb-3'>แนะนำสำหรับคุณ</p>
-            <h3 className='mb-5 text-2xl font-semibold'>{card.title}</h3>
+        <Card key={card.title} className='rounded-none flex flex-col'>
+          <CardContent className='p-4 flex-1'>
+            <h3 className='text-xl font-bold mb-4'>{card.title}</h3>
             <div className='grid grid-cols-2 gap-4'>
               {card.items.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className='rounded-2xl border border-border/60 bg-secondary/50 p-3 transition-colors hover:bg-secondary'
+                  className='flex flex-col'
                 >
                   <Image
                     src={item.image}
                     alt={item.name}
-                    className='mx-auto aspect-square h-auto max-w-full object-scale-down'
+                    className='aspect-square object-scale-down max-w-full h-auto mx-auto'
                     height={120}
                     width={120}
-                    sizes='(max-width: 1024px) 40vw, 12vw'
                   />
-                  <p className='mt-2 overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium text-foreground/90'>
+                  <p className='text-center text-sm whitespace-nowrap overflow-hidden text-ellipsis'>
                     {item.name}
                   </p>
                 </Link>
@@ -48,8 +43,8 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
             </div>
           </CardContent>
           {card.link && (
-            <CardFooter className='pt-0'>
-              <Link href={card.link.href} className='mt-2 font-semibold text-primary'>
+            <CardFooter>
+              <Link href={card.link.href} className='mt-4 block'>
                 {card.link.text}
               </Link>
             </CardFooter>

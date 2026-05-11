@@ -1,21 +1,21 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import React from 'react'
 
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { IProduct } from '@/lib/db/models/product.model'
-import { translateCategory } from '@/lib/i18n'
-import { formatNumber, generateId, round2 } from '@/lib/utils'
 
-import AddToCart from './add-to-cart'
-import ImageHover from './image-hover'
-import ProductPrice from './product-price'
 import Rating from './rating'
+import { formatNumber, generateId, round2 } from '@/lib/utils'
+import ProductPrice from './product-price'
+import ImageHover from './image-hover'
+import AddToCart from './add-to-cart'
 
 const ProductCard = ({
   product,
   hideBorder = false,
   hideDetails = false,
-  hideAddToCart = false,
+  hideAddToCart =false,
 }: {
   product: IProduct
   hideDetails?: boolean
@@ -24,7 +24,7 @@ const ProductCard = ({
 }) => {
   const ProductImage = () => (
     <Link href={`/product/${product.slug}`}>
-      <div className='relative h-56 overflow-hidden rounded-[1.4rem] bg-secondary/50'>
+      <div className='relative h-52'>
         {product.images.length > 1 ? (
           <ImageHover
             src={product.images[0]}
@@ -32,29 +32,25 @@ const ProductCard = ({
             alt={product.name}
           />
         ) : (
-          <div className='relative h-56'>
+          <div className='relative h-52'>
             <Image
               src={product.images[0]}
               alt={product.name}
               fill
-              sizes='(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 20vw'
-              className='object-contain p-5 transition-transform duration-500 hover:scale-105'
+              sizes='80vw'
+              className='object-contain'
             />
           </div>
         )}
       </div>
     </Link>
   )
-
   const ProductDetails = () => (
-    <div className='flex-1 space-y-3'>
-      <div className='flex items-center justify-between gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground'>
-        <p>{product.brand}</p>
-        <p>{translateCategory(product.category)}</p>
-      </div>
+    <div className='flex-1 space-y-2'>
+      <p className='font-bold'>{product.brand}</p>
       <Link
         href={`/product/${product.slug}`}
-        className='overflow-hidden text-left text-base font-semibold text-foreground text-ellipsis'
+        className='overflow-hidden text-ellipsis'
         style={{
           display: '-webkit-box',
           WebkitLineClamp: 2,
@@ -63,7 +59,7 @@ const ProductCard = ({
       >
         {product.name}
       </Link>
-      <div className='flex justify-start gap-2'>
+      <div className='flex gap-2 justify-center'>
         <Rating rating={product.avgRating} />
         <span>({formatNumber(product.numReviews)})</span>
       </div>
@@ -76,7 +72,6 @@ const ProductCard = ({
       />
     </div>
   )
-
   const AddButton = () => (
     <div className='w-full text-center'>
       <AddToCart
@@ -103,7 +98,7 @@ const ProductCard = ({
       <ProductImage />
       {!hideDetails && (
         <>
-          <div className='flex-1 p-3 text-center'>
+          <div className='p-3 flex-1 text-center'>
             <ProductDetails />
           </div>
           {!hideAddToCart && <AddButton />}
@@ -111,16 +106,16 @@ const ProductCard = ({
       )}
     </div>
   ) : (
-    <Card className='flex h-full flex-col overflow-hidden border-border/60 bg-card/90 shadow-[0_24px_80px_-48px_rgba(47,32,21,0.65)] transition-transform duration-300 hover:-translate-y-1'>
+    <Card className='flex flex-col  '>
       <CardHeader className='p-3'>
         <ProductImage />
       </CardHeader>
       {!hideDetails && (
         <>
-          <CardContent className='flex-1 p-4 pt-1'>
+          <CardContent className='p-3 flex-1  text-center'>
             <ProductDetails />
           </CardContent>
-          <CardFooter className='p-4 pt-0'>
+          <CardFooter className='P-3'>
             {!hideAddToCart && <AddButton />}
           </CardFooter>
         </>

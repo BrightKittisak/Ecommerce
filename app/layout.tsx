@@ -1,21 +1,19 @@
-import type { Metadata } from 'next'
-import { Bai_Jamjuree, Noto_Sans_Thai } from 'next/font/google'
-import './globals.css'
-
-import ClientProviders from '@/components/shared/client-providers'
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
 import { APP_DESCRIPTION, APP_NAME, APP_SLOGAN } from '@/lib/constants'
+import ClientProviders from "@/components/shared/client-providers";
 
-const notoSansThai = Noto_Sans_Thai({
-  variable: '--font-body',
-  subsets: ['thai', 'latin'],
-  weight: ['300', '400', '500', '600', '700'],
-})
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
 
-const baiJamjuree = Bai_Jamjuree({
-  variable: '--font-display',
-  subsets: ['thai', 'latin'],
-  weight: ['400', '500', '600', '700'],
-})
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
 
 export const metadata: Metadata = {
   title: {
@@ -28,15 +26,15 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
-    <html lang='th' suppressHydrationWarning>
+    <html lang='en' suppressHydrationWarning>
       <body
-        className={`${notoSansThai.variable} ${baiJamjuree.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
-  )
+  );
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDownIcon, Laptop, Moon, Sun } from 'lucide-react'
+import { ChevronDownIcon, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import * as React from 'react'
 import {
@@ -13,60 +13,59 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
+import useColorStore from '@/hooks/use-color-store'
 import useIsMounted from '@/hooks/use-is-mounted'
 
 export default function ThemeSwitcher() {
   const { theme, setTheme } = useTheme()
+  const { availableColors, color, setColor } = useColorStore(theme)
+  const changeTheme = (value: string) => {
+    setTheme(value)
+  }
   const isMounted = useIsMounted()
-  const activeTheme = isMounted ? theme : 'system'
-
-  const themeLabel =
-    activeTheme === 'dark'
-      ? 'โหมดกลางคืน'
-      : activeTheme === 'light'
-        ? 'โหมดสว่าง'
-        : 'อัตโนมัติ'
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className='header-button h-[41px]'>
-        {activeTheme === 'dark' ? (
-          <div className='flex items-center gap-1.5'>
-            <Moon className='h-4 w-4' />
-            {themeLabel}
-            <ChevronDownIcon />
-          </div>
-        ) : activeTheme === 'light' ? (
-          <div className='flex items-center gap-1.5'>
-            <Sun className='h-4 w-4' />
-            {themeLabel}
-            <ChevronDownIcon />
+        {theme === 'dark' && isMounted ? (
+          <div className='flex items-center gap-1'>
+            <Moon className='h-4 w-4' /> Dark <ChevronDownIcon />
           </div>
         ) : (
-          <div className='flex items-center gap-1.5'>
-            <Laptop className='h-4 w-4' />
-            {themeLabel}
+          <div className='flex items-center gap-1'>
+            <Sun className='h-4 w-4' /> Light
             <ChevronDownIcon />
           </div>
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-56'>
-        <DropdownMenuLabel>ธีมการแสดงผล</DropdownMenuLabel>
-        <DropdownMenuRadioGroup value={activeTheme} onValueChange={setTheme}>
-          <DropdownMenuRadioItem value='system'>
-            <Laptop className='mr-2 h-4 w-4' /> อัตโนมัติตามอุปกรณ์
-          </DropdownMenuRadioItem>
+        <DropdownMenuLabel>Theme</DropdownMenuLabel>
+
+        <DropdownMenuRadioGroup value={theme} onValueChange={changeTheme}>
           <DropdownMenuRadioItem value='dark'>
-            <Moon className='mr-2 h-4 w-4' /> โหมดกลางคืน
+            <Moon className='h-4 w-4 mr-1' /> Dark
           </DropdownMenuRadioItem>
           <DropdownMenuRadioItem value='light'>
-            <Sun className='mr-2 h-4 w-4' /> โหมดสว่าง
+            <Sun className='h-4 w-4 mr-1' /> Light
           </DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
         <DropdownMenuSeparator />
-        <p className='px-2 py-1 text-xs text-muted-foreground'>
-          สลับธีมได้ทันทีทั้งเว็บและระบบจะจดจำค่าที่เลือกไว้ให้
-        </p>
+        <DropdownMenuLabel>Color</DropdownMenuLabel>
+
+        <DropdownMenuRadioGroup
+          value={color.name}
+          onValueChange={(value) => setColor(value, true)}
+        >
+          {availableColors.map((c) => (
+            <DropdownMenuRadioItem key={c.name} value={c.name}>
+              <div
+                style={{ backgroundColor: c.name }}
+                className='h-4 w-4 mr-1 rounded-full'
+              ></div>
+
+              {c.name}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )

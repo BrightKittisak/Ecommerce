@@ -1,0 +1,62 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="128"
+  height="128"
+  viewBox="0 0 128 128"
+  fill="none"
+>
+  <rect width="128" height="128" rx="34" fill="url(#lush-bg)" />
+  <path
+    d="M39 30V75C39 87.7025 47.2975 96 60 96H89"
+    stroke="url(#lush-stroke)"
+    stroke-width="11"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M63 28C83 28 97 42.5 97 62C77 62 63 47.5 63 28Z"
+    fill="url(#lush-leaf)"
+  />
+  <path
+    d="M71 35C77 41 80.5 47.5 82 55"
+    stroke="#17392E"
+    stroke-width="4.5"
+    stroke-linecap="round"
+  />
+  <circle cx="93" cy="33" r="7" fill="#F4B078" />
+  <defs>
+    <linearGradient
+      id="lush-bg"
+      x1="15"
+      y1="10"
+      x2="111"
+      y2="118"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="#16392E" />
+      <stop offset="1" stop-color="#7DB68D" />
+    </linearGradient>
+    <linearGradient
+      id="lush-stroke"
+      x1="39"
+      y1="30"
+      x2="89"
+      y2="96"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="#FFF6EA" />
+      <stop offset="1" stop-color="#F5E6D4" />
+    </linearGradient>
+    <linearGradient
+      id="lush-leaf"
+      x1="63"
+      y1="28"
+      x2="97"
+      y2="62"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="#D8F1C5" />
+      <stop offset="1" stop-color="#F1E9D7" />
+    </linearGradient>
+  </defs>
+</svg>

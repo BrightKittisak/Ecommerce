@@ -28,13 +28,9 @@ export default function getMongoClient() {
 
   configureMongoDns()
 
-  if (process.env.NODE_ENV === 'development') {
-    if (!globalWithMongo._mongoClient) {
-      globalWithMongo._mongoClient = new MongoClient(uri, options)
-    }
-
-    return globalWithMongo._mongoClient
+  if (!globalWithMongo._mongoClient) {
+    globalWithMongo._mongoClient = new MongoClient(uri, options)
   }
 
-  return new MongoClient(uri, options)
+  return globalWithMongo._mongoClient
 }

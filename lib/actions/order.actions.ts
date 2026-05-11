@@ -196,12 +196,16 @@ export const calcDeliveryDateAndPrice = async ({
     items.reduce((acc, item) => acc + item.price * item.quantity, 0)
   )
 
-  const deliveryDate =
-    AVAILABLE_DELIVERY_DATES[
-    deliveryDateIndex === undefined
-      ? AVAILABLE_DELIVERY_DATES.length - 1
-      : deliveryDateIndex
-    ]
+  const fallbackDeliveryDateIndex = AVAILABLE_DELIVERY_DATES.length - 1
+  const normalizedDeliveryDateIndex =
+    typeof deliveryDateIndex === 'number' &&
+    Number.isInteger(deliveryDateIndex) &&
+    deliveryDateIndex >= 0 &&
+    deliveryDateIndex < AVAILABLE_DELIVERY_DATES.length
+      ? deliveryDateIndex
+      : fallbackDeliveryDateIndex
+
+  const deliveryDate = AVAILABLE_DELIVERY_DATES[normalizedDeliveryDateIndex]
   const shippingPrice =
     !shippingAddress || !deliveryDate
       ? undefined
@@ -219,10 +223,7 @@ export const calcDeliveryDateAndPrice = async ({
   )
   return {
     AVAILABLE_DELIVERY_DATES,
-    deliveryDateIndex:
-      deliveryDateIndex === undefined
-        ? AVAILABLE_DELIVERY_DATES.length - 1
-        : deliveryDateIndex,
+    deliveryDateIndex: normalizedDeliveryDateIndex,
     expectedDeliveryDate: calculateFutureDate(deliveryDate.daysToDeliver),
     itemsPrice,
     shippingPrice,

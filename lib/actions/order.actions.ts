@@ -1,7 +1,7 @@
 'use server'
 
 import { Cart, OrderItem, ShippingAddress } from '@/types'
-import { calculateFutureDate, formatError, round2 } from '../utils'
+import { formatError, round2 } from '../utils'
 import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
@@ -11,37 +11,12 @@ import { sendPurchaseReceipt } from '@/emails'
 import { revalidatePath } from 'next/cache'
 import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE } from '../constants'
 
-const getOrderOwnerId = (order: IOrder) => {
-  if (typeof order.user === 'string') return order.user
-  if (order.user && typeof order.user === 'object' && '_id' in order.user) {
-    return String(order.user._id)
-  }
-  return String(order.user)
-}
-
-const findOrderForUser = async ({
-  orderId,
-  userId,
-  isAdmin,
-}: {
-  orderId: string
-  userId: string
-  isAdmin: boolean
-}) => {
-  const order = await Order.findById(orderId)
-  if (!order) throw new Error('ไม่พบคำสั่งซื้อ')
-  if (!isAdmin && getOrderOwnerId(order) !== userId) {
-    throw new Error('ไม่พบคำสั่งซื้อ')
-  }
-  return order
-}
-
 // CREATE
 export const createOrder = async (clientSideCart: Cart) => {
   try {
     await connectToDatabase()
     const session = await auth()
-    if (!session) throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
+    if (!session) throw new Error('User not authenticated')
     // recalculate price and delivery date on the server
     const createdOrder = await createOrderFromCart(
       clientSideCart,
@@ -49,7 +24,7 @@ export const createOrder = async (clientSideCart: Cart) => {
     )
     return {
       success: true,
-      message: 'สร้างคำสั่งซื้อเรียบร้อยแล้ว',
+      message: 'Order placed successfully',
       data: { orderId: createdOrder._id.toString() },
     }
   } catch (error) {
@@ -62,11 +37,11 @@ export const createOrderFromCart = async (
 ) => {
   const cart = {
     ...clientSideCart,
-    ...(await calcDeliveryDateAndPrice({
+    ...calcDeliveryDateAndPrice({
       items: clientSideCart.items,
       shippingAddress: clientSideCart.shippingAddress,
       deliveryDateIndex: clientSideCart.deliveryDateIndex,
-    })),
+    }),
   }
 
   const order = OrderInputSchema.parse({
@@ -89,49 +64,26 @@ export async function getOrderById(orderId: string): Promise<IOrder> {
   return JSON.parse(JSON.stringify(order))
 }
 
-export async function getOrderByIdForCurrentUser(
-  orderId: string
-): Promise<IOrder | null> {
-  await connectToDatabase()
-  const session = await auth()
-  if (!session?.user?.id) return null
-
-  try {
-    const order = await findOrderForUser({
-      orderId,
-      userId: session.user.id,
-      isAdmin: session.user.role === 'Admin',
-    })
-    return JSON.parse(JSON.stringify(order))
-  } catch {
-    return null
-  }
-}
-
 export async function createPayPalOrder(orderId: string) {
   await connectToDatabase()
   try {
-    const session = await auth()
-    if (!session?.user?.id) throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
-
-    const order = await findOrderForUser({
-      orderId,
-      userId: session.user.id,
-      isAdmin: session.user.role === 'Admin',
-    })
-
-    const paypalOrder = await paypal.createOrder(order.totalPrice)
-    order.paymentResult = {
-      id: paypalOrder.id,
-      email_address: '',
-      status: '',
-      pricePaid: '0',
-    }
-    await order.save()
-    return {
-      success: true,
-      message: 'สร้างรายการชำระเงินผ่าน PayPal เรียบร้อยแล้ว',
-      data: paypalOrder.id,
+    const order = await Order.findById(orderId)
+    if (order) {
+      const paypalOrder = await paypal.createOrder(order.totalPrice)
+      order.paymentResult = {
+        id: paypalOrder.id,
+        email_address: '',
+        status: '',
+        pricePaid: '0',
+      }
+      await order.save()
+      return {
+        success: true,
+        message: 'PayPal order created successfully',
+        data: paypalOrder.id,
+      }
+    } else {
+      throw new Error('Order not found')
     }
   } catch (err) {
     return { success: false, message: formatError(err) }
@@ -144,14 +96,8 @@ export async function approvePayPalOrder(
 ) {
   await connectToDatabase()
   try {
-    const session = await auth()
-    if (!session?.user?.id) throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
-
-    const order = await findOrderForUser({
-      orderId,
-      userId: session.user.id,
-      isAdmin: session.user.role === 'Admin',
-    })
+    const order = await Order.findById(orderId).populate('user', 'email')
+    if (!order) throw new Error('Order not found')
 
     const captureData = await paypal.capturePayment(data.orderID)
     if (
@@ -159,7 +105,7 @@ export async function approvePayPalOrder(
       captureData.id !== order.paymentResult?.id ||
       captureData.status !== 'COMPLETED'
     )
-      throw new Error('เกิดข้อผิดพลาดในการชำระเงินผ่าน PayPal')
+      throw new Error('Error in paypal payment')
     order.isPaid = true
     order.paidAt = new Date()
     order.paymentResult = {
@@ -169,13 +115,12 @@ export async function approvePayPalOrder(
       pricePaid:
         captureData.purchase_units[0]?.payments?.captures[0]?.amount?.value,
     }
-    await order.populate('user', 'email')
     await order.save()
     await sendPurchaseReceipt({ order })
     revalidatePath(`/account/orders/${orderId}`)
     return {
       success: true,
-      message: 'ชำระเงินผ่าน PayPal สำหรับคำสั่งซื้อนี้เรียบร้อยแล้ว',
+      message: 'Your order has been successfully paid by PayPal',
     }
   } catch (err) {
     return { success: false, message: formatError(err) }
@@ -222,7 +167,6 @@ export const calcDeliveryDateAndPrice = async ({
       deliveryDateIndex === undefined
         ? AVAILABLE_DELIVERY_DATES.length - 1
         : deliveryDateIndex,
-    expectedDeliveryDate: calculateFutureDate(deliveryDate.daysToDeliver),
     itemsPrice,
     shippingPrice,
     taxPrice,
@@ -243,7 +187,7 @@ export async function getMyOrders({
   await connectToDatabase()
   const session = await auth()
   if (!session) {
-    throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
+    throw new Error('User is not authenticated')
   }
   const skipAmount = (Number(page) - 1) * limit
   const orders = await Order.find({

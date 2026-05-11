@@ -1,16 +1,6 @@
-'use client'
-
-import Image from 'next/image'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { toast } from 'sonner'
-
-import ProductPrice from '@/components/shared/product/product-price'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
+"use client";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -18,68 +8,67 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import useCartStore from '@/hooks/use-cart-store'
-import useIsMounted from '@/hooks/use-is-mounted'
-import { createOrder } from '@/lib/actions/order.actions'
+} from "@/components/ui/select";
+import {
+  calculateFutureDate,
+  formatDateTime,
+  timeUntilMidnight,
+} from "@/lib/utils";
+import { ShippingAddressSchema } from "@/lib/validator";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import CheckoutFooter from "./checkout-footer";
+import { ShippingAddress } from "@/types";
+import useIsMounted from "@/hooks/use-is-mounted";
+import Link from "next/link";
+import useCartStore from "@/hooks/use-cart-store";
+import ProductPrice from "@/components/shared/product/product-price";
 import {
   APP_NAME,
   AVAILABLE_DELIVERY_DATES,
   AVAILABLE_PAYMENT_METHODS,
   DEFAULT_PAYMENT_METHOD,
-} from '@/lib/constants'
-import {
-  calculateFutureDate,
-  formatDateTime,
-  timeUntilMidnight,
-} from '@/lib/utils'
-import { ShippingAddressSchema } from '@/lib/validator'
-import { ShippingAddress } from '@/types'
-
-import CheckoutFooter from './checkout-footer'
+} from "@/lib/constants";
+import { createOrder } from "@/lib/actions/order.actions";
+import { toast } from "sonner";
 
 const shippingAddressDefaultValues =
-  process.env.NODE_ENV === 'development'
+  process.env.NODE_ENV === "development"
     ? {
-        fullName: 'กิตติศักดิ์',
-        street: '191/65 ถนนสุขุมวิท',
-        city: 'เมืองอุบลราชธานี',
-        province: 'อุบลราชธานี',
-        phone: '0812345678',
-        postalCode: '34000',
-        country: 'ประเทศไทย',
+        fullName: "kittisak",
+        street: "1911, 65 Sherbrooke Est",
+        city: "Ubon",
+        province: "Quebec",
+        phone: "4181234567",
+        postalCode: "H2X 1C4",
+        country: "thai",
       }
     : {
-        fullName: '',
-        street: '',
-        city: '',
-        province: '',
-        phone: '',
-        postalCode: '',
-        country: '',
-      }
-
-const paymentMethodLabel: Record<string, string> = {
-  'Cash On Delivery': 'เก็บเงินปลายทาง',
-  PayPal: 'PayPal',
-  Stripe: 'บัตรเครดิต / เดบิต (Stripe)',
-}
-
-const getPaymentMethodLabel = (method?: string) =>
-  method ? paymentMethodLabel[method] ?? method : 'ยังไม่ได้เลือก'
+        fullName: "",
+        street: "",
+        city: "",
+        province: "",
+        phone: "",
+        postalCode: "",
+        country: "",
+      };
 
 const CheckoutForm = () => {
-  const router = useRouter()
+  const router = useRouter();
+
   const {
     cart: {
       items,
@@ -97,154 +86,145 @@ const CheckoutForm = () => {
     removeItem,
     setDeliveryDateIndex,
     clearCart,
-  } = useCartStore()
-  const isMounted = useIsMounted()
-  const selectedDeliveryDateIndex = deliveryDateIndex ?? 0
+  } = useCartStore();
+  const isMounted = useIsMounted();
 
   const shippingAddressForm = useForm<ShippingAddress>({
     resolver: zodResolver(ShippingAddressSchema),
     defaultValues: shippingAddress || shippingAddressDefaultValues,
-  })
-
+  });
   const onSubmitShippingAddress: SubmitHandler<ShippingAddress> = (values) => {
-    setShippingAddress(values)
-    setIsAddressSelected(true)
-    setIsPaymentMethodSelected(false)
-    setIsDeliveryDateSelected(false)
-  }
+    setShippingAddress(values);
+    setIsAddressSelected(true);
+  };
 
   useEffect(() => {
-    if (!isMounted || !shippingAddress) return
-    shippingAddressForm.reset(shippingAddress)
-  }, [isMounted, shippingAddress, shippingAddressForm])
+    if (!isMounted || !shippingAddress) return;
+    shippingAddressForm.setValue("fullName", shippingAddress.fullName);
+    shippingAddressForm.setValue("street", shippingAddress.street);
+    shippingAddressForm.setValue("city", shippingAddress.city);
+    shippingAddressForm.setValue("country", shippingAddress.country);
+    shippingAddressForm.setValue("postalCode", shippingAddress.postalCode);
+    shippingAddressForm.setValue("province", shippingAddress.province);
+    shippingAddressForm.setValue("phone", shippingAddress.phone);
+  }, [items, isMounted, router, shippingAddress, shippingAddressForm]);
 
-  const [isAddressSelected, setIsAddressSelected] = useState<boolean>(
-    Boolean(shippingAddress)
-  )
+  const [isAddressSelected, setIsAddressSelected] = useState<boolean>(false);
   const [isPaymentMethodSelected, setIsPaymentMethodSelected] =
-    useState<boolean>(false)
+    useState<boolean>(false);
   const [isDeliveryDateSelected, setIsDeliveryDateSelected] =
-    useState<boolean>(false)
+    useState<boolean>(false);
 
   const handlePlaceOrder = async () => {
-    if (!shippingAddress) {
-      toast.error('กรุณากรอกที่อยู่จัดส่งก่อน')
-      return
-    }
+    // TODO: place order
 
     const res = await createOrder({
       items,
       shippingAddress,
       expectedDeliveryDate: calculateFutureDate(
-        AVAILABLE_DELIVERY_DATES[selectedDeliveryDateIndex].daysToDeliver
+        AVAILABLE_DELIVERY_DATES[deliveryDateIndex!].daysToDeliver
       ),
-      deliveryDateIndex: selectedDeliveryDateIndex,
+      deliveryDateIndex,
       paymentMethod,
       itemsPrice,
       shippingPrice,
       taxPrice,
       totalPrice,
-    })
-
+    });
     if (!res.success) {
-      toast.error(res.message)
-      return
+      toast.error(res.message);
+    } else {
+      toast.success(res.message);
+      clearCart();
+      router.push(`/checkout/${res.data?.orderId}`);
     }
-
-    toast.success(res.message)
-    clearCart()
-    router.push(`/checkout/${res.data?.orderId}`)
-  }
-
+  };
   const handleSelectPaymentMethod = () => {
-    setIsAddressSelected(true)
-    setIsPaymentMethodSelected(true)
-    setIsDeliveryDateSelected(false)
-  }
-
+    setIsAddressSelected(true);
+    setIsPaymentMethodSelected(true);
+  };
   const handleSelectShippingAddress = () => {
-    shippingAddressForm.handleSubmit(onSubmitShippingAddress)()
-  }
-
+    shippingAddressForm.handleSubmit(onSubmitShippingAddress)();
+  };
   const CheckoutSummary = () => (
-    <Card className='border-border/60 bg-card/90'>
-      <CardContent className='p-4'>
+    <Card>
+      <CardContent className="p-4">
         {!isAddressSelected && (
-          <div className='mb-4 border-b pb-4'>
+          <div className="border-b mb-4">
             <Button
-              className='w-full rounded-full'
+              className="rounded-full w-full"
               onClick={handleSelectShippingAddress}
             >
-              ใช้ที่อยู่นี้
+              Ship to this address
             </Button>
-            <p className='py-2 text-center text-xs text-muted-foreground'>
-              เลือกที่อยู่จัดส่งและวิธีชำระเงินก่อน เพื่อให้ระบบคำนวณค่าส่งและภาษีได้ถูกต้อง
+            <p className="text-xs text-center py-2">
+              Choose a shipping address and payment method in order to calculate
+              shipping, handling, and tax.
             </p>
           </div>
         )}
         {isAddressSelected && !isPaymentMethodSelected && (
-          <div className='mb-4 border-b pb-4'>
+          <div className=" mb-4">
             <Button
-              className='w-full rounded-full'
+              className="rounded-full w-full"
               onClick={handleSelectPaymentMethod}
             >
-              ใช้วิธีชำระเงินนี้
+              Use this payment method
             </Button>
 
-            <p className='py-2 text-center text-xs text-muted-foreground'>
-              เลือกวิธีชำระเงินเพื่อไปยังขั้นตอนตรวจสอบสินค้าและวันจัดส่ง
+            <p className="text-xs text-center py-2">
+              Choose a payment method to continue checking out. You&apos;ll
+              still have a chance to review and edit your order before it&apos;s
+              final.
             </p>
           </div>
         )}
         {isPaymentMethodSelected && isAddressSelected && (
-          <div className='mb-4 border-b pb-4'>
-            <Button onClick={handlePlaceOrder} className='w-full rounded-full'>
-              ยืนยันคำสั่งซื้อ
+          <div>
+            <Button onClick={handlePlaceOrder} className="rounded-full w-full">
+              Place Your Order
             </Button>
-            <p className='py-2 text-center text-xs text-muted-foreground'>
-              เมื่อกดยืนยันคำสั่งซื้อ คุณยอมรับ
-              {' '}
-              <Link href='/page/privacy-policy'>นโยบายความเป็นส่วนตัว</Link>
-              {' '}และ{' '}
-              <Link href='/page/conditions-of-use'>เงื่อนไขการใช้งาน</Link>
-              {' '}ของ {APP_NAME}
+            <p className="text-xs text-center py-2">
+              By placing your order, you agree to {APP_NAME}&apos;s{" "}
+              <Link href="/page/privacy-policy">privacy notice</Link> and
+              <Link href="/page/conditions-of-use"> conditions of use</Link>.
             </p>
           </div>
         )}
 
         <div>
-          <div className='text-lg font-bold'>สรุปคำสั่งซื้อ</div>
-          <div className='space-y-2'>
-            <div className='flex justify-between'>
-              <span>ค่าสินค้า:</span>
+          <div className="text-lg font-bold">Order Summary</div>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span>Items:</span>
               <span>
                 <ProductPrice price={itemsPrice} plain />
               </span>
             </div>
-            <div className='flex justify-between'>
-              <span>ค่าจัดส่ง:</span>
+            <div className="flex justify-between">
+              <span>Shipping & Handling:</span>
               <span>
                 {shippingPrice === undefined ? (
-                  '--'
+                  "--"
                 ) : shippingPrice === 0 ? (
-                  'ฟรี'
+                  "FREE"
                 ) : (
                   <ProductPrice price={shippingPrice} plain />
                 )}
               </span>
             </div>
-            <div className='flex justify-between'>
-              <span>ภาษี:</span>
+            <div className="flex justify-between">
+              <span> Tax:</span>
               <span>
                 {taxPrice === undefined ? (
-                  '--'
+                  "--"
                 ) : (
                   <ProductPrice price={taxPrice} plain />
                 )}
               </span>
             </div>
-            <div className='flex justify-between pt-4 text-lg font-bold'>
-              <span>ยอดรวมสุทธิ:</span>
+            <div className="flex justify-between  pt-4 font-bold text-lg">
+              <span> Order Total:</span>
               <span>
                 <ProductPrice price={totalPrice} plain />
               </span>
@@ -253,67 +233,70 @@ const CheckoutForm = () => {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 
   return (
-    <main className='mx-auto max-w-6xl highlight-link'>
-      <div className='grid gap-6 md:grid-cols-4'>
-        <div className='md:col-span-3'>
+    <main className="max-w-6xl mx-auto highlight-link">
+      <div className="grid md:grid-cols-4 gap-6">
+        <div className="md:col-span-3">
+          {/* shipping address */}
           <div>
             {isAddressSelected && shippingAddress ? (
-              <div className='my-3 grid grid-cols-1 pb-3 md:grid-cols-12'>
-                <div className='col-span-5 flex text-lg font-bold'>
-                  <span className='w-8'>1</span>
-                  <span>ที่อยู่จัดส่ง</span>
+              <div className="grid grid-cols-1 md:grid-cols-12    my-3  pb-3">
+                <div className="col-span-5 flex text-lg font-bold ">
+                  <span className="w-8">1 </span>
+                  <span>Shipping address</span>
                 </div>
-                <div className='col-span-5'>
+                <div className="col-span-5 ">
                   <p>
                     {shippingAddress.fullName} <br />
                     {shippingAddress.street} <br />
                     {`${shippingAddress.city}, ${shippingAddress.province}, ${shippingAddress.postalCode}, ${shippingAddress.country}`}
                   </p>
                 </div>
-                <div className='col-span-2'>
+                <div className="col-span-2">
                   <Button
-                    variant='outline'
+                    variant={"outline"}
                     onClick={() => {
-                      setIsAddressSelected(false)
-                      setIsPaymentMethodSelected(false)
-                      setIsDeliveryDateSelected(false)
+                      setIsAddressSelected(false);
+                      setIsPaymentMethodSelected(true);
+                      setIsDeliveryDateSelected(true);
                     }}
                   >
-                    เปลี่ยน
+                    Change
                   </Button>
                 </div>
               </div>
             ) : (
               <>
-                <div className='my-2 flex text-lg font-bold text-primary'>
-                  <span className='w-8'>1</span>
-                  <span>กรอกที่อยู่จัดส่ง</span>
+                <div className="flex text-primary text-lg font-bold my-2">
+                  <span className="w-8">1 </span>
+                  <span>Enter shipping address</span>
                 </div>
                 <Form {...shippingAddressForm}>
                   <form
-                    method='post'
+                    method="post"
                     onSubmit={shippingAddressForm.handleSubmit(
                       onSubmitShippingAddress
                     )}
-                    className='space-y-4'
+                    className="space-y-4"
                   >
-                    <Card className='my-4 border-border/60 bg-card/90 md:ml-8'>
-                      <CardContent className='space-y-2 p-4'>
-                        <div className='mb-2 text-lg font-bold'>ข้อมูลจัดส่ง</div>
+                    <Card className="md:ml-8 my-4">
+                      <CardContent className="p-4 space-y-2">
+                        <div className="text-lg font-bold mb-2">
+                          Your address
+                        </div>
 
-                        <div className='flex flex-col gap-5 md:flex-row'>
+                        <div className="flex flex-col gap-5 md:flex-row">
                           <FormField
                             control={shippingAddressForm.control}
-                            name='fullName'
+                            name="fullName"
                             render={({ field }) => (
-                              <FormItem className='w-full'>
-                                <FormLabel>ชื่อผู้รับ</FormLabel>
+                              <FormItem className="w-full">
+                                <FormLabel>Full Name</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='กรอกชื่อผู้รับ'
+                                    placeholder="Enter full name"
                                     {...field}
                                   />
                                 </FormControl>
@@ -325,13 +308,13 @@ const CheckoutForm = () => {
                         <div>
                           <FormField
                             control={shippingAddressForm.control}
-                            name='street'
+                            name="street"
                             render={({ field }) => (
-                              <FormItem className='w-full'>
-                                <FormLabel>ที่อยู่</FormLabel>
+                              <FormItem className="w-full">
+                                <FormLabel>Address</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='บ้านเลขที่ / ถนน / แขวง / เขต'
+                                    placeholder="Enter address"
                                     {...field}
                                   />
                                 </FormControl>
@@ -340,15 +323,15 @@ const CheckoutForm = () => {
                             )}
                           />
                         </div>
-                        <div className='flex flex-col gap-5 md:flex-row'>
+                        <div className="flex flex-col gap-5 md:flex-row">
                           <FormField
                             control={shippingAddressForm.control}
-                            name='city'
+                            name="city"
                             render={({ field }) => (
-                              <FormItem className='w-full'>
-                                <FormLabel>อำเภอ / เขต</FormLabel>
+                              <FormItem className="w-full">
+                                <FormLabel>City</FormLabel>
                                 <FormControl>
-                                  <Input placeholder='กรอกอำเภอหรือเขต' {...field} />
+                                  <Input placeholder="Enter city" {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -356,13 +339,13 @@ const CheckoutForm = () => {
                           />
                           <FormField
                             control={shippingAddressForm.control}
-                            name='province'
+                            name="province"
                             render={({ field }) => (
-                              <FormItem className='w-full'>
-                                <FormLabel>จังหวัด</FormLabel>
+                              <FormItem className="w-full">
+                                <FormLabel>Province</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='กรอกจังหวัด'
+                                    placeholder="Enter province"
                                     {...field}
                                   />
                                 </FormControl>
@@ -372,13 +355,13 @@ const CheckoutForm = () => {
                           />
                           <FormField
                             control={shippingAddressForm.control}
-                            name='country'
+                            name="country"
                             render={({ field }) => (
-                              <FormItem className='w-full'>
-                                <FormLabel>ประเทศ</FormLabel>
+                              <FormItem className="w-full">
+                                <FormLabel>Country</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='กรอกประเทศ'
+                                    placeholder="Enter country"
                                     {...field}
                                   />
                                 </FormControl>
@@ -387,16 +370,16 @@ const CheckoutForm = () => {
                             )}
                           />
                         </div>
-                        <div className='flex flex-col gap-5 md:flex-row'>
+                        <div className="flex flex-col gap-5 md:flex-row">
                           <FormField
                             control={shippingAddressForm.control}
-                            name='postalCode'
+                            name="postalCode"
                             render={({ field }) => (
-                              <FormItem className='w-full'>
-                                <FormLabel>รหัสไปรษณีย์</FormLabel>
+                              <FormItem className="w-full">
+                                <FormLabel>Postal Code</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='กรอกรหัสไปรษณีย์'
+                                    placeholder="Enter postal code"
                                     {...field}
                                   />
                                 </FormControl>
@@ -406,13 +389,13 @@ const CheckoutForm = () => {
                           />
                           <FormField
                             control={shippingAddressForm.control}
-                            name='phone'
+                            name="phone"
                             render={({ field }) => (
-                              <FormItem className='w-full'>
-                                <FormLabel>เบอร์โทรศัพท์</FormLabel>
+                              <FormItem className="w-full">
+                                <FormLabel>Phone number</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='กรอกเบอร์โทรศัพท์'
+                                    placeholder="Enter phone number"
                                     {...field}
                                   />
                                 </FormControl>
@@ -422,9 +405,12 @@ const CheckoutForm = () => {
                           />
                         </div>
                       </CardContent>
-                      <CardFooter className='p-4'>
-                        <Button type='submit' className='rounded-full font-bold'>
-                          ใช้ที่อยู่นี้
+                      <CardFooter className="  p-4">
+                        <Button
+                          type="submit"
+                          className="rounded-full font-bold"
+                        >
+                          Ship to this address
                         </Button>
                       </CardFooter>
                     </Card>
@@ -433,171 +419,174 @@ const CheckoutForm = () => {
               </>
             )}
           </div>
-
-          <div className='border-y'>
+          {/* payment method */}
+          <div className="border-y">
             {isPaymentMethodSelected && paymentMethod ? (
-              <div className='my-3 grid grid-cols-1 pb-3 md:grid-cols-12'>
-                <div className='col-span-5 flex text-lg font-bold'>
-                  <span className='w-8'>2</span>
-                  <span>วิธีชำระเงิน</span>
+              <div className="grid  grid-cols-1 md:grid-cols-12  my-3 pb-3">
+                <div className="flex text-lg font-bold  col-span-5">
+                  <span className="w-8">2 </span>
+                  <span>Payment Method</span>
                 </div>
-                <div className='col-span-5'>
-                  <p>{getPaymentMethodLabel(paymentMethod)}</p>
+                <div className="col-span-5 ">
+                  <p>{paymentMethod}</p>
                 </div>
-                <div className='col-span-2'>
+                <div className="col-span-2">
                   <Button
-                    variant='outline'
+                    variant="outline"
                     onClick={() => {
-                      setIsPaymentMethodSelected(false)
-                      setIsDeliveryDateSelected(false)
+                      setIsPaymentMethodSelected(false);
+                      if (paymentMethod) setIsDeliveryDateSelected(true);
                     }}
                   >
-                    เปลี่ยน
+                    Change
                   </Button>
                 </div>
               </div>
             ) : isAddressSelected ? (
               <>
-                <div className='my-2 flex text-lg font-bold text-primary'>
-                  <span className='w-8'>2</span>
-                  <span>เลือกวิธีชำระเงิน</span>
+                <div className="flex text-primary text-lg font-bold my-2">
+                  <span className="w-8">2 </span>
+                  <span>Choose a payment method</span>
                 </div>
-                <Card className='my-4 border-border/60 bg-card/90 md:ml-8'>
-                  <CardContent className='p-4'>
+                <Card className="md:ml-8 my-4">
+                  <CardContent className="p-4">
                     <RadioGroup
                       value={paymentMethod}
                       onValueChange={(value) => setPaymentMethod(value)}
                     >
                       {AVAILABLE_PAYMENT_METHODS.map((pm) => (
-                        <div key={pm.name} className='flex items-center py-1'>
+                        <div key={pm.name} className="flex items-center py-1 ">
                           <RadioGroupItem
                             value={pm.name}
                             id={`payment-${pm.name}`}
                           />
                           <Label
-                            className='cursor-pointer pl-2 font-bold'
+                            className="font-bold pl-2 cursor-pointer"
                             htmlFor={`payment-${pm.name}`}
                           >
-                            {getPaymentMethodLabel(pm.name)}
+                            {pm.name}
                           </Label>
                         </div>
                       ))}
                     </RadioGroup>
                   </CardContent>
-                  <CardFooter className='p-4'>
+                  <CardFooter className="p-4">
                     <Button
                       onClick={handleSelectPaymentMethod}
-                      className='rounded-full font-bold'
+                      className="rounded-full font-bold"
                     >
-                      ใช้วิธีชำระเงินนี้
+                      Use this payment method
                     </Button>
                   </CardFooter>
                 </Card>
               </>
             ) : (
-              <div className='my-4 flex py-3 text-lg font-bold text-muted-foreground'>
-                <span className='w-8'>2</span>
-                <span>เลือกวิธีชำระเงิน</span>
+              <div className="flex text-muted-foreground text-lg font-bold my-4 py-3">
+                <span className="w-8">2 </span>
+                <span>Choose a payment method</span>
               </div>
             )}
           </div>
-
+          {/* items and delivery date */}
           <div>
-            {isDeliveryDateSelected ? (
-              <div className='my-3 grid grid-cols-1 pb-3 md:grid-cols-12'>
-                <div className='col-span-5 flex text-lg font-bold'>
-                  <span className='w-8'>3</span>
-                  <span>สินค้าและการจัดส่ง</span>
+            {isDeliveryDateSelected && deliveryDateIndex != undefined ? (
+              <div className="grid  grid-cols-1 md:grid-cols-12  my-3 pb-3">
+                <div className="flex text-lg font-bold  col-span-5">
+                  <span className="w-8">3 </span>
+                  <span>Items and shipping</span>
                 </div>
-                <div className='col-span-5'>
+                <div className="col-span-5">
                   <p>
-                    วันที่จัดส่งโดยประมาณ:{' '}
+                    Delivery date:{" "}
                     {
                       formatDateTime(
                         calculateFutureDate(
-                          AVAILABLE_DELIVERY_DATES[selectedDeliveryDateIndex]
+                          AVAILABLE_DELIVERY_DATES[deliveryDateIndex]
                             .daysToDeliver
                         )
                       ).dateOnly
                     }
                   </p>
                   <ul>
-                    {items.map((item) => (
-                      <li key={item.clientId}>
-                        {item.name} x {item.quantity}
+                    {items.map((item, _index) => (
+                      <li key={_index}>
+                        {item.name} x {item.quantity} = {item.price}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className='col-span-2'>
+                <div className="col-span-2">
                   <Button
-                    variant='outline'
-                    onClick={() => setIsDeliveryDateSelected(false)}
+                    variant={"outline"}
+                    onClick={() => {
+                      setIsPaymentMethodSelected(true);
+                      setIsDeliveryDateSelected(false);
+                    }}
                   >
-                    เปลี่ยน
+                    Change
                   </Button>
                 </div>
               </div>
             ) : isPaymentMethodSelected && isAddressSelected ? (
               <>
-                <div className='my-2 flex text-lg font-bold text-primary'>
-                  <span className='w-8'>3</span>
-                  <span>ตรวจสอบสินค้าและการจัดส่ง</span>
+                <div className="flex text-primary  text-lg font-bold my-2">
+                  <span className="w-8">3 </span>
+                  <span>Review items and shipping</span>
                 </div>
-                <Card className='border-border/60 bg-card/90 md:ml-8'>
-                  <CardContent className='p-4'>
-                    <p className='mb-2'>
-                      <span className='text-lg font-bold text-green-700'>
-                        จะได้รับภายใน{' '}
+                <Card className="md:ml-8">
+                  <CardContent className="p-4">
+                    <p className="mb-2">
+                      <span className="text-lg font-bold text-green-700">
+                        Arriving{" "}
                         {
                           formatDateTime(
                             calculateFutureDate(
-                              AVAILABLE_DELIVERY_DATES[selectedDeliveryDateIndex]
+                              AVAILABLE_DELIVERY_DATES[deliveryDateIndex!]
                                 .daysToDeliver
                             )
                           ).dateOnly
                         }
-                      </span>{' '}
-                      หากคุณสั่งซื้อภายใน {timeUntilMidnight().hours} ชั่วโมง{' '}
-                      {timeUntilMidnight().minutes} นาที
+                      </span>{" "}
+                      If you order in the next {timeUntilMidnight().hours} hours
+                      and {timeUntilMidnight().minutes} minutes.
                     </p>
-                    <div className='grid gap-6 md:grid-cols-2'>
+                    <div className="grid md:grid-cols-2 gap-6">
                       <div>
-                        {items.map((item) => (
-                          <div key={item.clientId} className='flex gap-4 py-2'>
-                            <div className='relative h-16 w-16'>
+                        {items.map((item, _index) => (
+                          <div key={_index} className="flex gap-4 py-2">
+                            <div className="relative w-16 h-16">
                               <Image
                                 src={item.image}
                                 alt={item.name}
                                 fill
-                                sizes='20vw'
+                                sizes="20vw"
                                 style={{
-                                  objectFit: 'contain',
+                                  objectFit: "contain",
                                 }}
                               />
                             </div>
 
-                            <div className='flex-1'>
-                              <p className='font-semibold'>
+                            <div className="flex-1">
+                              <p className="font-semibold">
                                 {item.name}, {item.color}, {item.size}
                               </p>
-                              <p className='font-bold'>
+                              <p className="font-bold">
                                 <ProductPrice price={item.price} plain />
                               </p>
 
                               <Select
                                 value={item.quantity.toString()}
                                 onValueChange={(value) => {
-                                  if (value === '0') removeItem(item)
-                                  else updateItem(item, Number(value))
+                                  if (value === "0") removeItem(item);
+                                  else updateItem(item, Number(value));
                                 }}
                               >
-                                <SelectTrigger className='w-24'>
+                                <SelectTrigger className="w-24">
                                   <SelectValue>
-                                    จำนวน: {item.quantity}
+                                    Qty: {item.quantity}
                                   </SelectValue>
                                 </SelectTrigger>
-                                <SelectContent position='popper'>
+                                <SelectContent position="popper">
                                   {Array.from({
                                     length: item.countInStock,
                                   }).map((_, i) => (
@@ -605,8 +594,8 @@ const CheckoutForm = () => {
                                       {i + 1}
                                     </SelectItem>
                                   ))}
-                                  <SelectItem key='delete' value='0'>
-                                    ลบ
+                                  <SelectItem key="delete" value="0">
+                                    Delete
                                   </SelectItem>
                                 </SelectContent>
                               </Select>
@@ -615,34 +604,34 @@ const CheckoutForm = () => {
                         ))}
                       </div>
                       <div>
-                        <div className='font-bold'>
-                          <p className='mb-2'>เลือกความเร็วในการจัดส่ง:</p>
+                        <div className=" font-bold">
+                          <p className="mb-2"> Choose a shipping speed:</p>
 
                           <ul>
                             <RadioGroup
                               value={
-                                AVAILABLE_DELIVERY_DATES[selectedDeliveryDateIndex]
+                                AVAILABLE_DELIVERY_DATES[deliveryDateIndex!]
                                   .name
                               }
                               onValueChange={(value) =>
                                 setDeliveryDateIndex(
                                   AVAILABLE_DELIVERY_DATES.findIndex(
-                                    (delivery) => delivery.name === value
-                                  )
+                                    (address) => address.name === value
+                                  )!
                                 )
                               }
                             >
                               {AVAILABLE_DELIVERY_DATES.map((dd) => (
-                                <div key={dd.name} className='flex'>
+                                <div key={dd.name} className="flex">
                                   <RadioGroupItem
                                     value={dd.name}
                                     id={`address-${dd.name}`}
                                   />
                                   <Label
-                                    className='cursor-pointer space-y-2 pl-2'
+                                    className="pl-2 space-y-2 cursor-pointer"
                                     htmlFor={`address-${dd.name}`}
                                   >
-                                    <div className='font-semibold text-green-700'>
+                                    <div className="text-green-700 font-semibold">
                                       {
                                         formatDateTime(
                                           calculateFutureDate(dd.daysToDeliver)
@@ -654,7 +643,7 @@ const CheckoutForm = () => {
                                       itemsPrice >= dd.freeShippingMinPrice
                                         ? 0
                                         : dd.shippingPrice) === 0 ? (
-                                        'จัดส่งฟรี'
+                                        "FREE Shipping"
                                       ) : (
                                         <ProductPrice
                                           price={dd.shippingPrice}
@@ -671,48 +660,40 @@ const CheckoutForm = () => {
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter className='justify-end p-4'>
-                    <Button
-                      onClick={() => setIsDeliveryDateSelected(true)}
-                      className='rounded-full'
-                    >
-                      ยืนยันสินค้าและการจัดส่ง
-                    </Button>
-                  </CardFooter>
                 </Card>
               </>
             ) : (
-              <div className='my-4 flex py-3 text-lg font-bold text-muted-foreground'>
-                <span className='w-8'>3</span>
-                <span>สินค้าและการจัดส่ง</span>
+              <div className="flex text-muted-foreground text-lg font-bold my-4 py-3">
+                <span className="w-8">3 </span>
+                <span>Items and shipping</span>
               </div>
             )}
           </div>
-
           {isPaymentMethodSelected && isAddressSelected && (
-            <div className='mt-6'>
-              <div className='block md:hidden'>
+            <div className="mt-6">
+              <div className="block md:hidden">
                 <CheckoutSummary />
               </div>
 
-              <Card className='hidden border-border/60 bg-card/90 md:block'>
-                <CardContent className='flex flex-col items-center justify-between gap-3 p-4 md:flex-row'>
-                  <Button onClick={handlePlaceOrder} className='rounded-full'>
-                    ยืนยันคำสั่งซื้อ
+              <Card className="hidden md:block ">
+                <CardContent className="p-4 flex flex-col md:flex-row justify-between items-center gap-3">
+                  <Button onClick={handlePlaceOrder} className="rounded-full">
+                    Place Your Order
                   </Button>
-                  <div className='flex-1'>
-                    <p className='text-lg font-bold'>
-                      ยอดรวมสุทธิ: <ProductPrice price={totalPrice} plain />
+                  <div className="flex-1">
+                    <p className="font-bold text-lg">
+                      Order Total: <ProductPrice price={totalPrice} plain />
                     </p>
-                    <p className='text-xs text-muted-foreground'>
-                      เมื่อกดยืนยันคำสั่งซื้อ คุณยอมรับ
-                      {' '}
-                      <Link href='/page/privacy-policy'>นโยบายความเป็นส่วนตัว</Link>
-                      {' '}และ{' '}
-                      <Link href='/page/conditions-of-use'>
-                        เงื่อนไขการใช้งาน
+                    <p className="text-xs">
+                      {" "}
+                      By placing your order, you agree to {APP_NAME}&apos;s{" "}
+                      <Link href="/page/privacy-policy">privacy notice</Link>{" "}
+                      and
+                      <Link href="/page/conditions-of-use">
+                        {" "}
+                        conditions of use
                       </Link>
-                      {' '}ของ {APP_NAME}
+                      .
                     </p>
                   </div>
                 </CardContent>
@@ -721,12 +702,11 @@ const CheckoutForm = () => {
           )}
           <CheckoutFooter />
         </div>
-        <div className='hidden md:block'>
+        <div className="hidden md:block">
           <CheckoutSummary />
         </div>
       </div>
     </main>
-  )
-}
-
-export default CheckoutForm
+  );
+};
+export default CheckoutForm;

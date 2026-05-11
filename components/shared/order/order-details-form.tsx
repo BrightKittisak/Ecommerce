@@ -3,9 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-import ProductPrice from '@/components/shared/product/product-price'
 import { Badge } from '@/components/ui/badge'
-import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
   Table,
@@ -17,6 +15,8 @@ import {
 } from '@/components/ui/table'
 import { IOrder } from '@/lib/db/models/order.model'
 import { cn, formatDateTime } from '@/lib/utils'
+import { buttonVariants } from '@/components/ui/button'
+import ProductPrice from '../product/product-price'
 
 export default function OrderDetailsForm({
   order,
@@ -41,26 +41,29 @@ export default function OrderDetailsForm({
 
   return (
     <div className='grid md:grid-cols-3 md:gap-5'>
-      <div className='space-y-4 overflow-x-auto md:col-span-2'>
+      <div className='overflow-x-auto md:col-span-2 space-y-4'>
         <Card>
-          <CardContent className='gap-4 p-4'>
-            <h2 className='pb-4 text-xl'>ที่อยู่จัดส่ง</h2>
+          <CardContent className='p-4 gap-4'>
+            <h2 className='text-xl pb-4'>Shipping Address</h2>
             <p>
               {shippingAddress.fullName} {shippingAddress.phone}
             </p>
             <p>
               {shippingAddress.street}, {shippingAddress.city},{' '}
               {shippingAddress.province}, {shippingAddress.postalCode},{' '}
-              {shippingAddress.country}
+              {shippingAddress.country}{' '}
             </p>
 
             {isDelivered ? (
-              <Badge>จัดส่งแล้วเมื่อ {formatDateTime(deliveredAt!).dateTime}</Badge>
+              <Badge>
+                Delivered at {formatDateTime(deliveredAt!).dateTime}
+              </Badge>
             ) : (
               <div>
-                <Badge variant='destructive'>ยังไม่จัดส่ง</Badge>
+                {' '}
+                <Badge variant='destructive'>Not delivered</Badge>
                 <div>
-                  คาดว่าจะจัดส่งถึงในวันที่{' '}
+                  Expected delivery at{' '}
                   {formatDateTime(expectedDeliveryDate!).dateTime}
                 </div>
               </div>
@@ -68,25 +71,25 @@ export default function OrderDetailsForm({
           </CardContent>
         </Card>
         <Card>
-          <CardContent className='gap-4 p-4'>
-            <h2 className='pb-4 text-xl'>วิธีชำระเงิน</h2>
+          <CardContent className='p-4 gap-4'>
+            <h2 className='text-xl pb-4'>Payment Method</h2>
             <p>{paymentMethod}</p>
             {isPaid ? (
-              <Badge>ชำระแล้วเมื่อ {formatDateTime(paidAt!).dateTime}</Badge>
+              <Badge>Paid at {formatDateTime(paidAt!).dateTime}</Badge>
             ) : (
-              <Badge variant='destructive'>ยังไม่ชำระเงิน</Badge>
+              <Badge variant='destructive'>Not paid</Badge>
             )}
           </CardContent>
         </Card>
         <Card>
-          <CardContent className='gap-4 p-4'>
-            <h2 className='pb-4 text-xl'>รายการสินค้า</h2>
+          <CardContent className='p-4   gap-4'>
+            <h2 className='text-xl pb-4'>Order Items</h2>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>สินค้า</TableHead>
-                  <TableHead>จำนวน</TableHead>
-                  <TableHead>ราคา</TableHead>
+                  <TableHead>Item</TableHead>
+                  <TableHead>Quantity</TableHead>
+                  <TableHead>Price</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -102,7 +105,7 @@ export default function OrderDetailsForm({
                           alt={item.name}
                           width={50}
                           height={50}
-                        />
+                        ></Image>
                         <span className='px-2'>{item.name}</span>
                       </Link>
                     </TableCell>
@@ -119,29 +122,33 @@ export default function OrderDetailsForm({
       </div>
       <div>
         <Card>
-          <CardContent className='space-y-4 gap-4 p-4'>
-            <h2 className='pb-4 text-xl'>สรุปคำสั่งซื้อ</h2>
+          <CardContent className='p-4  space-y-4 gap-4'>
+            <h2 className='text-xl pb-4'>Order Summary</h2>
             <div className='flex justify-between'>
-              <div>ค่าสินค้า</div>
+              <div>Items</div>
               <div>
+                {' '}
                 <ProductPrice price={itemsPrice} plain />
               </div>
             </div>
             <div className='flex justify-between'>
-              <div>ภาษี</div>
+              <div>Tax</div>
               <div>
+                {' '}
                 <ProductPrice price={taxPrice} plain />
               </div>
             </div>
             <div className='flex justify-between'>
-              <div>ค่าส่ง</div>
+              <div>Shipping</div>
               <div>
+                {' '}
                 <ProductPrice price={shippingPrice} plain />
               </div>
             </div>
             <div className='flex justify-between'>
-              <div>ยอดรวม</div>
+              <div>Total</div>
               <div>
+                {' '}
                 <ProductPrice price={totalPrice} plain />
               </div>
             </div>
@@ -151,7 +158,7 @@ export default function OrderDetailsForm({
                 className={cn(buttonVariants(), 'w-full')}
                 href={`/checkout/${order._id}`}
               >
-                ชำระเงินสำหรับคำสั่งซื้อนี้
+                Pay Order
               </Link>
             )}
           </CardContent>

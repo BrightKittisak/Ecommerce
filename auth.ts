@@ -3,7 +3,7 @@ import Google from 'next-auth/providers/google'
 import bcrypt from 'bcryptjs'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { connectToDatabase } from './lib/db'
-import getMongoClient from './lib/db/client'
+import client from './lib/db/client'
 import User from './lib/db/models/user.model'
 
 import NextAuth, { type DefaultSession } from 'next-auth'
@@ -29,7 +29,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60,
   },
-  adapter: MongoDBAdapter(() => getMongoClient()),
+  adapter: MongoDBAdapter(client),
   providers: [
     Google({
       allowDangerousEmailAccountLinking: true,
@@ -72,7 +72,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           await connectToDatabase()
           await User.findByIdAndUpdate(user.id, {
             name: user.name || user.email!.split('@')[0],
-            role: 'User',
+            role: 'user',
           })
         }
         token.name = user.name || user.email!.split('@')[0]

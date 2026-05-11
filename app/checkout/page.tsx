@@ -4,13 +4,13 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: 'ชำระเงิน',
-}
+  title: "Checkout",
+};
 
 export default async function CheckoutPage() {
-  const session = await auth()
+  const session = await auth();
   if (!session?.user) {
-    redirect('/sign-in?callbackUrl=/checkout')
+    redirect("/sign-in?callbackUrl=/checkout");
   }
   return <CheckoutForm />
 }

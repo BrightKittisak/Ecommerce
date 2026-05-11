@@ -40,7 +40,7 @@ import {
           if (error.type === 'card_error' || error.type === 'validation_error') {
             setErrorMessage(error.message)
           } else {
-            setErrorMessage('เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ')
+            setErrorMessage('An unknown error occurred')
           }
         })
         .finally(() => setIsLoading(false))
@@ -48,7 +48,7 @@ import {
   
     return (
       <form onSubmit={handleSubmit} className='space-y-4'>
-        <div className='text-xl'>ชำระเงินผ่าน Stripe</div>
+        <div className='text-xl'>Stripe Checkout</div>
         {errorMessage && <div className='text-destructive'>{errorMessage}</div>}
         <PaymentElement />
         <div>
@@ -60,10 +60,10 @@ import {
           disabled={stripe == null || elements == null || isLoading}
         >
           {isLoading ? (
-            'กำลังชำระเงิน...'
+            'Purchasing...'
           ) : (
             <div>
-              ชำระเงิน - <ProductPrice price={priceInCents / 100} plain />
+              Purchase - <ProductPrice price={priceInCents / 100} plain />
             </div>
           )}
         </Button>

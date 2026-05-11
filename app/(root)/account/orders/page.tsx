@@ -1,9 +1,7 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 
-import BrowsingHistoryList from '@/components/shared/browsing-history-list'
 import Pagination from '@/components/shared/pagination'
-import ProductPrice from '@/components/shared/product/product-price'
 import {
   Table,
   TableBody,
@@ -15,13 +13,13 @@ import {
 import { getMyOrders } from '@/lib/actions/order.actions'
 import { IOrder } from '@/lib/db/models/order.model'
 import { formatDateTime, formatId } from '@/lib/utils'
+import BrowsingHistoryList from '@/components/shared/browsing-history-list'
+import ProductPrice from '@/components/shared/product/product-price'
 
-const PAGE_TITLE = 'คำสั่งซื้อของคุณ'
-
+const PAGE_TITLE = 'Your Orders'
 export const metadata: Metadata = {
   title: PAGE_TITLE,
 }
-
 export default async function OrdersPage(props: {
   searchParams: Promise<{ page: string }>
 }) {
@@ -30,12 +28,11 @@ export default async function OrdersPage(props: {
   const orders = await getMyOrders({
     page,
   })
-
   return (
     <div>
       <div className='flex gap-2'>
-        <Link href='/account'>บัญชีของคุณ</Link>
-        <span>/</span>
+        <Link href='/account'>Your Account</Link>
+        <span>›</span>
         <span>{PAGE_TITLE}</span>
       </div>
       <h1 className='h1-bold pt-4'>{PAGE_TITLE}</h1>
@@ -43,18 +40,20 @@ export default async function OrdersPage(props: {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัส</TableHead>
-              <TableHead>วันที่</TableHead>
-              <TableHead>ยอดรวม</TableHead>
-              <TableHead>ชำระแล้ว</TableHead>
-              <TableHead>จัดส่งแล้ว</TableHead>
-              <TableHead>จัดการ</TableHead>
+              <TableHead>Id</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Total</TableHead>
+              <TableHead>Paid</TableHead>
+              <TableHead>Delivered</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {orders.data.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6}>คุณยังไม่มีคำสั่งซื้อ</TableCell>
+                <TableCell colSpan={6} className=''>
+                  You have no orders.
+                </TableCell>
               </TableRow>
             )}
             {orders.data.map((order: IOrder) => (
@@ -64,23 +63,25 @@ export default async function OrdersPage(props: {
                     {formatId(order._id)}
                   </Link>
                 </TableCell>
-                <TableCell>{formatDateTime(order.createdAt!).dateTime}</TableCell>
+                <TableCell>
+                  {formatDateTime(order.createdAt!).dateTime}
+                </TableCell>
                 <TableCell>
                   <ProductPrice price={order.totalPrice} plain />
                 </TableCell>
                 <TableCell>
                   {order.isPaid && order.paidAt
                     ? formatDateTime(order.paidAt).dateTime
-                    : 'ยังไม่ชำระ'}
+                    : 'No'}
                 </TableCell>
                 <TableCell>
                   {order.isDelivered && order.deliveredAt
                     ? formatDateTime(order.deliveredAt).dateTime
-                    : 'ยังไม่จัดส่ง'}
+                    : 'No'}
                 </TableCell>
                 <TableCell>
                   <Link href={`/account/orders/${order._id}`}>
-                    <span className='px-2'>รายละเอียด</span>
+                    <span className='px-2'>Details</span>
                   </Link>
                 </TableCell>
               </TableRow>
@@ -88,7 +89,8 @@ export default async function OrdersPage(props: {
           </TableBody>
         </Table>
         {orders.totalPages > 1 && (
-          <Pagination page={page} totalPages={orders.totalPages} />
+          // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+          <Pagination page={page} totalPages={orders?.totalPages!} />
         )}
       </div>
       <BrowsingHistoryList className='mt-16' />

@@ -42,16 +42,17 @@ const main = async () => {
     }
     const createdReviews = await Review.insertMany(rws)
 
+
     console.log({
       createdUser,
       createdProducts,
       createdReviews,
-      message: 'เติมข้อมูลตัวอย่างลงฐานข้อมูลเรียบร้อยแล้ว',
+      message: 'Seeded database successfully',
     })
     process.exit(0)
   } catch (error) {
     console.error(error)
-    throw new Error('ไม่สามารถเติมข้อมูลตัวอย่างลงฐานข้อมูลได้')
+    throw new Error('Failed to seed database')
   }
 }
 

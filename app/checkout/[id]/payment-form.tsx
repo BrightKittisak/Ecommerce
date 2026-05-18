@@ -81,6 +81,8 @@ export default function OrderPaymentForm({
     const res = await approvePayPalOrder(order._id, data)
     if (res.success) {
       toast.success(res.message)
+      router.push(`/account/orders/${order._id}`)
+      router.refresh()
     } else {
       toast.error(res.message) 
     }

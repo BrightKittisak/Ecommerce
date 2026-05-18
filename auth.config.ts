@@ -12,13 +12,7 @@ export default {
         /\/checkout(\/.*)?/.test(pathname) || /\/account(\/.*)?/.test(pathname)
 
       if (isAdminPath) {
-        if (!auth) return false
-
-        if (auth.user?.role !== 'Admin') {
-          return Response.redirect(new URL('/account', request.nextUrl))
-        }
-
-        return true
+        return !!auth
       }
 
       if (isProtectedPath) return !!auth

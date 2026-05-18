@@ -45,7 +45,7 @@ const useCartStore = create(
             throw new Error('จำนวนสินค้าในสต็อกไม่เพียงพอ')
           }
         } else {
-          if (item.countInStock < item.quantity) {
+          if (item.countInStock < quantity) {
             throw new Error('จำนวนสินค้าในสต็อกไม่เพียงพอ')
           }
         }

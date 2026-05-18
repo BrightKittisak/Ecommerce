@@ -105,7 +105,9 @@ const CheckoutForm = () => {
     clearCart,
   } = useCartStore()
   const isMounted = useIsMounted()
-  const selectedDeliveryDateIndex = deliveryDateIndex ?? 0
+  const defaultDeliveryDateIndex = AVAILABLE_DELIVERY_DATES.length - 1
+  const selectedDeliveryDateIndex =
+    deliveryDateIndex ?? defaultDeliveryDateIndex
 
   const shippingAddressForm = useForm<ShippingAddress>({
     resolver: zodResolver(ShippingAddressSchema),

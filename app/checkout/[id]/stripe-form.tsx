@@ -29,21 +29,25 @@ import {
       if (stripe == null || elements == null || email == null) return
   
       setIsLoading(true)
-      stripe
-        .confirmPayment({
-          elements,
-          confirmParams: {
-            return_url: `${SERVER_URL}/checkout/${orderId}/stripe-payment-success`,
-          },
-        })
-        .then(({ error }) => {
-          if (error.type === 'card_error' || error.type === 'validation_error') {
-            setErrorMessage(error.message)
-          } else {
-            setErrorMessage('เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ')
-          }
-        })
-        .finally(() => setIsLoading(false))
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${SERVER_URL}/checkout/${orderId}/stripe-payment-success`,
+        },
+      })
+
+      if (!error) {
+        setIsLoading(false)
+        return
+      }
+
+      if (error.type === 'card_error' || error.type === 'validation_error') {
+        setErrorMessage(error.message)
+      } else {
+        setErrorMessage('เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ')
+      }
+
+      setIsLoading(false)
     }
   
     return (

@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { connectToDatabase } from './lib/db'
 import getMongoClient from './lib/db/client'
-import User from './lib/db/models/user.model'
+import User, { type IUser } from './lib/db/models/user.model'
 
 import NextAuth, { type DefaultSession } from 'next-auth'
 import authConfig from './auth.config'
@@ -42,7 +42,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         await connectToDatabase()
-        if (credentials == null) return null
+        if (credentials == null || !credentials.email) return null
 
         const user = await User.findOne({ email: credentials.email })
 
@@ -70,8 +70,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!user.name) {
           await connectToDatabase()
           await User.findByIdAndUpdate(user.id, {
-            name: user.name || user.email!.split('@')[0],
-            role: 'User',
+            name: user.email!.split('@')[0],
+            role: (user as IUser).role || 'User', // Preserve existing role
           })
         }
         token.name = user.name || user.email!.split('@')[0]

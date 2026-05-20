@@ -10,12 +10,46 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { getAllCategories } from '@/lib/actions/product.actions'
 import { APP_NAME } from '@/lib/constants'
-import data from '@/lib/data'
 import { exploreLinks, policyLinks } from '@/lib/site-navigation'
 
 import Menu from './menu'
 import Search from './search'
 import Sidebar from './sidebar'
+
+const headerMenus = [
+  {
+    name: 'ดีลวันนี้',
+    href: '/search?tag=todays-deal',
+  },
+  {
+    name: 'ของเข้าใหม่',
+    href: '/search?tag=new-arrival',
+  },
+  {
+    name: 'สินค้าแนะนำ',
+    href: '/search?tag=featured',
+  },
+  {
+    name: 'ขายดี',
+    href: '/search?tag=best-seller',
+  },
+  {
+    name: 'ประวัติการเข้าชม',
+    href: '/#browsing-history',
+  },
+  {
+    name: 'บริการลูกค้า',
+    href: '/page/customer-service',
+  },
+  {
+    name: 'เกี่ยวกับเรา',
+    href: '/page/about-us',
+  },
+  {
+    name: 'ช่วยเหลือ',
+    href: '/page/help',
+  },
+]
 
 function HeaderDropdown({
   label,
@@ -102,16 +136,16 @@ export default async function Header() {
       <div className='border-t border-border/60 bg-card/70'>
         <div className='page-shell flex items-center gap-4 overflow-hidden py-2'>
           <Sidebar categories={categories} />
-          <div className='flex max-h-[42px] flex-wrap items-center gap-2 overflow-hidden'>
-            {data.headerMenus.map((menu) => (
-              <Link
-                href={menu.href}
-                key={menu.href}
-                className='header-button !px-3 !py-1.5 text-[13px] text-muted-foreground hover:text-foreground sm:text-sm'
-              >
-                {menu.name}
-              </Link>
-            ))}
+           <div className='flex max-h-[42px] flex-wrap items-center gap-2 overflow-hidden'>
+             {headerMenus.map((menu) => (
+               <Link
+                 href={menu.href}
+                 key={menu.href}
+                 className='header-button !px-3 !py-1.5 text-[13px] text-muted-foreground hover:text-foreground sm:text-sm'
+               >
+                 {menu.name}
+               </Link>
+             ))}
             <Link
               href='/page/customer-service'
               className='header-button !px-3 !py-1.5 text-[13px] text-muted-foreground hover:text-foreground sm:text-sm'

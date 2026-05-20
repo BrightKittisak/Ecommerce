@@ -8,8 +8,31 @@ import {
   getProductsByTag,
   getProductsForCard,
 } from '@/lib/actions/product.actions'
-import data from '@/lib/data'
 import { toSlug } from '@/lib/utils'
+
+const carousels = [
+  {
+    title: 'ดีลนาฬิกาข้อมือสุดคุ้มที่ช่วยยกระดับลุคได้ในทุกโอกาส',
+    buttonCaption: 'ดูเพิ่มเติม',
+    image: '/images/banner2.jpg',
+    url: '/search?category=Wrist Watches',
+    isPublished: true,
+  },
+  {
+    title: 'เสื้อยืดขายดีที่แต่งง่าย ใส่สบาย และหยิบใช้ได้ทุกวัน',
+    buttonCaption: 'เลือกซื้อเลย',
+    image: '/images/banner1.jpg',
+    url: '/search?category=T-Shirts',
+    isPublished: true,
+  },
+  {
+    title: 'รองเท้ายอดนิยมที่ลูกค้าหยิบใส่ตะกร้ามากที่สุดในช่วงนี้',
+    buttonCaption: 'เลือกซื้อเลย',
+    image: '/images/banner3.jpg',
+    url: '/search?category=Shoes',
+    isPublished: true,
+  },
+]
 
 export default async function HomePage() {
   const categories = (await getAllCategories()).slice(0, 4)
@@ -68,7 +91,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <HomeCarousel items={data.carousels} />
+       <HomeCarousel items={carousels} />
       <div className='page-shell mt-6 space-y-6'>
         <section className='section-shell grid gap-6 p-6 lg:grid-cols-[1.2fr_0.8fr] lg:p-8'>
           <div className='space-y-7'>

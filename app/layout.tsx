@@ -8,13 +8,15 @@ import { APP_DESCRIPTION, APP_NAME, APP_SLOGAN } from '@/lib/constants'
 const notoSansThai = Noto_Sans_Thai({
   variable: '--font-body',
   subsets: ['thai', 'latin'],
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['400', '700'],
+  display: 'swap',
 })
 
 const baiJamjuree = Bai_Jamjuree({
   variable: '--font-display',
   subsets: ['thai', 'latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '700'],
+  display: 'swap',
 })
 
 export const metadata: Metadata = {

@@ -55,11 +55,20 @@ export async function POST(req: NextRequest) {
 
   await connectToDatabase()
 
-  const charge = event.data.object
-  const orderId = charge.metadata.orderId
-  const email = charge.billing_details.email
-  const pricePaidInCents = charge.amount
-  const order = await Order.findById(orderId).populate('user', 'email')
+   const charge = event.data.object
+   const orderId = charge.metadata.orderId
+   
+   // Validate that orderId exists in metadata
+   if (!orderId) {
+     return NextResponse.json(
+       { message: 'Missing orderId in Stripe event metadata' },
+       { status: 400 }
+     )
+   }
+   
+   const email = charge.billing_details.email
+   const pricePaidInCents = charge.amount
+   const order = await Order.findById(orderId).populate('user', 'email')
 
   if (!order) {
     return NextResponse.json(

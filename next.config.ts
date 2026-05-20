@@ -6,4 +6,15 @@ const nextConfig: NextConfig = {
   generateEtags: true,
 };
 
-export default nextConfig;
+const getConfig = async (): Promise<NextConfig> => {
+  if (process.env.ANALYZE === 'true') {
+    const { default: withBundleAnalyzer } = await import('@next/bundle-analyzer');
+    return withBundleAnalyzer({
+      analyzerMode: 'json',
+      openAnalyzer: false,
+    })(nextConfig);
+  }
+  return nextConfig;
+};
+
+export default getConfig;

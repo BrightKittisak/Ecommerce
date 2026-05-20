@@ -65,8 +65,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    jwt: async ({ token, user, trigger, session }) => {
+    jwt: async ({ token, user }) => {
+      // Sign in
       if (user) {
+        // Update database if user has no name (first sign-in)
         if (!user.name) {
           await connectToDatabase()
           await User.findByIdAndUpdate(user.id, {
@@ -74,35 +76,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             role: (user as IUser).role || 'User', // Preserve existing role
           })
         }
+        
+        // Set token properties from user object
         token.name = user.name || user.email!.split('@')[0]
-        token.role = (user as { role?: string }).role
+        token.role = (user as { role?: string }).role || 'User'
       }
-
-      if (session?.user?.name && trigger === 'update') {
-        token.name = session.user.name
-      }
-
-      if (token.sub) {
-        await connectToDatabase()
-        const dbUser = await User.findById(token.sub)
-          .select('name email role')
-          .lean()
-
-        if (dbUser) {
-          token.name = dbUser.name || dbUser.email.split('@')[0]
-          token.role = dbUser.role || 'User'
-        }
-      }
-
+      
       return token
     },
-    session: async ({ session, user, trigger, token }) => {
+    session: async ({ session, token }) => {
+      // Set user properties from token
       session.user.id = token.sub as string
       session.user.role = token.role as string
       session.user.name = token.name
-      if (trigger === 'update') {
-        session.user.name = user.name
-      }
+      
       return session
     },
   },

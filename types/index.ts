@@ -6,10 +6,11 @@ import {
   ShippingAddressSchema,
   UserInputSchema,
   UserSignInSchema,
-  UserSignUpSchema,
   ReviewInputSchema,
   UserNameSchema,
 } from '@/lib/validator'
+import { UserSignUpSchema } from '@/lib/auth-validator'
+import { CreateOrderItemSchema, CreateOrderSchema } from '@/lib/order-validator'
 import { z } from 'zod'
 
 export type IReviewInput = z.infer<typeof ReviewInputSchema>
@@ -46,6 +47,8 @@ export type Data = {
 export type IOrderInput = z.infer<typeof OrderInputSchema>
 export type OrderItem = z.infer<typeof OrderItemSchema>
 export type Cart = z.infer<typeof CartSchema>
+export type CreateOrderItem = z.infer<typeof CreateOrderItemSchema>
+export type CreateOrderInput = z.infer<typeof CreateOrderSchema>
 export type ShippingAddress = z.infer<typeof ShippingAddressSchema>
 
 

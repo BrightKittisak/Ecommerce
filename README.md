@@ -30,6 +30,17 @@ Lush คือเว็บ e-commerce ที่พัฒนาด้วย Next.
 - `PayPal`
 - `Resend`
 
+## Engineering Docs
+
+- [CONTRIBUTING.md](/C:/Users/kitti/Documents/Learning/Backend/Ecommerce/CONTRIBUTING.md)
+  - Git workflow, branch policy, PR rules, merge strategy, release gates
+- [docs/ENGINEERING_STANDARDS.md](/C:/Users/kitti/Documents/Learning/Backend/Ecommerce/docs/ENGINEERING_STANDARDS.md)
+  - clean code expectations, architecture boundaries, security and performance rules
+- [docs/HIGH_SCALE_PRODUCTION_ROADMAP.md](/C:/Users/kitti/Documents/Learning/Backend/Ecommerce/docs/HIGH_SCALE_PRODUCTION_ROADMAP.md)
+  - phased roadmap for production hardening, scale, security, and refactor work
+- [docs/PHASE_1_EXECUTION_PLAN.md](/C:/Users/kitti/Documents/Learning/Backend/Ecommerce/docs/PHASE_1_EXECUTION_PLAN.md)
+  - first implementation slices, branch names, dependencies, and acceptance criteria
+
 ## โครงสร้างสำคัญ
 
 - [app](/C:/Users/kitti/Documents/Learning/Backend/Ecommerce/app)
@@ -143,7 +154,7 @@ npm run dev
 
 ## Release Checklist
 
-ก่อนส่งขึ้น `master` แนะนำเช็กอย่างน้อย:
+ก่อนส่งขึ้น `main` แนะนำเช็กอย่างน้อย:
 
 - `npm run lint`
 - `npx tsc --noEmit`
@@ -152,8 +163,21 @@ npm run dev
 - ทดสอบ `/admin/overview` และ `/admin/orders`
 - ทดสอบ flow `search -> cart -> checkout -> order details`
 
-## Git Workflow ที่แนะนำ
+## Engineering Direction
 
-- พัฒนางานบน branch ย่อยเสมอ
-- merge feature branch เข้า `develop` ก่อน
-- เมื่อผ่านการตรวจและทดสอบแล้ว ค่อยเปิด PR จาก `develop` ไป `master`
+The project is now being treated as a structured refactor and hardening program
+instead of a demo that only needs small finishing touches.
+
+Current engineering goals:
+
+- production-grade order and payment safety
+- cleaner architecture and code ownership
+- faster browse performance
+- stronger scale characteristics
+- stricter Git and review discipline
+
+Use these documents as the current source of truth:
+
+- [CONTRIBUTING.md](/C:/Users/kitti/Documents/Learning/Backend/Ecommerce/CONTRIBUTING.md)
+- [docs/ENGINEERING_STANDARDS.md](/C:/Users/kitti/Documents/Learning/Backend/Ecommerce/docs/ENGINEERING_STANDARDS.md)
+- [docs/HIGH_SCALE_PRODUCTION_ROADMAP.md](/C:/Users/kitti/Documents/Learning/Backend/Ecommerce/docs/HIGH_SCALE_PRODUCTION_ROADMAP.md)

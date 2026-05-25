@@ -1,7 +1,12 @@
 'use server'
 
 import { CreateOrderInput, OrderItem, ShippingAddress } from '@/types'
-import { CURRENCY_CODE, calculateFutureDate, formatError, round2 } from '../utils'
+import {
+  CURRENCY_CODE,
+  calculateFutureDate,
+  formatError,
+  round2,
+} from '../utils'
 import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
@@ -62,7 +67,11 @@ const buildOrderItemsFromRequest = async (
       throw new Error(`สินค้า ${product.name} มีในสต็อกไม่เพียงพอ`)
     }
 
-    if (item.size && product.sizes.length > 0 && !product.sizes.includes(item.size)) {
+    if (
+      item.size &&
+      product.sizes.length > 0 &&
+      !product.sizes.includes(item.size)
+    ) {
       throw new Error(`ไซซ์ ${item.size} ของสินค้า ${product.name} ไม่ถูกต้อง`)
     }
 
@@ -95,13 +104,15 @@ const buildOrderItemsFromRequest = async (
   })
 }
 
+const formatPaymentAmount = (amount: number) => round2(amount).toFixed(2)
+
 // CREATE
 export const createOrder = async (clientOrder: CreateOrderInput) => {
   try {
     await connectToDatabase()
     const session = await auth()
     if (!session) throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
-    // recalculate price and delivery date on the server
+
     const createdOrder = await createOrderFromCart(
       CreateOrderSchema.parse(clientOrder),
       session.user.id!
@@ -115,6 +126,7 @@ export const createOrder = async (clientOrder: CreateOrderInput) => {
     return { success: false, message: formatError(error) }
   }
 }
+
 export const createOrderFromCart = async (
   clientOrder: CreateOrderInput,
   userId: string
@@ -182,6 +194,14 @@ export async function createPayPalOrder(orderId: string) {
       isAdmin: session.user.role === 'Admin',
     })
 
+    if (order.isPaid) {
+      return {
+        success: true,
+        message: 'คำสั่งซื้อนี้ชำระเงินเรียบร้อยแล้ว',
+        data: order.paymentResult?.id ?? orderId,
+      }
+    }
+
     const paypalOrder = await paypal.createOrder(order.totalPrice)
     order.paymentResult = {
       id: paypalOrder.id,
@@ -215,21 +235,45 @@ export async function approvePayPalOrder(
       isAdmin: session.user.role === 'Admin',
     })
 
+    if (order.isPaid) {
+      return {
+        success: true,
+        message: 'คำสั่งซื้อนี้ชำระเงินเรียบร้อยแล้ว',
+      }
+    }
+
+    if (!order.paymentResult?.id || data.orderID !== order.paymentResult.id) {
+      throw new Error('ข้อมูลคำสั่งชำระเงิน PayPal ไม่ตรงกับคำสั่งซื้อ')
+    }
+
     const captureData = await paypal.capturePayment(data.orderID)
+    const capture = captureData.purchase_units[0]?.payments?.captures[0]
+    const pricePaid = capture?.amount?.value
+    const currencyPaid = capture?.amount?.currency_code
+
     if (
       !captureData ||
       captureData.id !== order.paymentResult?.id ||
       captureData.status !== 'COMPLETED'
-    )
+    ) {
       throw new Error('เกิดข้อผิดพลาดในการชำระเงินผ่าน PayPal')
+    }
+
+    if (pricePaid !== formatPaymentAmount(order.totalPrice)) {
+      throw new Error('ยอดชำระเงินจาก PayPal ไม่ตรงกับยอดคำสั่งซื้อ')
+    }
+
+    if (currencyPaid !== order.currencyCode) {
+      throw new Error('สกุลเงินจาก PayPal ไม่ตรงกับคำสั่งซื้อ')
+    }
+
     order.isPaid = true
     order.paidAt = new Date()
     order.paymentResult = {
-      id: captureData.id,
+      id: capture?.id ?? captureData.id,
       status: captureData.status,
       email_address: captureData.payer.email_address,
-      pricePaid:
-        captureData.purchase_units[0]?.payments?.captures[0]?.amount?.value,
+      pricePaid,
     }
     await order.populate('user', 'email')
     await order.save()
@@ -271,7 +315,7 @@ export const calcDeliveryDateAndPrice = async ({
     !shippingAddress || !deliveryDate
       ? undefined
       : deliveryDate.freeShippingMinPrice > 0 &&
-        itemsPrice >= deliveryDate.freeShippingMinPrice
+          itemsPrice >= deliveryDate.freeShippingMinPrice
         ? 0
         : deliveryDate.shippingPrice
 
@@ -279,9 +323,10 @@ export const calcDeliveryDateAndPrice = async ({
 
   const totalPrice = round2(
     itemsPrice +
-    (shippingPrice ? round2(shippingPrice) : 0) +
-    (taxPrice ? round2(taxPrice) : 0)
+      (shippingPrice ? round2(shippingPrice) : 0) +
+      (taxPrice ? round2(taxPrice) : 0)
   )
+
   return {
     AVAILABLE_DELIVERY_DATES,
     deliveryDateIndex: normalizedDeliveryDateIndex,
@@ -289,10 +334,9 @@ export const calcDeliveryDateAndPrice = async ({
     itemsPrice,
     shippingPrice,
     taxPrice,
-    totalPrice
+    totalPrice,
   }
 }
-
 
 // GET
 export async function getMyOrders({
@@ -308,18 +352,19 @@ export async function getMyOrders({
   if (!session) {
     throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
   }
+
   const skipAmount = (Number(page) - 1) * limit
   const orders = await Order.find({
-    user: session?.user?.id,
+    user: session.user.id,
   })
     .sort({ createdAt: 'desc' })
     .skip(skipAmount)
     .limit(limit)
-  const ordersCount = await Order.countDocuments({ user: session?.user?.id })
+
+  const ordersCount = await Order.countDocuments({ user: session.user.id })
 
   return {
     data: JSON.parse(JSON.stringify(orders)),
     totalPages: Math.ceil(ordersCount / limit),
   }
 }
-

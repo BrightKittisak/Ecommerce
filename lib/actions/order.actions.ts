@@ -1,15 +1,17 @@
 'use server'
 
-import { Cart, OrderItem, ShippingAddress } from '@/types'
+import { CreateOrderInput, OrderItem, ShippingAddress } from '@/types'
 import { CURRENCY_CODE, calculateFutureDate, formatError, round2 } from '../utils'
 import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
 import Order, { IOrder } from '../db/models/order.model'
+import Product from '../db/models/product.model'
 import { paypal } from '../paypal'
 import { sendPurchaseReceipt } from '@/emails'
 import { revalidatePath } from 'next/cache'
 import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE } from '../constants'
+import { CreateOrderSchema } from '../order-validator'
 
 const getOrderOwnerId = (order: IOrder) => {
   if (typeof order.user === 'string') return order.user
@@ -36,15 +38,72 @@ const findOrderForUser = async ({
   return order
 }
 
+const buildOrderItemsFromRequest = async (
+  items: CreateOrderInput['items']
+): Promise<OrderItem[]> => {
+  const productIds = [...new Set(items.map((item) => item.product))]
+  const products = await Product.find({
+    _id: { $in: productIds },
+    isPublished: true,
+  }).lean()
+
+  const productById = new Map(
+    products.map((product) => [String(product._id), product])
+  )
+
+  return items.map((item) => {
+    const product = productById.get(item.product)
+
+    if (!product) {
+      throw new Error('ไม่พบสินค้าที่ต้องการสั่งซื้อ')
+    }
+
+    if (item.quantity > product.countInStock) {
+      throw new Error(`สินค้า ${product.name} มีในสต็อกไม่เพียงพอ`)
+    }
+
+    if (item.size && product.sizes.length > 0 && !product.sizes.includes(item.size)) {
+      throw new Error(`ไซซ์ ${item.size} ของสินค้า ${product.name} ไม่ถูกต้อง`)
+    }
+
+    if (
+      item.color &&
+      product.colors.length > 0 &&
+      !product.colors.includes(item.color)
+    ) {
+      throw new Error(`สี ${item.color} ของสินค้า ${product.name} ไม่ถูกต้อง`)
+    }
+
+    const primaryImage = product.images[0]
+    if (!primaryImage) {
+      throw new Error(`สินค้า ${product.name} ไม่มีรูปภาพสำหรับสร้างคำสั่งซื้อ`)
+    }
+
+    return {
+      clientId: item.clientId,
+      product: String(product._id),
+      name: product.name,
+      slug: product.slug,
+      category: product.category,
+      quantity: item.quantity,
+      countInStock: product.countInStock,
+      image: primaryImage,
+      price: round2(product.price),
+      size: item.size,
+      color: item.color,
+    }
+  })
+}
+
 // CREATE
-export const createOrder = async (clientSideCart: Cart) => {
+export const createOrder = async (clientOrder: CreateOrderInput) => {
   try {
     await connectToDatabase()
     const session = await auth()
     if (!session) throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
     // recalculate price and delivery date on the server
     const createdOrder = await createOrderFromCart(
-      clientSideCart,
+      CreateOrderSchema.parse(clientOrder),
       session.user.id!
     )
     return {
@@ -57,15 +116,17 @@ export const createOrder = async (clientSideCart: Cart) => {
   }
 }
 export const createOrderFromCart = async (
-  clientSideCart: Cart,
+  clientOrder: CreateOrderInput,
   userId: string
 ) => {
+  const items = await buildOrderItemsFromRequest(clientOrder.items)
   const cart = {
-    ...clientSideCart,
+    ...clientOrder,
+    items,
     ...(await calcDeliveryDateAndPrice({
-      items: clientSideCart.items,
-      shippingAddress: clientSideCart.shippingAddress,
-      deliveryDateIndex: clientSideCart.deliveryDateIndex,
+      items,
+      shippingAddress: clientOrder.shippingAddress,
+      deliveryDateIndex: clientOrder.deliveryDateIndex,
     })),
   }
 

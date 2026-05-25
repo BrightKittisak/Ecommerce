@@ -2,11 +2,13 @@
 import { auth, signIn, signOut } from '@/auth'
 import { IUserName,IUserSignIn, IUserSignUp } from '@/types'
 import bcrypt from 'bcryptjs'
-import { UserSignUpSchema } from '../validator'
+import { UserSignUpSchema } from '../auth-validator'
 import { connectToDatabase } from '../db'
 import User from '../db/models/user.model'
 import { formatError } from '../utils'
 import { redirect } from 'next/navigation'
+
+const PASSWORD_HASH_SALT_ROUNDS = 12
 
 export async function signInWithCredentials(user: IUserSignIn) {
   return await signIn('credentials', { ...user, redirect: false })
@@ -33,7 +35,7 @@ export async function registerUser(userSignUp: IUserSignUp) {
     await connectToDatabase()
     await User.create({
       ...user,
-      password: await bcrypt.hash(user.password, 5),
+      password: await bcrypt.hash(user.password, PASSWORD_HASH_SALT_ROUNDS),
     })
     return { success: true, message: 'สร้างบัญชีผู้ใช้เรียบร้อยแล้ว' }
   } catch (error) {

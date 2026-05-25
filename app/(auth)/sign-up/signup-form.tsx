@@ -1,10 +1,18 @@
 'use client'
+
+import Link from 'next/link'
 import { redirect, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { isRedirectError } from 'next/dist/client/components/redirect-error'
 
+import { registerUser, signInWithCredentials } from '@/lib/actions/user.actions'
+import { UserSignUpSchema } from '@/lib/auth-validator'
+import { APP_NAME } from '@/lib/constants'
+import { IUserSignUp } from '@/types'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import Link from 'next/link'
 import {
   Form,
   FormControl,
@@ -13,15 +21,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { useForm } from 'react-hook-form'
-import { IUserSignUp } from '@/types'
-import { registerUser, signInWithCredentials } from '@/lib/actions/user.actions'
-import { toast } from 'sonner'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { UserSignUpSchema } from '@/lib/validator'
+import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { isRedirectError } from 'next/dist/client/components/redirect-error'
-import { APP_NAME } from '@/lib/constants'
 
 export default function SignUpForm() {
   const searchParams = useSearchParams()
@@ -45,7 +46,7 @@ export default function SignUpForm() {
     try {
       const res = await registerUser(data)
       if (!res.success) {
-        setError('email', { message: res.error }) // แสดง error ในช่อง email
+        setError('email', { message: res.error })
         toast.error(res.error)
         return
       }
@@ -57,7 +58,7 @@ export default function SignUpForm() {
       redirect(callbackUrl)
     } catch (error) {
       if (isRedirectError(error)) throw error
-      toast.error('เกิดปัญหาบางอย่าง กรุณาลองใหม่อีกครั้ง')
+      toast.error('เน€เธเธดเธ”เธเธฑเธเธซเธฒเธเธฒเธเธญเธขเนเธฒเธ เธเธฃเธธเธ“เธฒเธฅเธญเธเนเธซเธกเนเธญเธตเธเธเธฃเธฑเนเธ')
     } finally {
       setIsSubmitting(false)
     }
@@ -73,9 +74,9 @@ export default function SignUpForm() {
             name='name'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>ชื่อ</FormLabel>
+                <FormLabel>เธเธทเนเธญ</FormLabel>
                 <FormControl>
-                  <Input placeholder='กรอกชื่อของคุณ' {...field} />
+                  <Input placeholder='เธเธฃเธญเธเธเธทเนเธญเธเธญเธเธเธธเธ“' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -87,9 +88,14 @@ export default function SignUpForm() {
             name='email'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>อีเมล</FormLabel>
+                <FormLabel>เธญเธตเน€เธกเธฅ</FormLabel>
                 <FormControl>
-                  <Input type='email' placeholder='กรอกอีเมล' {...field} />
+                  <Input
+                    type='email'
+                    placeholder='เธเธฃเธญเธเธญเธตเน€เธกเธฅ'
+                    autoComplete='email'
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -101,10 +107,19 @@ export default function SignUpForm() {
             name='password'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>รหัสผ่าน</FormLabel>
+                <FormLabel>เธฃเธซเธฑเธชเธเนเธฒเธ</FormLabel>
                 <FormControl>
-                  <Input type='password' placeholder='กรอกรหัสผ่าน' {...field} />
+                  <Input
+                    type='password'
+                    placeholder='เธเธฃเธญเธเธฃเธซเธฑเธชเธเนเธฒเธ'
+                    autoComplete='new-password'
+                    {...field}
+                  />
                 </FormControl>
+                <p className='text-xs text-muted-foreground'>
+                  Use at least 8 characters with uppercase, lowercase, number,
+                  and special character.
+                </p>
                 <FormMessage />
               </FormItem>
             )}
@@ -115,9 +130,14 @@ export default function SignUpForm() {
             name='confirmPassword'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>ยืนยันรหัสผ่าน</FormLabel>
+                <FormLabel>เธขเธทเธเธขเธฑเธเธฃเธซเธฑเธชเธเนเธฒเธ</FormLabel>
                 <FormControl>
-                  <Input type='password' placeholder='กรอกรหัสผ่านอีกครั้ง' {...field} />
+                  <Input
+                    type='password'
+                    placeholder='เธเธฃเธญเธเธฃเธซเธฑเธชเธเนเธฒเธเธญเธตเธเธเธฃเธฑเนเธ'
+                    autoComplete='new-password'
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -126,25 +146,24 @@ export default function SignUpForm() {
 
           <div>
             <Button type='submit' disabled={isSubmitting}>
-              {isSubmitting ? 'กำลังสมัครสมาชิก...' : 'สมัครสมาชิก'}
+              {isSubmitting ? 'เธเธณเธฅเธฑเธเธชเธกเธฑเธเธฃเธชเธกเธฒเธเธดเธ...' : 'เธชเธกเธฑเธเธฃเธชเธกเธฒเธเธดเธ'}
             </Button>
           </div>
 
           <div className='text-sm'>
-            เมื่อสร้างบัญชี แปลว่าคุณยอมรับ
-            {' '}
-            <Link href='/page/conditions-of-use'>เงื่อนไขการใช้งาน</Link>
-            {' '}และ{' '}
-            <Link href='/page/privacy-policy'>นโยบายความเป็นส่วนตัว</Link>
-            {' '}ของ {APP_NAME}
+            เน€เธกเธทเนเธญเธชเธฃเนเธฒเธเธเธฑเธเธเธต เนเธเธฅเธงเนเธฒเธเธธเธ“เธขเธญเธกเธฃเธฑเธ{' '}
+            <Link href='/page/conditions-of-use'>เน€เธเธทเนเธญเธเนเธเธเธฒเธฃเนเธเนเธเธฒเธ</Link>{' '}
+            เนเธฅเธฐ{' '}
+            <Link href='/page/privacy-policy'>เธเนเธขเธเธฒเธขเธเธงเธฒเธกเน€เธเนเธเธชเนเธงเธเธ•เธฑเธง</Link>{' '}
+            เธเธญเธ {APP_NAME}
           </div>
 
           <Separator className='mb-4' />
 
           <div className='text-sm'>
-            มีบัญชีอยู่แล้ว?{' '}
+            เธกเธตเธเธฑเธเธเธตเธญเธขเธนเนเนเธฅเนเธง?{' '}
             <Link className='link' href={`/sign-in?callbackUrl=${callbackUrl}`}>
-              เข้าสู่ระบบ
+              เน€เธเนเธฒเธชเธนเนเธฃเธฐเธเธ
             </Link>
           </div>
         </div>

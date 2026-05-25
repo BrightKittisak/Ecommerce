@@ -141,17 +141,16 @@ const CheckoutForm = () => {
     }
 
     const res = await createOrder({
-      items,
+      items: items.map((item) => ({
+        clientId: item.clientId,
+        product: item.product,
+        quantity: item.quantity,
+        size: item.size,
+        color: item.color,
+      })),
       shippingAddress,
-      expectedDeliveryDate: calculateFutureDate(
-        AVAILABLE_DELIVERY_DATES[selectedDeliveryDateIndex].daysToDeliver
-      ),
       deliveryDateIndex: selectedDeliveryDateIndex,
       paymentMethod,
-      itemsPrice,
-      shippingPrice,
-      taxPrice,
-      totalPrice,
     })
 
     if (!res.success) {

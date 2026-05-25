@@ -49,26 +49,23 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  if (event.type !== 'charge.succeeded') {
+  if (event.type !== 'payment_intent.succeeded') {
     return NextResponse.json({ received: true })
   }
 
   await connectToDatabase()
 
-   const charge = event.data.object
-   const orderId = charge.metadata.orderId
-   
-   // Validate that orderId exists in metadata
-   if (!orderId) {
-     return NextResponse.json(
-       { message: 'Missing orderId in Stripe event metadata' },
-       { status: 400 }
-     )
-   }
-   
-   const email = charge.billing_details.email
-   const pricePaidInCents = charge.amount
-   const order = await Order.findById(orderId).populate('user', 'email')
+  const paymentIntent = event.data.object
+  const orderId = paymentIntent.metadata.orderId
+
+  if (!orderId) {
+    return NextResponse.json(
+      { message: 'Missing orderId in Stripe event metadata' },
+      { status: 400 }
+    )
+  }
+
+  const order = await Order.findById(orderId).populate('user', 'email')
 
   if (!order) {
     return NextResponse.json(
@@ -77,21 +74,36 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Stripe may retry webhook delivery. Treat repeated events as success
-  // without sending duplicate receipts or mutating the order again.
-  if (order.isPaid || order.paymentResult?.id === event.id) {
+  if (order.isPaid || order.paymentResult?.id === paymentIntent.id) {
     return NextResponse.json({
       message: 'Order payment already processed',
     })
   }
 
+  const expectedAmountInCents = Math.round(order.totalPrice * 100)
+  const expectedCurrency = order.currencyCode.toLowerCase()
+
+  if (paymentIntent.amount_received !== expectedAmountInCents) {
+    return NextResponse.json(
+      { message: 'Stripe payment amount does not match the order total' },
+      { status: 400 }
+    )
+  }
+
+  if (paymentIntent.currency !== expectedCurrency) {
+    return NextResponse.json(
+      { message: 'Stripe payment currency does not match the order currency' },
+      { status: 400 }
+    )
+  }
+
   order.isPaid = true
-  order.paidAt = new Date()
+  order.paidAt = new Date(paymentIntent.created * 1000)
   order.paymentResult = {
-    id: event.id,
-    status: 'COMPLETED',
-    email_address: email ?? '',
-    pricePaid: (pricePaidInCents / 100).toFixed(2),
+    id: paymentIntent.id,
+    status: paymentIntent.status.toUpperCase(),
+    email_address: paymentIntent.receipt_email ?? '',
+    pricePaid: (paymentIntent.amount_received / 100).toFixed(2),
   }
   await order.save()
 

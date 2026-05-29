@@ -35,19 +35,29 @@ const carousels = [
 ]
 
 export default async function HomePage() {
-  const categories = (await getAllCategories()).slice(0, 4)
-  const newArrivals = await getProductsForCard({
-    tag: 'new-arrival',
-    limit: 4,
-  })
-  const featureds = await getProductsForCard({
-    tag: 'featured',
-    limit: 4,
-  })
-  const bestSellers = await getProductsForCard({
-    tag: 'best-seller',
-    limit: 4,
-  })
+  const [
+    allCategories,
+    newArrivals,
+    featureds,
+    bestSellers,
+    todaysDeals,
+  ] = await Promise.all([
+    getAllCategories(),
+    getProductsForCard({
+      tag: 'new-arrival',
+      limit: 4,
+    }),
+    getProductsForCard({
+      tag: 'featured',
+      limit: 4,
+    }),
+    getProductsForCard({
+      tag: 'best-seller',
+      limit: 4,
+    }),
+    getProductsByTag({ tag: 'todays-deal' }),
+  ])
+  const categories = allCategories.slice(0, 4)
   const cards = [
     {
       title: 'หมวดหมู่ที่น่าค้นหา',
@@ -86,8 +96,6 @@ export default async function HomePage() {
       },
     },
   ]
-
-  const todaysDeals = await getProductsByTag({ tag: 'todays-deal' })
 
   return (
     <>

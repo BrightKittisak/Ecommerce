@@ -1,36 +1,150 @@
 'use server'
 
-import { cache } from 'react'
+import { unstable_cache } from 'next/cache'
 
 import { connectToDatabase } from '@/lib/db'
 import Product, { IProduct } from '@/lib/db/models/product.model'
 import { PAGE_SIZE } from '../constants'
 
-const getPublishedCategories = cache(async () => {
-  await connectToDatabase()
-  return Product.find({ isPublished: true }).distinct('category')
-})
+const CATALOG_CACHE_REVALIDATE_SECONDS = 5 * 60
 
-const getPublishedTags = cache(async () => {
-  await connectToDatabase()
-  const tags = await Product.aggregate([
-    { $match: { isPublished: true } },
-    { $unwind: '$tags' },
-    { $group: { _id: null, uniqueTags: { $addToSet: '$tags' } } },
-    { $project: { _id: 0, uniqueTags: 1 } },
-  ])
+const getPublishedCategories = unstable_cache(
+  async () => {
+    await connectToDatabase()
+    return Product.find({ isPublished: true }).distinct('category')
+  },
+  ['published-categories'],
+  {
+    revalidate: CATALOG_CACHE_REVALIDATE_SECONDS,
+    tags: ['catalog', 'categories'],
+  }
+)
 
-  return (
-    (tags[0]?.uniqueTags
-      .sort((a: string, b: string) => a.localeCompare(b))
-      .map((x: string) =>
-        x
-          .split('-')
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ')
-      ) as string[]) || []
-  )
-})
+const getPublishedTags = unstable_cache(
+  async () => {
+    await connectToDatabase()
+    const tags = await Product.aggregate([
+      { $match: { isPublished: true } },
+      { $unwind: '$tags' },
+      { $group: { _id: null, uniqueTags: { $addToSet: '$tags' } } },
+      { $project: { _id: 0, uniqueTags: 1 } },
+    ])
+
+    return (
+      (tags[0]?.uniqueTags
+        .sort((a: string, b: string) => a.localeCompare(b))
+        .map((x: string) =>
+          x
+            .split('-')
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ')
+        ) as string[]) || []
+    )
+  },
+  ['published-tags'],
+  {
+    revalidate: CATALOG_CACHE_REVALIDATE_SECONDS,
+    tags: ['catalog', 'tags'],
+  }
+)
+
+const getCachedProductsForCard = unstable_cache(
+  async (tag: string, limit: number) => {
+    await connectToDatabase()
+    const products = await Product.find(
+      { tags: { $in: [tag] }, isPublished: true },
+      { name: 1, slug: 1, images: 1 }
+    )
+      .sort({ createdAt: 'desc' })
+      .limit(limit)
+      .lean()
+
+    return products.map((product) => ({
+      name: product.name,
+      href: `/product/${product.slug}`,
+      image: product.images[0],
+    })) as {
+      name: string
+      href: string
+      image: string
+    }[]
+  },
+  ['products-for-card'],
+  {
+    revalidate: CATALOG_CACHE_REVALIDATE_SECONDS,
+    tags: ['catalog', 'products'],
+  }
+)
+
+const getCachedProductsByTag = unstable_cache(
+  async (tag: string, limit: number) => {
+    await connectToDatabase()
+    const products = await Product.find({
+      tags: { $in: [tag] },
+      isPublished: true,
+    })
+      .sort({ createdAt: 'desc' })
+      .limit(limit)
+      .lean()
+    return JSON.parse(JSON.stringify(products)) as IProduct[]
+  },
+  ['products-by-tag'],
+  {
+    revalidate: CATALOG_CACHE_REVALIDATE_SECONDS,
+    tags: ['catalog', 'products'],
+  }
+)
+
+const getCachedProductBySlug = unstable_cache(
+  async (slug: string) => {
+    await connectToDatabase()
+    const product = await Product.findOne({ slug, isPublished: true }).lean()
+    if (!product) throw new Error('ไม่พบสินค้า')
+    return JSON.parse(JSON.stringify(product)) as IProduct
+  },
+  ['product-by-slug'],
+  {
+    revalidate: CATALOG_CACHE_REVALIDATE_SECONDS,
+    tags: ['catalog', 'products'],
+  }
+)
+
+const getCachedRelatedProductsByCategory = unstable_cache(
+  async ({
+    category,
+    productId,
+    limit,
+    page,
+  }: {
+    category: string
+    productId: string
+    limit: number
+    page: number
+  }) => {
+    await connectToDatabase()
+    const skipAmount = (Number(page) - 1) * limit
+    const conditions = {
+      isPublished: true,
+      category,
+      _id: { $ne: productId },
+    }
+    const products = await Product.find(conditions)
+      .sort({ numSales: 'desc' })
+      .skip(skipAmount)
+      .limit(limit)
+      .lean()
+    const productsCount = await Product.countDocuments(conditions)
+    return {
+      data: JSON.parse(JSON.stringify(products)) as IProduct[],
+      totalPages: Math.ceil(productsCount / limit),
+    }
+  },
+  ['related-products-by-category'],
+  {
+    revalidate: CATALOG_CACHE_REVALIDATE_SECONDS,
+    tags: ['catalog', 'products'],
+  }
+)
 
 export async function getAllCategories() {
   return getPublishedCategories()
@@ -43,51 +157,24 @@ export async function getProductsForCard({
   tag: string
   limit?: number
 }) {
-  await connectToDatabase()
-  const products = await Product.find(
-    { tags: { $in: [tag] }, isPublished: true },
-    { name: 1, slug: 1, images: 1 }
-  )
-    .sort({ createdAt: 'desc' })
-    .limit(limit)
-    .lean()
-
-  return products.map((product) => ({
-    name: product.name,
-    href: `/product/${product.slug}`,
-    image: product.images[0],
-  })) as {
-    name: string
-    href: string
-    image: string
-  }[]
+  return getCachedProductsForCard(tag, limit)
 }
 
 export async function getProductsByTag({
-    tag,
-    limit = 10,
-  }: {
-    tag: string
-    limit?: number
-  }) {
-    await connectToDatabase()
-    const products = await Product.find({
-      tags: { $in: [tag] },
-      isPublished: true,
-    })
-      .sort({ createdAt: 'desc' })
-      .limit(limit)
-      .lean()
-    return JSON.parse(JSON.stringify(products)) as IProduct[]
-  }
-
-  // GET ONE PRODUCT BY SLUG
-export async function getProductBySlug(slug: string) {
-  await connectToDatabase()
-  const product = await Product.findOne({ slug, isPublished: true }).lean()
-  if (!product) throw new Error('ไม่พบสินค้า')
-  return JSON.parse(JSON.stringify(product)) as IProduct
+  tag,
+  limit = 10,
+}: {
+  tag: string
+  limit?: number
+}) {
+  return getCachedProductsByTag(tag, limit)
 }
+
+// GET ONE PRODUCT BY SLUG
+export async function getProductBySlug(slug: string) {
+  return getCachedProductBySlug(slug)
+}
+
 // GET RELATED PRODUCTS: PRODUCTS WITH SAME CATEGORY
 export async function getRelatedProductsByCategory({
   category,
@@ -100,23 +187,12 @@ export async function getRelatedProductsByCategory({
   limit?: number
   page: number
 }) {
-  await connectToDatabase()
-  const skipAmount = (Number(page) - 1) * limit
-  const conditions = {
-    isPublished: true,
+  return getCachedRelatedProductsByCategory({
     category,
-    _id: { $ne: productId },
-  }
-  const products = await Product.find(conditions)
-    .sort({ numSales: 'desc' })
-    .skip(skipAmount)
-    .limit(limit)
-    .lean()
-  const productsCount = await Product.countDocuments(conditions)
-  return {
-    data: JSON.parse(JSON.stringify(products)) as IProduct[],
-    totalPages: Math.ceil(productsCount / limit),
-  }
+    productId,
+    limit,
+    page,
+  })
 }
 
 // GET ALL PRODUCTS

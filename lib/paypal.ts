@@ -1,3 +1,4 @@
+import { formatPayPalAmount } from './paypal-capture-verification'
 import { CURRENCY_CODE } from './utils'
 
 const base = process.env.PAYPAL_API_URL || 'https://api-m.sandbox.paypal.com'
@@ -18,7 +19,7 @@ export const paypal = {
           {
             amount: {
               currency_code: CURRENCY_CODE,
-              value: price.toFixed(2),
+              value: formatPayPalAmount(price),
             },
           },
         ],

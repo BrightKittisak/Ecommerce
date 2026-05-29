@@ -8,6 +8,7 @@ import { OrderInputSchema } from '../validator'
 import Order, { IOrder } from '../db/models/order.model'
 import Product from '../db/models/product.model'
 import { paypal } from '../paypal'
+import { verifyPayPalCapture } from '../paypal-capture-verification'
 import { sendPurchaseReceipt } from '@/emails'
 import { revalidatePath } from 'next/cache'
 import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE } from '../constants'
@@ -20,8 +21,6 @@ const getOrderOwnerId = (order: IOrder) => {
   }
   return String(order.user)
 }
-
-const formatPaymentAmount = (amount: number) => round2(amount).toFixed(2)
 
 const findOrderForUser = async ({
   orderId,
@@ -236,25 +235,23 @@ export async function approvePayPalOrder(
     }
 
     const captureData = await paypal.capturePayment(data.orderID)
-    const capture = captureData.purchase_units?.[0]?.payments?.captures?.[0]
-    const capturedAmount = capture?.amount
-    const expectedAmount = formatPaymentAmount(order.totalPrice)
-    if (
-      !captureData ||
-      captureData.id !== data.orderID ||
-      captureData.status !== 'COMPLETED' ||
-      capture?.status !== 'COMPLETED' ||
-      capturedAmount?.currency_code !== CURRENCY_CODE ||
-      capturedAmount?.value !== expectedAmount
-    )
+    let verifiedCapture
+    try {
+      verifiedCapture = verifyPayPalCapture({
+        captureData,
+        expectedOrderId: data.orderID,
+        expectedTotalPrice: order.totalPrice,
+      })
+    } catch {
       throw new Error('เกิดข้อผิดพลาดในการชำระเงินผ่าน PayPal')
+    }
     order.isPaid = true
     order.paidAt = new Date()
     order.paymentResult = {
-      id: capture.id || captureData.id,
-      status: capture.status,
-      email_address: captureData.payer?.email_address || '',
-      pricePaid: capturedAmount.value,
+      id: verifiedCapture.captureId,
+      status: verifiedCapture.status,
+      email_address: verifiedCapture.payerEmail,
+      pricePaid: verifiedCapture.pricePaid,
     }
     await order.populate('user', 'email')
     await order.save()

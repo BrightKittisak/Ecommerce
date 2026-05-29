@@ -5,11 +5,10 @@ import {
   ProductInputSchema,
   ShippingAddressSchema,
   UserInputSchema,
-  UserSignInSchema,
   ReviewInputSchema,
   UserNameSchema,
 } from '@/lib/validator'
-import { UserSignUpSchema } from '@/lib/auth-validator'
+import { UserSignInSchema, UserSignUpSchema } from '@/lib/auth-validator'
 import { CreateOrderItemSchema, CreateOrderSchema } from '@/lib/order-validator'
 import { z } from 'zod'
 

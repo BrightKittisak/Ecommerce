@@ -2,7 +2,7 @@
 import { auth, signIn, signOut } from '@/auth'
 import { IUserName,IUserSignIn, IUserSignUp } from '@/types'
 import bcrypt from 'bcryptjs'
-import { UserSignUpSchema } from '../auth-validator'
+import { UserSignInSchema, UserSignUpSchema } from '../auth-validator'
 import { connectToDatabase } from '../db'
 import User from '../db/models/user.model'
 import { formatError } from '../utils'
@@ -11,7 +11,8 @@ import { redirect } from 'next/navigation'
 const PASSWORD_HASH_SALT_ROUNDS = 12
 
 export async function signInWithCredentials(user: IUserSignIn) {
-  return await signIn('credentials', { ...user, redirect: false })
+  const credentials = UserSignInSchema.parse(user)
+  return await signIn('credentials', { ...credentials, redirect: false })
 }
 export const SignOut = async () => {
   const redirectTo = await signOut({ redirect: false })

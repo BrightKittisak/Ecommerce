@@ -18,7 +18,7 @@ import { signInWithCredentials } from '@/lib/actions/user.actions'
 
 import { toast } from 'sonner'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { UserSignInSchema } from '@/lib/validator'
+import { UserSignInSchema } from '@/lib/auth-validator'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { APP_NAME } from '@/lib/constants'
 
@@ -26,7 +26,7 @@ const signInDefaultValues =
   process.env.NODE_ENV === 'development'
     ? {
         email: 'admin@example.com',
-        password: '123456',
+        password: 'LushDemo123!',
       }
     : {
         email: '',

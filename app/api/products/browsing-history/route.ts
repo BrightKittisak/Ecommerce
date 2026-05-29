@@ -2,18 +2,31 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import Product from '@/lib/db/models/product.model'
 import { connectToDatabase } from '@/lib/db'
+import { parseBrowsingHistoryQuery } from '@/lib/browsing-history-query'
+
+const PRODUCT_CARD_FIELDS = {
+  name: 1,
+  slug: 1,
+  category: 1,
+  brand: 1,
+  images: 1,
+  price: 1,
+  listPrice: 1,
+  countInStock: 1,
+  tags: 1,
+  sizes: 1,
+  colors: 1,
+  avgRating: 1,
+  numReviews: 1,
+} as const
+
+const MAX_RELATED_PRODUCTS = 24
 
 export const GET = async (request: NextRequest) => {
-  const listType = request.nextUrl.searchParams.get('type') || 'history'
-  const productIdsParam = request.nextUrl.searchParams.get('ids')
-  const categoriesParam = request.nextUrl.searchParams.get('categories')
+  const parsedQuery = parseBrowsingHistoryQuery(request.nextUrl.searchParams)
 
-  if (!productIdsParam || !categoriesParam) {
-    return NextResponse.json([])
-  }
-
-  const productIds = productIdsParam.split(',')
-  const categories = categoriesParam.split(',')
+  if (!parsedQuery) return NextResponse.json([])
+  const { listType, productIds, categories } = parsedQuery
   const filter =
     listType === 'history'
       ? {
@@ -22,7 +35,10 @@ export const GET = async (request: NextRequest) => {
       : { category: { $in: categories }, _id: { $nin: productIds } }
 
   await connectToDatabase()
-  const products = await Product.find(filter)
+  const products = await Product.find(filter, PRODUCT_CARD_FIELDS)
+    .limit(listType === 'history' ? productIds.length : MAX_RELATED_PRODUCTS)
+    .lean()
+
   if (listType === 'history')
     return NextResponse.json(
       products.sort(

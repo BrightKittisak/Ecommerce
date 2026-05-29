@@ -4,6 +4,7 @@ import Stripe from 'stripe'
 
 import { Button } from '@/components/ui/button'
 import { getOrderByIdForCurrentUser } from '@/lib/actions/order.actions'
+import { verifyStripePaymentIntent } from '@/lib/stripe-payment-verification'
 
 const getStripeClient = () => {
   const secretKey = process.env.STRIPE_SECRET_KEY
@@ -37,19 +38,16 @@ export default async function SuccessPage(props: {
     searchParams.payment_intent
   )
 
-  if (
-    paymentIntent.metadata.orderId == null ||
-    paymentIntent.metadata.orderId !== order._id.toString()
-  ) {
-    return notFound()
-  }
-
-  const expectedAmountInCents = Math.round(order.totalPrice * 100)
-  const expectedCurrency = order.currencyCode.toLowerCase()
-  if (
-    paymentIntent.amount !== expectedAmountInCents ||
-    paymentIntent.currency !== expectedCurrency
-  ) {
+  try {
+    verifyStripePaymentIntent({
+      paymentIntent,
+      expectedOrderId: order._id.toString(),
+      expectedTotalPrice: order.totalPrice,
+      expectedCurrencyCode: order.currencyCode,
+      amountField: 'amount',
+      requireSucceeded: false,
+    })
+  } catch {
     return notFound()
   }
 

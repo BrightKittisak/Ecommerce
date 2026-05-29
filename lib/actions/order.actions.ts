@@ -21,6 +21,8 @@ const getOrderOwnerId = (order: IOrder) => {
   return String(order.user)
 }
 
+const formatPaymentAmount = (amount: number) => round2(amount).toFixed(2)
+
 const findOrderForUser = async ({
   orderId,
   userId,
@@ -182,6 +184,13 @@ export async function createPayPalOrder(orderId: string) {
       isAdmin: session.user.role === 'Admin',
     })
 
+    if (order.isPaid) {
+      return {
+        success: true,
+        message: 'Order is already paid',
+      }
+    }
+
     const paypalOrder = await paypal.createOrder(order.totalPrice)
     order.paymentResult = {
       id: paypalOrder.id,
@@ -215,21 +224,37 @@ export async function approvePayPalOrder(
       isAdmin: session.user.role === 'Admin',
     })
 
+    if (order.isPaid) {
+      return {
+        success: true,
+        message: 'Order is already paid',
+      }
+    }
+
+    if (data.orderID !== order.paymentResult?.id) {
+      throw new Error('PayPal order does not match this order')
+    }
+
     const captureData = await paypal.capturePayment(data.orderID)
+    const capture = captureData.purchase_units?.[0]?.payments?.captures?.[0]
+    const capturedAmount = capture?.amount
+    const expectedAmount = formatPaymentAmount(order.totalPrice)
     if (
       !captureData ||
-      captureData.id !== order.paymentResult?.id ||
-      captureData.status !== 'COMPLETED'
+      captureData.id !== data.orderID ||
+      captureData.status !== 'COMPLETED' ||
+      capture?.status !== 'COMPLETED' ||
+      capturedAmount?.currency_code !== CURRENCY_CODE ||
+      capturedAmount?.value !== expectedAmount
     )
       throw new Error('เกิดข้อผิดพลาดในการชำระเงินผ่าน PayPal')
     order.isPaid = true
     order.paidAt = new Date()
     order.paymentResult = {
-      id: captureData.id,
-      status: captureData.status,
-      email_address: captureData.payer.email_address,
-      pricePaid:
-        captureData.purchase_units[0]?.payments?.captures[0]?.amount?.value,
+      id: capture.id || captureData.id,
+      status: capture.status,
+      email_address: captureData.payer?.email_address || '',
+      pricePaid: capturedAmount.value,
     }
     await order.populate('user', 'email')
     await order.save()

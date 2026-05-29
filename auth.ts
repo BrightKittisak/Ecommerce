@@ -30,7 +30,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   adapter: MongoDBAdapter(() => getMongoClient()),
   providers: [
-    Google({}),
+    Google({
+      allowDangerousEmailAccountLinking: false,
+    }),
     CredentialsProvider({
       credentials: {
         email: {

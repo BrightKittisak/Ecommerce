@@ -4,6 +4,7 @@ import Stripe from 'stripe'
 import { sendPurchaseReceipt } from '@/emails'
 import { connectToDatabase } from '@/lib/db'
 import Order from '@/lib/db/models/order.model'
+import { verifyStripePaymentIntent } from '@/lib/stripe-payment-verification'
 
 const getStripeClient = () => {
   const secretKey = process.env.STRIPE_SECRET_KEY
@@ -80,19 +81,18 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  const expectedAmountInCents = Math.round(order.totalPrice * 100)
-  const expectedCurrency = order.currencyCode.toLowerCase()
-
-  if (paymentIntent.amount_received !== expectedAmountInCents) {
+  let verifiedPayment
+  try {
+    verifiedPayment = verifyStripePaymentIntent({
+      paymentIntent,
+      expectedOrderId: order._id.toString(),
+      expectedTotalPrice: order.totalPrice,
+      expectedCurrencyCode: order.currencyCode,
+      amountField: 'amount_received',
+    })
+  } catch {
     return NextResponse.json(
-      { message: 'Stripe payment amount does not match the order total' },
-      { status: 400 }
-    )
-  }
-
-  if (paymentIntent.currency !== expectedCurrency) {
-    return NextResponse.json(
-      { message: 'Stripe payment currency does not match the order currency' },
+      { message: 'Stripe payment details do not match the order' },
       { status: 400 }
     )
   }
@@ -100,10 +100,10 @@ export async function POST(req: NextRequest) {
   order.isPaid = true
   order.paidAt = new Date(paymentIntent.created * 1000)
   order.paymentResult = {
-    id: paymentIntent.id,
-    status: paymentIntent.status.toUpperCase(),
-    email_address: paymentIntent.receipt_email ?? '',
-    pricePaid: (paymentIntent.amount_received / 100).toFixed(2),
+    id: verifiedPayment.id,
+    status: verifiedPayment.status,
+    email_address: verifiedPayment.emailAddress,
+    pricePaid: verifiedPayment.pricePaid,
   }
   await order.save()
 

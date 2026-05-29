@@ -112,10 +112,10 @@ npm run dev
 
 - Admin
   - email: `admin@example.com`
-  - password: `123456`
+  - password: `LushDemo123!`
 - User
   - email: `jane@example.com`
-  - password: `123456`
+  - password: `LushDemo123!`
 
 ## Scripts
 

@@ -27,6 +27,16 @@ const StrongPassword = z
     message: 'Password must include at least one special character',
   })
 
+const ExistingPassword = z
+  .string()
+  .min(1, 'Password is required')
+  .max(100, 'Password must be 100 characters or fewer')
+
+export const UserSignInSchema = z.object({
+  email: Email,
+  password: ExistingPassword,
+})
+
 export const UserSignUpSchema = z
   .object({
     name: UserName,

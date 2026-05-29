@@ -18,7 +18,7 @@ export const paypal = {
           {
             amount: {
               currency_code: CURRENCY_CODE,
-              value: price,
+              value: price.toFixed(2),
             },
           },
         ],

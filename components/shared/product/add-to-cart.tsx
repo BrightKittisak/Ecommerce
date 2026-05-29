@@ -44,7 +44,7 @@ export default function AddToCart({
         }
       }}
     >
-      Add to Cart
+      เพิ่มลงตะกร้า
     </Button>
   ) : (
     <div className='w-full space-y-2'>

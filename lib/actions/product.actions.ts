@@ -7,6 +7,21 @@ import Product, { IProduct } from '@/lib/db/models/product.model'
 import { PAGE_SIZE } from '../constants'
 
 const CATALOG_CACHE_REVALIDATE_SECONDS = 5 * 60
+const PRODUCT_CARD_FIELDS = {
+  name: 1,
+  slug: 1,
+  category: 1,
+  brand: 1,
+  images: 1,
+  price: 1,
+  listPrice: 1,
+  countInStock: 1,
+  tags: 1,
+  sizes: 1,
+  colors: 1,
+  avgRating: 1,
+  numReviews: 1,
+} as const
 
 const getPublishedCategories = unstable_cache(
   async () => {
@@ -82,7 +97,7 @@ const getCachedProductsByTag = unstable_cache(
     const products = await Product.find({
       tags: { $in: [tag] },
       isPublished: true,
-    })
+    }, PRODUCT_CARD_FIELDS)
       .sort({ createdAt: 'desc' })
       .limit(limit)
       .lean()
@@ -128,7 +143,7 @@ const getCachedRelatedProductsByCategory = unstable_cache(
       category,
       _id: { $ne: productId },
     }
-    const products = await Product.find(conditions)
+    const products = await Product.find(conditions, PRODUCT_CARD_FIELDS)
       .sort({ numSales: 'desc' })
       .skip(skipAmount)
       .limit(limit)
@@ -259,27 +274,22 @@ export async function getAllProducts({
             ? { avgRating: -1 }
             : { _id: -1 }
   const isPublished = { isPublished: true }
-  const products = await Product.find({
+  const conditions = {
     ...isPublished,
     ...queryFilter,
     ...tagFilter,
     ...categoryFilter,
     ...priceFilter,
     ...ratingFilter,
-  })
-    .sort(order)
-    .skip(limit * (Number(page) - 1))
-    .limit(limit)
-    .lean()
-
-  const countProducts = await Product.countDocuments({
-    ...isPublished,
-    ...queryFilter,
-    ...tagFilter,
-    ...categoryFilter,
-    ...priceFilter,
-    ...ratingFilter,
-  })
+  }
+  const [products, countProducts] = await Promise.all([
+    Product.find(conditions, PRODUCT_CARD_FIELDS)
+      .sort(order)
+      .skip(limit * (Number(page) - 1))
+      .limit(limit)
+      .lean(),
+    Product.countDocuments(conditions),
+  ])
   return {
     products: JSON.parse(JSON.stringify(products)) as IProduct[],
     totalPages: Math.ceil(countProducts / limit),

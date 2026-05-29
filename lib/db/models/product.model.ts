@@ -91,6 +91,15 @@ const productSchema = new Schema<IProduct>(
   }
 )
 
+productSchema.index({ isPublished: 1, slug: 1 })
+productSchema.index({ isPublished: 1, category: 1 })
+productSchema.index({ isPublished: 1, tags: 1, createdAt: -1 })
+productSchema.index({ isPublished: 1, category: 1, numSales: -1 })
+productSchema.index({ isPublished: 1, price: 1 })
+productSchema.index({ isPublished: 1, avgRating: -1 })
+productSchema.index({ isPublished: 1, numSales: -1 })
+productSchema.index({ countInStock: 1 })
+
 const Product =
   (models.Product as Model<IProduct>) ||
   model<IProduct>('Product', productSchema)

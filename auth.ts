@@ -5,6 +5,12 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { connectToDatabase } from './lib/db'
 import getMongoClient from './lib/db/client'
 import User, { type IUser } from './lib/db/models/user.model'
+import {
+  assertSignInAllowed,
+  clearSignInFailures,
+  getSignInRateLimitKeys,
+  recordFailedSignIn,
+} from './lib/auth-rate-limit'
 
 import NextAuth, { type DefaultSession } from 'next-auth'
 import authConfig from './auth.config'
@@ -40,11 +46,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         },
         password: { type: 'password' },
       },
-      async authorize(credentials) {
+      async authorize(credentials, request) {
         await connectToDatabase()
         if (credentials == null || !credentials.email) return null
 
-        const user = await User.findOne({ email: credentials.email })
+        const email = String(credentials.email)
+        const rateLimitKeys = getSignInRateLimitKeys({ email, request })
+        await assertSignInAllowed(rateLimitKeys)
+
+        const user = await User.findOne({ email })
 
         if (user && user.password) {
           const isMatch = await bcrypt.compare(
@@ -52,6 +62,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             user.password
           )
           if (isMatch) {
+            await clearSignInFailures(rateLimitKeys)
             return {
               id: user._id,
               name: user.name,
@@ -60,6 +71,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
           }
         }
+        await recordFailedSignIn(rateLimitKeys)
         return null
       },
     }),

@@ -1,0 +1,15 @@
+export const PRODUCT_CARD_FIELDS = {
+  name: 1,
+  slug: 1,
+  category: 1,
+  brand: 1,
+  images: 1,
+  price: 1,
+  listPrice: 1,
+  countInStock: 1,
+  tags: 1,
+  sizes: 1,
+  colors: 1,
+  avgRating: 1,
+  numReviews: 1,
+} as const

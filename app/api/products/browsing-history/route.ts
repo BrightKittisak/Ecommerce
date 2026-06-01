@@ -3,22 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Product from '@/lib/db/models/product.model'
 import { connectToDatabase } from '@/lib/db'
 import { parseBrowsingHistoryQuery } from '@/lib/browsing-history-query'
-
-const PRODUCT_CARD_FIELDS = {
-  name: 1,
-  slug: 1,
-  category: 1,
-  brand: 1,
-  images: 1,
-  price: 1,
-  listPrice: 1,
-  countInStock: 1,
-  tags: 1,
-  sizes: 1,
-  colors: 1,
-  avgRating: 1,
-  numReviews: 1,
-} as const
+import { PRODUCT_CARD_FIELDS } from '@/lib/product-query-fields'
 
 const MAX_RELATED_PRODUCTS = 24
 

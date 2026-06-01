@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import { Button } from '@/components/ui/button'
@@ -14,6 +13,9 @@ import { toast } from "sonner"
 import { OrderItem } from '@/types'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : 'Something went wrong'
 
 export default function AddToCart({
   item,
@@ -39,8 +41,8 @@ export default function AddToCart({
               </Button>
             ),
           })
-        } catch (error: any) {
-          toast.error(error.message)
+        } catch (error) {
+          toast.error(getErrorMessage(error))
         }
       }}
     >
@@ -71,8 +73,8 @@ export default function AddToCart({
           try {
             const itemId = await addItem(item, quantity)
             router.push(`/cart/${itemId}`)
-          } catch (error: any) {
-            toast.error(error.message)
+          } catch (error) {
+            toast.error(getErrorMessage(error))
           }
         }}
       >
@@ -85,8 +87,8 @@ export default function AddToCart({
           try {
             await addItem(item, quantity)
             router.push(`/checkout`)
-          } catch (error: any) {
-            toast.error(error.message)
+          } catch (error) {
+            toast.error(getErrorMessage(error))
           }
         }}
         className='w-full rounded-full '

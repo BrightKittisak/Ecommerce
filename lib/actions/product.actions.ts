@@ -5,6 +5,7 @@ import { unstable_cache } from 'next/cache'
 import { connectToDatabase } from '@/lib/db'
 import Product, { IProduct } from '@/lib/db/models/product.model'
 import { PRODUCT_CARD_FIELDS } from '@/lib/product-query-fields'
+import { serializeForClient } from '@/lib/serialization'
 import { PAGE_SIZE } from '../constants'
 
 const CATALOG_CACHE_REVALIDATE_SECONDS = 5 * 60
@@ -87,7 +88,7 @@ const getCachedProductsByTag = unstable_cache(
       .sort({ createdAt: 'desc' })
       .limit(limit)
       .lean()
-    return JSON.parse(JSON.stringify(products)) as IProduct[]
+    return serializeForClient(products) as IProduct[]
   },
   ['products-by-tag'],
   {
@@ -101,7 +102,7 @@ const getCachedProductBySlug = unstable_cache(
     await connectToDatabase()
     const product = await Product.findOne({ slug, isPublished: true }).lean()
     if (!product) throw new Error('ไม่พบสินค้า')
-    return JSON.parse(JSON.stringify(product)) as IProduct
+    return serializeForClient(product) as IProduct
   },
   ['product-by-slug'],
   {
@@ -136,7 +137,7 @@ const getCachedRelatedProductsByCategory = unstable_cache(
       .lean()
     const productsCount = await Product.countDocuments(conditions)
     return {
-      data: JSON.parse(JSON.stringify(products)) as IProduct[],
+      data: serializeForClient(products) as IProduct[],
       totalPages: Math.ceil(productsCount / limit),
     }
   },
@@ -277,7 +278,7 @@ export async function getAllProducts({
     Product.countDocuments(conditions),
   ])
   return {
-    products: JSON.parse(JSON.stringify(products)) as IProduct[],
+    products: serializeForClient(products) as IProduct[],
     totalPages: Math.ceil(countProducts / limit),
     totalProducts: countProducts,
     from: limit * (Number(page) - 1) + 1,

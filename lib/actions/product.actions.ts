@@ -4,24 +4,10 @@ import { unstable_cache } from 'next/cache'
 
 import { connectToDatabase } from '@/lib/db'
 import Product, { IProduct } from '@/lib/db/models/product.model'
+import { PRODUCT_CARD_FIELDS } from '@/lib/product-query-fields'
 import { PAGE_SIZE } from '../constants'
 
 const CATALOG_CACHE_REVALIDATE_SECONDS = 5 * 60
-const PRODUCT_CARD_FIELDS = {
-  name: 1,
-  slug: 1,
-  category: 1,
-  brand: 1,
-  images: 1,
-  price: 1,
-  listPrice: 1,
-  countInStock: 1,
-  tags: 1,
-  sizes: 1,
-  colors: 1,
-  avgRating: 1,
-  numReviews: 1,
-} as const
 
 const getPublishedCategories = unstable_cache(
   async () => {

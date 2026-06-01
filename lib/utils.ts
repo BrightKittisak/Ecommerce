@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from 'clsx'
 import qs from 'query-string'
 import { twMerge } from 'tailwind-merge'
+import { ZodError } from 'zod'
 
 export function formUrlQuery({
   params,
@@ -81,32 +82,54 @@ export const round2 = (num: number) =>
 export const generateId = () =>
   Array.from({ length: 24 }, () => Math.floor(Math.random() * 10)).join('')
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const formatError = (error: any): string => {
-  if (error.name === 'ZodError') {
-    const fieldErrors = Object.keys(error.errors).map((field) => {
-      const errorMessage = error.errors[field].message
-      return `${error.errors[field].path}: ${errorMessage}`
-    })
-    return fieldErrors.join('. ')
+type MongooseValidationError = {
+  name: 'ValidationError'
+  errors: Record<string, { message: string }>
+}
+
+type DuplicateKeyError = {
+  code: 11000
+  keyValue: Record<string, unknown>
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const isMongooseValidationError = (
+  error: unknown
+): error is MongooseValidationError =>
+  isRecord(error) &&
+  error.name === 'ValidationError' &&
+  isRecord(error.errors)
+
+const isDuplicateKeyError = (error: unknown): error is DuplicateKeyError =>
+  isRecord(error) &&
+  error.code === 11000 &&
+  isRecord(error.keyValue)
+
+export const formatError = (error: unknown): string => {
+  if (error instanceof ZodError) {
+    return error.errors
+      .map((fieldError) => `${fieldError.path.join('.')}: ${fieldError.message}`)
+      .join('. ')
   }
 
-  if (error.name === 'ValidationError') {
-    const fieldErrors = Object.keys(error.errors).map((field) => {
-      const errorMessage = error.errors[field].message
-      return errorMessage
-    })
-    return fieldErrors.join('. ')
+  if (isMongooseValidationError(error)) {
+    return Object.values(error.errors)
+      .map((fieldError) => fieldError.message)
+      .join('. ')
   }
 
-  if (error.code === 11000) {
+  if (isDuplicateKeyError(error)) {
     const duplicateField = Object.keys(error.keyValue)[0]
     return `${duplicateField} มีอยู่แล้วในระบบ`
   }
 
-  return typeof error.message === 'string'
-    ? error.message
-    : JSON.stringify(error.message)
+  if (error instanceof Error) return error.message
+
+  if (typeof error === 'string') return error
+
+  return 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ'
 }
 
 export function calculateFutureDate(days: number) {

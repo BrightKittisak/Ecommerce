@@ -16,6 +16,24 @@ test('accepts strong credential passwords during sign-up', () => {
   assert.deepEqual(parsedInput, validSignUpInput)
 })
 
+test('normalizes credential emails during sign-up and sign-in', () => {
+  assert.equal(
+    UserSignUpSchema.parse({
+      ...validSignUpInput,
+      email: '  Buyer@Example.COM ',
+    }).email,
+    'buyer@example.com'
+  )
+
+  assert.equal(
+    UserSignInSchema.parse({
+      email: '  Buyer@Example.COM ',
+      password: 'legacy',
+    }).email,
+    'buyer@example.com'
+  )
+})
+
 test('rejects weak credential passwords during sign-up', () => {
   const weakPasswords = [
     'short1!',

@@ -41,6 +41,9 @@ const reviewSchema = new Schema<IReview>(
   }
 )
 
+reviewSchema.index({ product: 1, createdAt: -1 })
+reviewSchema.index({ product: 1, user: 1 }, { unique: true })
+
 const Review =
   (models.Review as Model<IReview>) || model<IReview>('Review', reviewSchema)
 

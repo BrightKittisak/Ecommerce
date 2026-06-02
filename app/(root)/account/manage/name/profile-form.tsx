@@ -36,6 +36,8 @@ export const ProfileForm = () => {
     if (!res.success) return toast(res.message)
 
     const { data, message } = res
+    if (!data) return toast.error(message)
+
     const newSession = {
       ...session,
       user: {

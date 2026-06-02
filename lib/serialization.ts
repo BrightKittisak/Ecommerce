@@ -1,3 +1,3 @@
-export function serializeForClient<T>(value: T): T {
+export function serializeForClient<T>(value: unknown): T {
   return JSON.parse(JSON.stringify(value)) as T
 }

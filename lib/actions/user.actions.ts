@@ -7,6 +7,11 @@ import { connectToDatabase } from '../db'
 import User from '../db/models/user.model'
 import { formatError } from '../utils'
 import { redirect } from 'next/navigation'
+import { serializeForClient } from '../serialization'
+
+type UpdatedUserName = {
+  name: string
+}
 
 const PASSWORD_HASH_SALT_ROUNDS = 12
 
@@ -56,7 +61,7 @@ export async function updateUserName(user: IUserName) {
     return {
       success: true,
       message: 'อัปเดตข้อมูลผู้ใช้เรียบร้อยแล้ว',
-      data: JSON.parse(JSON.stringify(updatedUser)),
+      data: serializeForClient<UpdatedUserName>(updatedUser),
     }
   } catch (error) {
     return { success: false, message: formatError(error) }

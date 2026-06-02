@@ -13,6 +13,7 @@ import { formatError } from '../utils'
 import { ReviewInputSchema } from '../validator'
 import { IReviewDetails } from '@/types'
 import { PAGE_SIZE } from '../constants'
+import { serializeForClient } from '../serialization'
 
 export async function createUpdateReview({
   data,
@@ -48,7 +49,6 @@ export async function createUpdateReview({
       return {
         success: true,
         message: 'อัปเดตรีวิวเรียบร้อยแล้ว',
-        // data: JSON.parse(JSON.stringify(existReview)),
       }
     } else {
       await Review.create(review)
@@ -57,7 +57,6 @@ export async function createUpdateReview({
       return {
         success: true,
         message: 'ส่งรีวิวเรียบร้อยแล้ว',
-        // data: JSON.parse(JSON.stringify(newReview)),
       }
     }
   } catch (error) {
@@ -126,7 +125,7 @@ export async function getReviews({
     .limit(limit)
   const reviewsCount = await Review.countDocuments({ product: productId })
   return {
-    data: JSON.parse(JSON.stringify(reviews)) as IReviewDetails[],
+    data: serializeForClient<IReviewDetails[]>(reviews),
     totalPages: reviewsCount === 0 ? 1 : Math.ceil(reviewsCount / limit),
   }
 }
@@ -144,5 +143,5 @@ export const getReviewByProductId = async ({
     product: productId,
     user: session?.user?.id,
   })
-  return review ? (JSON.parse(JSON.stringify(review)) as IReview) : null
+  return review ? serializeForClient<IReview>(review) : null
 }

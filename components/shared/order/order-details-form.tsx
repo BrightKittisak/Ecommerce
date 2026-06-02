@@ -19,6 +19,11 @@ import { IOrder } from '@/lib/db/models/order.model'
 import { formatVariantSummary, translatePaymentMethod } from '@/lib/i18n'
 import { cn, formatCurrency, formatDateTime } from '@/lib/utils'
 
+const missingDateLabel = 'รออัปเดตวันที่'
+
+const formatOrderDateTime = (date?: Date) =>
+  date ? formatDateTime(date).dateTime : missingDateLabel
+
 export default function OrderDetailsForm({
   order,
 }: {
@@ -56,13 +61,13 @@ export default function OrderDetailsForm({
             </p>
 
             {isDelivered ? (
-              <Badge>จัดส่งแล้วเมื่อ {formatDateTime(deliveredAt!).dateTime}</Badge>
+              <Badge>จัดส่งแล้วเมื่อ {formatOrderDateTime(deliveredAt)}</Badge>
             ) : (
               <div>
                 <Badge variant='destructive'>ยังไม่จัดส่ง</Badge>
                 <div>
                   คาดว่าจะจัดส่งถึงในวันที่{' '}
-                  {formatDateTime(expectedDeliveryDate!).dateTime}
+                  {formatOrderDateTime(expectedDeliveryDate)}
                 </div>
               </div>
             )}
@@ -73,7 +78,7 @@ export default function OrderDetailsForm({
             <h2 className='pb-4 text-xl'>วิธีชำระเงิน</h2>
             <p>{translatePaymentMethod(paymentMethod)}</p>
             {isPaid ? (
-              <Badge>ชำระแล้วเมื่อ {formatDateTime(paidAt!).dateTime}</Badge>
+              <Badge>ชำระแล้วเมื่อ {formatOrderDateTime(paidAt)}</Badge>
             ) : (
               <Badge variant='destructive'>ยังไม่ชำระเงิน</Badge>
             )}

@@ -15,6 +15,7 @@ import {
   getRelatedProductsByCategory,
 } from '@/lib/actions/product.actions'
 import { translateBrand, translateCategory } from '@/lib/i18n'
+import { normalizePaginationPage } from '@/lib/pagination'
 import { generateId, round2 } from '@/lib/utils'
 
 import ReviewList from './review-list'
@@ -39,6 +40,7 @@ export default async function ProductDetails(props: {
 }) {
   const searchParams = await props.searchParams
   const { page, color, size } = searchParams
+  const currentPage = normalizePaginationPage(page)
   const params = await props.params
   const { slug } = params
 
@@ -46,7 +48,7 @@ export default async function ProductDetails(props: {
   const relatedProducts = await getRelatedProductsByCategory({
     category: product.category,
     productId: product._id,
-    page: Number(page || '1'),
+    page: currentPage,
   })
 
   const session = await auth()

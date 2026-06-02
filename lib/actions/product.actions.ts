@@ -7,6 +7,7 @@ import Product, { IProduct } from '@/lib/db/models/product.model'
 import { buildProductNameSearchFilter } from '@/lib/product-search-query'
 import { PRODUCT_CARD_FIELDS } from '@/lib/product-query-fields'
 import { serializeForClient } from '@/lib/serialization'
+import { normalizePaginationPage } from '../pagination'
 import { PAGE_SIZE } from '../constants'
 
 const CATALOG_CACHE_REVALIDATE_SECONDS = 5 * 60
@@ -125,7 +126,8 @@ const getCachedRelatedProductsByCategory = unstable_cache(
     page: number
   }) => {
     await connectToDatabase()
-    const skipAmount = (Number(page) - 1) * limit
+    const currentPage = normalizePaginationPage(page)
+    const skipAmount = (currentPage - 1) * limit
     const conditions = {
       isPublished: true,
       category,
@@ -219,6 +221,7 @@ export async function getAllProducts({
   sort?: string
 }) {
   limit = limit || PAGE_SIZE
+  const currentPage = normalizePaginationPage(page)
   await connectToDatabase()
 
   const queryFilter = buildProductNameSearchFilter(query)
@@ -265,7 +268,7 @@ export async function getAllProducts({
   const [products, countProducts] = await Promise.all([
     Product.find(conditions, PRODUCT_CARD_FIELDS)
       .sort(order)
-      .skip(limit * (Number(page) - 1))
+      .skip(limit * (currentPage - 1))
       .limit(limit)
       .lean(),
     Product.countDocuments(conditions),
@@ -274,8 +277,8 @@ export async function getAllProducts({
     products: serializeForClient(products) as IProduct[],
     totalPages: Math.ceil(countProducts / limit),
     totalProducts: countProducts,
-    from: limit * (Number(page) - 1) + 1,
-    to: limit * (Number(page) - 1) + products.length,
+    from: limit * (currentPage - 1) + 1,
+    to: limit * (currentPage - 1) + products.length,
   }
 }
 

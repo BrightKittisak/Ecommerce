@@ -2,6 +2,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Calendar, Check, StarIcon, User } from 'lucide-react'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useInView } from 'react-intersection-observer'
@@ -60,12 +61,13 @@ const reviewFormDefaultValues = {
 }
 
 export default function ReviewList({
-  userId,
   product,
 }: {
-  userId: string | undefined
   product: IProduct
 }) {
+  const { data: session, status } = useSession()
+  const userId = session?.user?.id
+  const canReview = status === 'authenticated' && Boolean(userId)
   const [page, setPage] = useState(2)
   const [totalPages, setTotalPages] = useState(0)
   const [reviews, setReviews] = useState<IReviewDetails[]>([])
@@ -136,7 +138,9 @@ export default function ReviewList({
 
   const handleOpenForm = async () => {
     form.setValue('product', product._id)
-    form.setValue('user', userId!)
+    if (userId) {
+      form.setValue('user', userId)
+    }
     form.setValue('isVerifiedPurchase', true)
     const review = await getReviewByProductId({ productId: product._id })
     if (review) {
@@ -165,7 +169,7 @@ export default function ReviewList({
               รีวิวสินค้านี้
             </h3>
             <p className='text-sm'>แบ่งปันประสบการณ์ของคุณให้ลูกค้าคนอื่นได้เห็น</p>
-            {userId ? (
+            {canReview ? (
               <Dialog open={open} onOpenChange={setOpen}>
                 <Button
                   onClick={handleOpenForm}

@@ -1,8 +1,9 @@
+'use client'
+
 import Link from 'next/link'
 import { ChevronDown } from 'lucide-react'
+import { signOut, useSession } from 'next-auth/react'
 
-import { auth } from '@/auth'
-import { SignOut } from '@/lib/actions/user.actions'
 import { cn } from '@/lib/utils'
 import { Button, buttonVariants } from '@/components/ui/button'
 import {
@@ -14,8 +15,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-export default async function UserButton() {
-  const session = await auth()
+export default function UserButton() {
+  const { data: session, status } = useSession()
+  const isAuthenticated = status === 'authenticated' && session?.user
 
   return (
     <div className='flex items-center gap-2'>
@@ -24,14 +26,14 @@ export default async function UserButton() {
           <div className='flex items-center gap-2'>
             <div className='flex flex-col text-left text-xs'>
               <span className='text-muted-foreground'>
-                สวัสดี, {session ? session.user.name : 'เข้าสู่ระบบ'}
+                สวัสดี, {isAuthenticated ? session.user.name : 'เข้าสู่ระบบ'}
               </span>
               <span className='font-bold text-foreground'>บัญชีและคำสั่งซื้อ</span>
             </div>
             <ChevronDown />
           </div>
         </DropdownMenuTrigger>
-        {session ? (
+        {isAuthenticated ? (
           <DropdownMenuContent className='w-56' align='end' forceMount>
             <DropdownMenuLabel className='font-normal'>
               <div className='flex flex-col space-y-1'>
@@ -58,14 +60,13 @@ export default async function UserButton() {
               )}
             </DropdownMenuGroup>
             <DropdownMenuItem className='mb-1 p-0'>
-              <form action={SignOut} className='w-full'>
-                <Button
-                  className='h-4 w-full justify-start px-2 py-4'
-                  variant='ghost'
-                >
-                  ออกจากระบบ
-                </Button>
-              </form>
+              <Button
+                className='h-4 w-full justify-start px-2 py-4'
+                variant='ghost'
+                onClick={() => signOut({ callbackUrl: '/' })}
+              >
+                ออกจากระบบ
+              </Button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         ) : (

@@ -10,6 +10,8 @@ import {
 } from '@/lib/actions/product.actions'
 import { toSlug } from '@/lib/utils'
 
+export const dynamic = 'force-dynamic'
+
 const carousels = [
   {
     title: 'ดีลนาฬิกาข้อมือสุดคุ้มที่ช่วยยกระดับลุคได้ในทุกโอกาส',

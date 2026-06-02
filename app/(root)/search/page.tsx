@@ -16,6 +16,8 @@ import { translateCategory, translateTag } from '@/lib/i18n'
 import { normalizePaginationPage } from '@/lib/pagination'
 import { CURRENCY_SYMBOL, getFilterUrl, toSlug } from '@/lib/utils'
 
+export const dynamic = 'force-dynamic'
+
 const sortOrders = [
   { value: 'price-low-to-high', name: 'ราคาต่ำไปสูง' },
   { value: 'price-high-to-low', name: 'ราคาสูงไปต่ำ' },

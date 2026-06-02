@@ -7,6 +7,8 @@ const UserName = z
 
 const Email = z
   .string()
+  .trim()
+  .toLowerCase()
   .min(1, 'Email is required')
   .email('Email is invalid')
 

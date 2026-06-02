@@ -11,6 +11,7 @@ import {
   getSignInRateLimitKeys,
   recordFailedSignIn,
 } from './lib/auth-rate-limit'
+import { UserSignInSchema } from './lib/auth-validator'
 
 import NextAuth, { type DefaultSession } from 'next-auth'
 import authConfig from './auth.config'
@@ -48,19 +49,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials, request) {
         await connectToDatabase()
-        if (credentials == null || !credentials.email) return null
+        const parsedCredentials = UserSignInSchema.safeParse(credentials)
+        if (!parsedCredentials.success) return null
 
-        const email = String(credentials.email)
+        const { email: rawEmail, password } = parsedCredentials.data
+        const email = rawEmail.trim().toLowerCase()
         const rateLimitKeys = getSignInRateLimitKeys({ email, request })
         await assertSignInAllowed(rateLimitKeys)
 
         const user = await User.findOne({ email })
+          .collation({ locale: 'en', strength: 2 })
 
         if (user && user.password) {
-          const isMatch = await bcrypt.compare(
-            credentials.password as string,
-            user.password
-          )
+          const isMatch = await bcrypt.compare(password, user.password)
           if (isMatch) {
             await clearSignInFailures(rateLimitKeys)
             return {

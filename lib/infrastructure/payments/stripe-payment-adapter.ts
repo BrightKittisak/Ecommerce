@@ -36,3 +36,8 @@ export async function createStripeCheckoutPaymentIntent({
 
   return paymentIntent.client_secret
 }
+
+export async function retrieveStripePaymentIntent(paymentIntentId: string) {
+  const stripe = getStripeClient()
+  return stripe.paymentIntents.retrieve(paymentIntentId)
+}

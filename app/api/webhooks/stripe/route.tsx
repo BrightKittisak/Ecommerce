@@ -4,6 +4,7 @@ import Stripe from 'stripe'
 import { sendPurchaseReceipt } from '@/emails'
 import { connectToDatabase } from '@/lib/db'
 import Order from '@/lib/db/models/order.model'
+import { logger, serializeLogError } from '@/lib/logger'
 import { verifyStripePaymentIntent } from '@/lib/stripe-payment-verification'
 
 const getStripeClient = () => {
@@ -110,7 +111,11 @@ export async function POST(req: NextRequest) {
   try {
     await sendPurchaseReceipt({ order })
   } catch (error) {
-    console.log('Failed to send Stripe purchase receipt', error)
+    logger.error('stripe.purchase_receipt_failed', {
+      orderId: order._id.toString(),
+      paymentIntentId: paymentIntent.id,
+      error: serializeLogError(error),
+    })
   }
 
   return NextResponse.json({

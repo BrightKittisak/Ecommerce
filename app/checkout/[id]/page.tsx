@@ -1,10 +1,12 @@
-import { notFound } from "next/navigation";
-import React from "react";
-import Stripe from "stripe";
-import { auth } from "@/auth";
-import { getOrderByIdForCurrentUser } from "@/lib/actions/order.actions";
-import { CURRENCY_CODE } from "@/lib/utils";
-import PaymentForm from "./payment-form";
+import { notFound } from 'next/navigation'
+import React from 'react'
+
+import { auth } from '@/auth'
+import { getOrderByIdForCurrentUser } from '@/lib/actions/order.actions'
+import { getStripeClient } from '@/lib/stripe'
+import { CURRENCY_CODE } from '@/lib/utils'
+
+import PaymentForm from './payment-form'
 
 export const metadata = {
   title: 'ชำระเงิน',
@@ -26,7 +28,7 @@ const CheckoutPaymentPage = async (props: {
 
   let client_secret = null
   if (order.paymentMethod === 'Stripe' && !order.isPaid) {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+    const stripe = getStripeClient()
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(order.totalPrice * 100),
       currency: CURRENCY_CODE.toLowerCase(),

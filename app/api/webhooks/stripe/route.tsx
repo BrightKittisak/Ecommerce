@@ -1,18 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Stripe from 'stripe'
 
 import { sendPurchaseReceipt } from '@/emails'
 import { connectToDatabase } from '@/lib/db'
 import Order from '@/lib/db/models/order.model'
+import { constructStripeWebhookEvent } from '@/lib/infrastructure/payments/stripe-payment-adapter'
 import { logger, serializeLogError } from '@/lib/logger'
 import { incrementProductSales } from '@/lib/product-sales'
-import { getStripeClient, getStripeWebhookSecret } from '@/lib/stripe'
 import { verifyStripePaymentIntent } from '@/lib/stripe-payment-verification'
 
 export async function POST(req: NextRequest) {
-  const stripe = getStripeClient()
-  const webhookSecret = getStripeWebhookSecret()
-
   const body = await req.text()
   const signature = req.headers.get('stripe-signature')
 
@@ -23,10 +19,9 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  let event: Stripe.Event
-
+  let event: ReturnType<typeof constructStripeWebhookEvent>
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
+    event = constructStripeWebhookEvent({ body, signature })
   } catch (error) {
     return NextResponse.json(
       {

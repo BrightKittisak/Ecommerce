@@ -11,7 +11,7 @@ import {
   getAllProducts,
   getAllTags,
 } from '@/lib/actions/product.actions'
-import { IProduct } from '@/lib/db/models/product.model'
+import type { ProductDTO } from '@/lib/application/products/dtos'
 import { translateCategory, translateTag } from '@/lib/i18n'
 import { normalizePaginationPage } from '@/lib/pagination'
 import { CURRENCY_SYMBOL, getFilterUrl, toSlug } from '@/lib/utils'
@@ -274,7 +274,7 @@ export default async function SearchPage(props: {
 
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
             {data.products.length === 0 && <div>ไม่พบสินค้าที่ตรงกับเงื่อนไข</div>}
-            {data.products.map((product: IProduct) => (
+            {data.products.map((product: ProductDTO) => (
               <ProductCard key={product._id} product={product} />
             ))}
           </div>

@@ -50,7 +50,7 @@ import {
 } from '@/lib/actions/review.actions'
 import { ReviewInputSchema } from '@/lib/validator'
 import RatingSummary from '@/components/shared/product/rating-summary'
-import { IProduct } from '@/lib/db/models/product.model'
+import type { ProductDTO } from '@/lib/application/products/dtos'
 import { Separator } from '@/components/ui/separator'
 import type { ReviewDetailsDTO } from '@/lib/application/reviews/dtos'
 
@@ -63,7 +63,7 @@ const reviewFormDefaultValues = {
 export default function ReviewList({
   product,
 }: {
-  product: IProduct
+  product: ProductDTO
 }) {
   const { data: session, status } = useSession()
   const userId = session?.user?.id

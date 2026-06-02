@@ -1,6 +1,6 @@
 'use client'
 
-import { IProduct } from '@/lib/db/models/product.model'
+import type { ProductDTO } from '@/lib/application/products/dtos'
 import {
   Carousel,
   CarouselContent,
@@ -17,7 +17,7 @@ export default function ProductSlider({
   hideDetails = false,
 }: {
   title?: string
-  products: IProduct[]
+  products: ProductDTO[]
   hideDetails?: boolean
 }) {
   return (

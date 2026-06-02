@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { IProduct } from '@/lib/db/models/product.model'
+import type { ProductDTO } from '@/lib/application/products/dtos'
 import { translateBrand, translateCategory } from '@/lib/i18n'
 import { formatNumber, generateId, round2 } from '@/lib/utils'
 
@@ -17,7 +17,7 @@ const ProductCard = ({
   hideDetails = false,
   hideAddToCart = false,
 }: {
-  product: IProduct
+  product: ProductDTO
   hideDetails?: boolean
   hideBorder?: boolean
   hideAddToCart?: boolean

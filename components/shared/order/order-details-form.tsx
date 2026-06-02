@@ -15,19 +15,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { IOrder } from '@/lib/db/models/order.model'
+import type { OrderDTO } from '@/lib/application/orders/dtos'
 import { formatVariantSummary, translatePaymentMethod } from '@/lib/i18n'
 import { cn, formatCurrency, formatDateTime } from '@/lib/utils'
 
 const missingDateLabel = 'รออัปเดตวันที่'
 
-const formatOrderDateTime = (date?: Date) =>
+const formatOrderDateTime = (date?: string) =>
   date ? formatDateTime(date).dateTime : missingDateLabel
 
 export default function OrderDetailsForm({
   order,
 }: {
-  order: IOrder
+  order: OrderDTO
   isAdmin: boolean
 }) {
   const {

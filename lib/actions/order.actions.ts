@@ -1,6 +1,8 @@
 'use server'
 
 import { CreateOrderInput, OrderItem, ShippingAddress } from '@/types'
+import { toOrderDTO } from '@/lib/application/orders/serializers'
+import type { OrderDTO } from '@/lib/application/orders/dtos'
 import { CURRENCY_CODE, calculateFutureDate, formatError, round2 } from '../utils'
 import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
@@ -18,7 +20,6 @@ import {
   aggregateStockReservations,
 } from '../order-stock-reservation'
 import { incrementProductSales } from '../product-sales'
-import { serializeForClient } from '../serialization'
 import { normalizePaginationPage } from '../pagination'
 
 const getOrderOwnerId = (order: IOrder) => {
@@ -205,15 +206,15 @@ export const createOrderFromCart = async (
   }
 }
 
-export async function getOrderById(orderId: string): Promise<IOrder | null> {
+export async function getOrderById(orderId: string): Promise<OrderDTO | null> {
   await connectToDatabase()
   const order = await Order.findById(orderId)
-  return serializeForClient<IOrder | null>(order)
+  return order ? toOrderDTO(order) : null
 }
 
 export async function getOrderByIdForCurrentUser(
   orderId: string
-): Promise<IOrder | null> {
+): Promise<OrderDTO | null> {
   await connectToDatabase()
   const session = await auth()
   if (!session?.user?.id) return null
@@ -224,7 +225,7 @@ export async function getOrderByIdForCurrentUser(
       userId: session.user.id,
       isAdmin: session.user.role === 'Admin',
     })
-    return serializeForClient<IOrder>(order)
+    return toOrderDTO(order)
   } catch {
     return null
   }
@@ -401,7 +402,7 @@ export async function getMyOrders({
   const ordersCount = await Order.countDocuments({ user: session?.user?.id })
 
   return {
-    data: serializeForClient<IOrder[]>(orders),
+    data: orders.map((order) => toOrderDTO(order)),
     totalPages: Math.ceil(ordersCount / limit),
   }
 }

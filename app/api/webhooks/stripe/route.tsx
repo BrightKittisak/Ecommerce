@@ -6,25 +6,12 @@ import { connectToDatabase } from '@/lib/db'
 import Order from '@/lib/db/models/order.model'
 import { logger, serializeLogError } from '@/lib/logger'
 import { incrementProductSales } from '@/lib/product-sales'
+import { getStripeClient, getStripeWebhookSecret } from '@/lib/stripe'
 import { verifyStripePaymentIntent } from '@/lib/stripe-payment-verification'
-
-const getStripeClient = () => {
-  const secretKey = process.env.STRIPE_SECRET_KEY
-
-  if (!secretKey) {
-    throw new Error('Missing environment variable: "STRIPE_SECRET_KEY"')
-  }
-
-  return new Stripe(secretKey)
-}
 
 export async function POST(req: NextRequest) {
   const stripe = getStripeClient()
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
-
-  if (!webhookSecret) {
-    throw new Error('Missing environment variable: "STRIPE_WEBHOOK_SECRET"')
-  }
+  const webhookSecret = getStripeWebhookSecret()
 
   const body = await req.text()
   const signature = req.headers.get('stripe-signature')

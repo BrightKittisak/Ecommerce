@@ -1,20 +1,10 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import Stripe from 'stripe'
 
 import { Button } from '@/components/ui/button'
 import { getOrderByIdForCurrentUser } from '@/lib/actions/order.actions'
+import { getStripeClient } from '@/lib/stripe'
 import { verifyStripePaymentIntent } from '@/lib/stripe-payment-verification'
-
-const getStripeClient = () => {
-  const secretKey = process.env.STRIPE_SECRET_KEY
-
-  if (!secretKey) {
-    throw new Error('Missing environment variable: "STRIPE_SECRET_KEY"')
-  }
-
-  return new Stripe(secretKey)
-}
 
 export default async function SuccessPage(props: {
   params: Promise<{

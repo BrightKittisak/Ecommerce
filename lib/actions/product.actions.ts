@@ -4,7 +4,11 @@ import { unstable_cache } from 'next/cache'
 
 import { connectToDatabase } from '@/lib/db'
 import Product, { IProduct } from '@/lib/db/models/product.model'
-import { buildProductNameSearchFilter } from '@/lib/product-search-query'
+import {
+  buildProductNameSearchFilter,
+  buildProductPriceFilter,
+  buildProductRatingFilter,
+} from '@/lib/product-search-query'
 import { PRODUCT_CARD_FIELDS } from '@/lib/product-query-fields'
 import { serializeForClient } from '@/lib/serialization'
 import { normalizePaginationPage } from '../pagination'
@@ -228,24 +232,8 @@ export async function getAllProducts({
   const categoryFilter = category && category !== 'all' ? { category } : {}
   const tagFilter = tag && tag !== 'all' ? { tags: tag } : {}
 
-  const ratingFilter =
-    rating && rating !== 'all'
-      ? {
-          avgRating: {
-            $gte: Number(rating),
-          },
-        }
-      : {}
-  // 10-50
-  const priceFilter =
-    price && price !== 'all'
-      ? {
-          price: {
-            $gte: Number(price.split('-')[0]),
-            $lte: Number(price.split('-')[1]),
-          },
-        }
-      : {}
+  const ratingFilter = buildProductRatingFilter(rating)
+  const priceFilter = buildProductPriceFilter(price)
   const order: Record<string, 1 | -1> =
     sort === 'best-selling'
       ? { numSales: -1 }

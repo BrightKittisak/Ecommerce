@@ -3,7 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { getOrderByIdForCurrentUser } from '@/lib/actions/order.actions'
-import { getStripeClient } from '@/lib/stripe'
+import { retrieveStripePaymentIntent } from '@/lib/infrastructure/payments/stripe-payment-adapter'
 import { verifyStripePaymentIntent } from '@/lib/stripe-payment-verification'
 
 export default async function SuccessPage(props: {
@@ -23,8 +23,7 @@ export default async function SuccessPage(props: {
   const order = await getOrderByIdForCurrentUser(id)
   if (!order) notFound()
 
-  const stripe = getStripeClient()
-  const paymentIntent = await stripe.paymentIntents.retrieve(
+  const paymentIntent = await retrieveStripePaymentIntent(
     searchParams.payment_intent
   )
 

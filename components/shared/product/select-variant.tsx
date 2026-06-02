@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { IProduct } from '@/lib/db/models/product.model'
+import type { ProductDTO } from '@/lib/application/products/dtos'
 import { translateColor, translateSize } from '@/lib/i18n'
 import Link from 'next/link'
 
@@ -8,7 +8,7 @@ export default function SelectVariant({
   size,
   color,
 }: {
-  product: IProduct
+  product: ProductDTO
   color: string
   size: string
 }) {

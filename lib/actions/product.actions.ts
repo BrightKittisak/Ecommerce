@@ -2,8 +2,9 @@
 
 import { unstable_cache } from 'next/cache'
 
+import { toProductDTO } from '@/lib/application/products/serializers'
 import { connectToDatabase } from '@/lib/db'
-import Product, { IProduct } from '@/lib/db/models/product.model'
+import Product from '@/lib/db/models/product.model'
 import {
   normalizeCatalogFacetValues,
   normalizePublishedTagLabels,
@@ -14,7 +15,6 @@ import {
   buildProductRatingFilter,
 } from '@/lib/product-search-query'
 import { PRODUCT_CARD_FIELDS } from '@/lib/product-query-fields'
-import { serializeForClient } from '@/lib/serialization'
 import { normalizePaginationPage } from '../pagination'
 import { PAGE_SIZE } from '../constants'
 
@@ -93,7 +93,7 @@ const getCachedProductsByTag = unstable_cache(
       .sort({ createdAt: 'desc' })
       .limit(limit)
       .lean()
-    return serializeForClient(products) as IProduct[]
+    return products.map((product) => toProductDTO(product))
   },
   ['products-by-tag'],
   {
@@ -107,7 +107,7 @@ const getCachedProductBySlug = unstable_cache(
     await connectToDatabase()
     const product = await Product.findOne({ slug, isPublished: true }).lean()
     if (!product) throw new Error('ไม่พบสินค้า')
-    return serializeForClient(product) as IProduct
+    return toProductDTO(product)
   },
   ['product-by-slug'],
   {
@@ -143,7 +143,7 @@ const getCachedRelatedProductsByCategory = unstable_cache(
       .lean()
     const productsCount = await Product.countDocuments(conditions)
     return {
-      data: serializeForClient(products) as IProduct[],
+      data: products.map((product) => toProductDTO(product)),
       totalPages: Math.ceil(productsCount / limit),
     }
   },
@@ -261,7 +261,7 @@ export async function getAllProducts({
     Product.countDocuments(conditions),
   ])
   return {
-    products: serializeForClient(products) as IProduct[],
+    products: products.map((product) => toProductDTO(product)),
     totalPages: Math.ceil(countProducts / limit),
     totalProducts: countProducts,
     from: limit * (currentPage - 1) + 1,

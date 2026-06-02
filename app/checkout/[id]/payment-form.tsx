@@ -5,26 +5,38 @@ import {
   PayPalScriptProvider,
   usePayPalScriptReducer,
 } from '@paypal/react-paypal-js'
-import { Card, CardContent } from '@/components/ui/card'
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
+import { redirect, useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+
+import ProductPrice from '@/components/shared/product/product-price'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   approvePayPalOrder,
   createPayPalOrder,
 } from '@/lib/actions/order.actions'
 import { IOrder } from '@/lib/db/models/order.model'
-import {
-  formatVariantSummary,
-  translatePaymentMethod,
-} from '@/lib/i18n'
+import { formatVariantSummary, translatePaymentMethod } from '@/lib/i18n'
 import { formatDateTime } from '@/lib/utils'
 
 import CheckoutFooter from '../checkout-footer'
-import { redirect, useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import ProductPrice from '@/components/shared/product/product-price'
-import { loadStripe } from '@stripe/stripe-js'
-import { Elements } from '@stripe/react-stripe-js'
 import StripeForm from './stripe-form'
+
+const getStripePublishableKey = () => {
+  const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+
+  if (!publishableKey) {
+    throw new Error(
+      'Missing environment variable: "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"'
+    )
+  }
+
+  return publishableKey
+}
+
+const stripePromise = loadStripe(getStripePublishableKey())
 
 const paymentMethodLabel: Record<string, string> = {
   'Cash On Delivery': 'เก็บเงินปลายทาง',
@@ -40,7 +52,7 @@ export default function OrderPaymentForm({
   order: IOrder
   paypalClientId: string
   isAdmin: boolean
-  clientSecret:string | null
+  clientSecret: string | null
 }) {
   const router = useRouter()
   const {
@@ -89,7 +101,7 @@ export default function OrderPaymentForm({
       router.push(`/account/orders/${order._id}`)
       router.refresh()
     } else {
-      toast.error(res.message) 
+      toast.error(res.message)
     }
   }
 
@@ -146,20 +158,19 @@ export default function OrderPaymentForm({
               </div>
             )}
 
-              {!isPaid && paymentMethod === 'Stripe' && clientSecret && (
-                <Elements
-                  options={{
-                    clientSecret,
-                  }}
-                  stripe={stripePromise}
-                >
-                  <StripeForm
-                    priceInCents={Math.round(order.totalPrice * 100)}
-                    orderId={order._id}
-                  />
-                </Elements>
-              )}
-
+            {!isPaid && paymentMethod === 'Stripe' && clientSecret && (
+              <Elements
+                options={{
+                  clientSecret,
+                }}
+                stripe={stripePromise}
+              >
+                <StripeForm
+                  priceInCents={Math.round(order.totalPrice * 100)}
+                  orderId={order._id}
+                />
+              </Elements>
+            )}
 
             {!isPaid && paymentMethod === 'Cash On Delivery' && (
               <Button
@@ -175,10 +186,6 @@ export default function OrderPaymentForm({
     </Card>
   )
 
-  const stripePromise = loadStripe(
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
-  )
-    
   return (
     <main className='max-w-6xl mx-auto'>
       <div className='grid md:grid-cols-4 gap-6'>

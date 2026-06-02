@@ -1,5 +1,5 @@
 import { formatStripeAmountInCents } from '../../stripe-payment-verification'
-import { getStripeClient } from '../../stripe'
+import { getStripeClient, getStripeWebhookSecret } from '../../stripe'
 import { CURRENCY_CODE } from '../../utils'
 
 type StripeCheckoutPaymentIntentInput = {
@@ -40,4 +40,19 @@ export async function createStripeCheckoutPaymentIntent({
 export async function retrieveStripePaymentIntent(paymentIntentId: string) {
   const stripe = getStripeClient()
   return stripe.paymentIntents.retrieve(paymentIntentId)
+}
+
+export function constructStripeWebhookEvent({
+  body,
+  signature,
+}: {
+  body: string
+  signature: string
+}) {
+  const stripe = getStripeClient()
+  return stripe.webhooks.constructEvent(
+    body,
+    signature,
+    getStripeWebhookSecret()
+  )
 }

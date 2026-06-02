@@ -2,8 +2,17 @@ import mongoose from 'mongoose'
 
 import { configureMongoDns } from './configure-dns'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const cached = (global as any).mongoose || { conn: null, promise: null }
+type MongooseCache = {
+  conn: typeof mongoose | null
+  promise: Promise<typeof mongoose> | null
+}
+
+const globalForMongoose = globalThis as typeof globalThis & {
+  mongoose?: MongooseCache
+}
+
+const cached = globalForMongoose.mongoose || { conn: null, promise: null }
+globalForMongoose.mongoose = cached
 
 export const connectToDatabase = async (
   MONGODB_URI = process.env.MONGODB_URI

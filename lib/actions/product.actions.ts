@@ -5,6 +5,10 @@ import { unstable_cache } from 'next/cache'
 import { connectToDatabase } from '@/lib/db'
 import Product, { IProduct } from '@/lib/db/models/product.model'
 import {
+  normalizeCatalogFacetValues,
+  normalizePublishedTagLabels,
+} from '@/lib/catalog-facets'
+import {
   buildProductNameSearchFilter,
   buildProductPriceFilter,
   buildProductRatingFilter,
@@ -19,7 +23,11 @@ const CATALOG_CACHE_REVALIDATE_SECONDS = 5 * 60
 const getPublishedCategories = unstable_cache(
   async () => {
     await connectToDatabase()
-    return Product.find({ isPublished: true }).distinct('category')
+    const categories = await Product.find({ isPublished: true }).distinct(
+      'category'
+    )
+
+    return normalizeCatalogFacetValues(categories)
   },
   ['published-categories'],
   {
@@ -38,16 +46,7 @@ const getPublishedTags = unstable_cache(
       { $project: { _id: 0, uniqueTags: 1 } },
     ])
 
-    return (
-      (tags[0]?.uniqueTags
-        .sort((a: string, b: string) => a.localeCompare(b))
-        .map((x: string) =>
-          x
-            .split('-')
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ')
-        ) as string[]) || []
-    )
+    return normalizePublishedTagLabels(tags)
   },
   ['published-tags'],
   {

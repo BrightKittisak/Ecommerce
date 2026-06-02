@@ -17,6 +17,7 @@ import {
   StockReservation,
   aggregateStockReservations,
 } from '../order-stock-reservation'
+import { incrementProductSales } from '../product-sales'
 import { serializeForClient } from '../serialization'
 import { normalizePaginationPage } from '../pagination'
 
@@ -313,6 +314,7 @@ export async function approvePayPalOrder(
     }
     await order.populate('user', 'email')
     await order.save()
+    await incrementProductSales(order.items)
     await sendPurchaseReceipt({ order })
     revalidatePath(`/account/orders/${orderId}`)
     return {

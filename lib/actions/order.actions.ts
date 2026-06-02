@@ -13,6 +13,7 @@ import { sendPurchaseReceipt } from '@/emails'
 import { revalidatePath } from 'next/cache'
 import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE } from '../constants'
 import { CreateOrderSchema } from '../order-validator'
+import { serializeForClient } from '../serialization'
 
 const getOrderOwnerId = (order: IOrder) => {
   if (typeof order.user === 'string') return order.user
@@ -146,10 +147,10 @@ export const createOrderFromCart = async (
   return await Order.create(order)
 }
 
-export async function getOrderById(orderId: string): Promise<IOrder> {
+export async function getOrderById(orderId: string): Promise<IOrder | null> {
   await connectToDatabase()
   const order = await Order.findById(orderId)
-  return JSON.parse(JSON.stringify(order))
+  return serializeForClient(order)
 }
 
 export async function getOrderByIdForCurrentUser(
@@ -165,7 +166,7 @@ export async function getOrderByIdForCurrentUser(
       userId: session.user.id,
       isAdmin: session.user.role === 'Admin',
     })
-    return JSON.parse(JSON.stringify(order))
+    return serializeForClient(order)
   } catch {
     return null
   }
@@ -340,7 +341,7 @@ export async function getMyOrders({
   const ordersCount = await Order.countDocuments({ user: session?.user?.id })
 
   return {
-    data: JSON.parse(JSON.stringify(orders)),
+    data: serializeForClient(orders),
     totalPages: Math.ceil(ordersCount / limit),
   }
 }

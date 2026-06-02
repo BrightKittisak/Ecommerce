@@ -20,6 +20,7 @@ import { toast } from 'sonner'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { UserSignInSchema } from '@/lib/auth-validator'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
+import { sanitizeAuthCallbackUrl } from '@/lib/auth-callback-url'
 import { APP_NAME } from '@/lib/constants'
 
 const signInDefaultValues =
@@ -35,7 +36,7 @@ const signInDefaultValues =
 
 export default function CredentialsSignInForm() {
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/'
+  const callbackUrl = sanitizeAuthCallbackUrl(searchParams.get('callbackUrl'))
 
   const form = useForm<IUserSignIn>({
     resolver: zodResolver(UserSignInSchema),

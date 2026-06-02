@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 
 import { auth } from '@/auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { sanitizeAuthCallbackUrl } from '@/lib/auth-callback-url'
 
 import SignUpForm from './signup-form'
 
@@ -18,10 +19,11 @@ export default async function SignUpPage(props: {
   const searchParams = await props.searchParams
 
   const { callbackUrl } = searchParams
+  const safeCallbackUrl = sanitizeAuthCallbackUrl(callbackUrl)
 
   const session = await auth()
   if (session) {
-    return redirect(callbackUrl || '/')
+    return redirect(safeCallbackUrl)
   }
 
   return (

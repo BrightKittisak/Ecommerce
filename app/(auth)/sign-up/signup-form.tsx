@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
 
 import { registerUser, signInWithCredentials } from '@/lib/actions/user.actions'
+import { sanitizeAuthCallbackUrl } from '@/lib/auth-callback-url'
 import { UserSignUpSchema } from '@/lib/auth-validator'
 import { APP_NAME } from '@/lib/constants'
 import { IUserSignUp } from '@/types'
@@ -26,7 +27,7 @@ import { Separator } from '@/components/ui/separator'
 
 export default function SignUpForm() {
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/'
+  const callbackUrl = sanitizeAuthCallbackUrl(searchParams.get('callbackUrl'))
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<IUserSignUp>({
@@ -162,7 +163,10 @@ export default function SignUpForm() {
 
           <div className='text-sm'>
             เธกเธตเธเธฑเธเธเธตเธญเธขเธนเนเนเธฅเนเธง?{' '}
-            <Link className='link' href={`/sign-in?callbackUrl=${callbackUrl}`}>
+            <Link
+              className='link'
+              href={`/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+            >
               เน€เธเนเธฒเธชเธนเนเธฃเธฐเธเธ
             </Link>
           </div>

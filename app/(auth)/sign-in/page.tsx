@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 import CredentialsSignInForm from './credentials-signin-form'
 import { Button } from '@/components/ui/button'
+import { sanitizeAuthCallbackUrl } from '@/lib/auth-callback-url'
 import { APP_NAME } from '@/lib/constants'
 import { GoogleSignInForm } from './google-signin-form'
 
@@ -29,10 +30,11 @@ export default async function SignIn(props: {
   const searchParams = await props.searchParams
 
   const { callbackUrl = '/', error } = searchParams
+  const safeCallbackUrl = sanitizeAuthCallbackUrl(callbackUrl)
 
   const session = await auth()
   if (session) {
-    return redirect(callbackUrl)
+    return redirect(safeCallbackUrl)
   }
 
   const authError = error ? authErrorMessages[error] : null
@@ -60,7 +62,7 @@ export default async function SignIn(props: {
       </Card>
       <SeparatorWithOr>เน€เธเธดเนเธเน€เธเธขเนเธเน {APP_NAME} เนเธเนเนเธซเธก?</SeparatorWithOr>
 
-      <Link href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
+      <Link href={`/sign-up?callbackUrl=${encodeURIComponent(safeCallbackUrl)}`}>
         <Button className='w-full' variant='outline'>
           เธชเธฃเนเธฒเธเธเธฑเธเธเธต {APP_NAME}
         </Button>

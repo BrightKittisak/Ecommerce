@@ -13,6 +13,10 @@ import { sendPurchaseReceipt } from '@/emails'
 import { revalidatePath } from 'next/cache'
 import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE } from '../constants'
 import { CreateOrderSchema } from '../order-validator'
+import {
+  StockReservation,
+  aggregateStockReservations,
+} from '../order-stock-reservation'
 import { serializeForClient } from '../serialization'
 import { normalizePaginationPage } from '../pagination'
 
@@ -98,6 +102,51 @@ const buildOrderItemsFromRequest = async (
   })
 }
 
+const reserveProductStock = async (
+  reservations: StockReservation[]
+): Promise<StockReservation[]> => {
+  const reservedStock: StockReservation[] = []
+
+  for (const reservation of reservations) {
+    const result = await Product.updateOne(
+      {
+        _id: reservation.productId,
+        isPublished: true,
+        countInStock: { $gte: reservation.quantity },
+      },
+      {
+        $inc: {
+          countInStock: -reservation.quantity,
+        },
+      }
+    )
+
+    if (result.modifiedCount !== 1) {
+      await releaseProductStock(reservedStock)
+      throw new Error('สินค้าในสต็อกไม่เพียงพอสำหรับคำสั่งซื้อนี้')
+    }
+
+    reservedStock.push(reservation)
+  }
+
+  return reservedStock
+}
+
+const releaseProductStock = async (reservations: StockReservation[]) => {
+  await Promise.all(
+    reservations.map((reservation) =>
+      Product.updateOne(
+        { _id: reservation.productId },
+        {
+          $inc: {
+            countInStock: reservation.quantity,
+          },
+        }
+      )
+    )
+  )
+}
+
 // CREATE
 export const createOrder = async (clientOrder: CreateOrderInput) => {
   try {
@@ -123,6 +172,7 @@ export const createOrderFromCart = async (
   userId: string
 ) => {
   const items = await buildOrderItemsFromRequest(clientOrder.items)
+  const stockReservations = aggregateStockReservations(clientOrder.items)
   const cart = {
     ...clientOrder,
     items,
@@ -145,7 +195,13 @@ export const createOrderFromCart = async (
     currencyCode: CURRENCY_CODE,
     expectedDeliveryDate: cart.expectedDeliveryDate,
   })
-  return await Order.create(order)
+  const reservedStock = await reserveProductStock(stockReservations)
+  try {
+    return await Order.create(order)
+  } catch (error) {
+    await releaseProductStock(reservedStock)
+    throw error
+  }
 }
 
 export async function getOrderById(orderId: string): Promise<IOrder | null> {

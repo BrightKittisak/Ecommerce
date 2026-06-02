@@ -72,8 +72,13 @@ export default function OrderPaymentForm({
 
   const handleCreatePayPalOrder = async () => {
     const res = await createPayPalOrder(order._id)
-    if (!res.success)
-      return toast.error(res.message)
+    if (!res.success || !res.data) {
+      const message = res.success
+        ? 'Unable to create PayPal order'
+        : res.message
+      toast.error(message)
+      throw new Error(message)
+    }
     return res.data
   }
 

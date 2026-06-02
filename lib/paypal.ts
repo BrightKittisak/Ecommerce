@@ -3,6 +3,34 @@ import { CURRENCY_CODE } from './utils'
 
 const base = process.env.PAYPAL_API_URL || 'https://api-m.sandbox.paypal.com'
 
+type PayPalAccessTokenResponse = {
+  access_token: string
+}
+
+type PayPalOrderResponse = {
+  id: string
+}
+
+type PayPalCaptureResponse = {
+  id?: string
+  status?: string
+  payer?: {
+    email_address?: string
+  }
+  purchase_units?: Array<{
+    payments?: {
+      captures?: Array<{
+        id?: string
+        status?: string
+        amount?: {
+          currency_code?: string
+          value?: string
+        }
+      }>
+    }
+  }>
+}
+
 export const paypal = {
   createOrder: async function createOrder(price: number) {
     const accessToken = await generateAccessToken()
@@ -25,7 +53,7 @@ export const paypal = {
         ],
       }),
     })
-    return handleResponse(response)
+    return handleResponse<PayPalOrderResponse>(response)
   },
   capturePayment: async function capturePayment(orderId: string) {
     const accessToken = await generateAccessToken()
@@ -38,7 +66,7 @@ export const paypal = {
       },
     })
 
-    return handleResponse(response)
+    return handleResponse<PayPalCaptureResponse>(response)
   },
 }
 
@@ -55,16 +83,15 @@ async function generateAccessToken() {
     },
   })
 
-  const jsonData = await handleResponse(response)
+  const jsonData = await handleResponse<PayPalAccessTokenResponse>(response)
   return jsonData.access_token
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function handleResponse(response: any) {
+async function handleResponse<T = unknown>(response: Response): Promise<T> {
   if (response.status === 200 || response.status === 201) {
-    return response.json()
+    return (await response.json()) as T
   }
 
-  const errorMessage = await response.text()
+  const errorMessage = (await response.text()) || response.statusText
   throw new Error(errorMessage)
 }

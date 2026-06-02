@@ -143,6 +143,10 @@ const staticPages: Record<string, StaticPage> = {
 
 const staticNavLinks = [...exploreLinks, ...policyLinks]
 
+export function generateStaticParams() {
+  return Object.keys(staticPages).map((slug) => ({ slug }))
+}
+
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {

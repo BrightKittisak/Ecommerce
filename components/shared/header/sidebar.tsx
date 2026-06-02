@@ -1,8 +1,10 @@
+'use client'
+
 import Link from 'next/link'
 import { ChevronRight, MenuIcon, UserCircle, X } from 'lucide-react'
+import { signOut, useSession } from 'next-auth/react'
 
-import { auth } from '@/auth'
-import { SignOut } from '@/lib/actions/user.actions'
+import useCatalogCategories from '@/hooks/use-catalog-categories'
 import { translateCategory } from '@/lib/i18n'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,12 +17,10 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer'
 
-export default async function Sidebar({
-  categories,
-}: {
-  categories: string[]
-}) {
-  const session = await auth()
+export default function Sidebar() {
+  const { data: session, status } = useSession()
+  const categories = useCatalogCategories()
+  const isAuthenticated = status === 'authenticated' && session?.user
 
   return (
     <Drawer direction='left'>
@@ -34,7 +34,7 @@ export default async function Sidebar({
             <DrawerHeader>
               <DrawerTitle className='flex items-center'>
                 <UserCircle className='mr-2 h-6 w-6' />
-                {session ? (
+                {isAuthenticated ? (
                   <DrawerClose asChild>
                     <Link href='/account'>
                       <span className='text-lg font-semibold'>
@@ -97,15 +97,14 @@ export default async function Sidebar({
                 บริการลูกค้า
               </Link>
             </DrawerClose>
-            {session ? (
-              <form action={SignOut} className='w-full'>
-                <Button
-                  className='item-button w-full justify-start text-base'
-                  variant='ghost'
-                >
-                  ออกจากระบบ
-                </Button>
-              </form>
+            {isAuthenticated ? (
+              <Button
+                className='item-button w-full justify-start text-base'
+                variant='ghost'
+                onClick={() => signOut({ callbackUrl: '/' })}
+              >
+                ออกจากระบบ
+              </Button>
             ) : (
               <Link href='/sign-in' className='item-button'>
                 เข้าสู่ระบบ

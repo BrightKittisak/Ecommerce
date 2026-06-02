@@ -8,7 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { getAllCategories } from '@/lib/actions/product.actions'
 import { APP_NAME } from '@/lib/constants'
 import { exploreLinks, policyLinks } from '@/lib/site-navigation'
 
@@ -85,9 +84,7 @@ function HeaderDropdown({
   )
 }
 
-export default async function Header() {
-  const categories = await getAllCategories()
-
+export default function Header() {
   return (
     <header className='sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur-xl'>
       <div className='bg-[linear-gradient(90deg,#18352c,#2f5a49,#b55b34)] text-white'>
@@ -135,7 +132,7 @@ export default async function Header() {
 
       <div className='border-t border-border/60 bg-card/70'>
         <div className='page-shell flex items-center gap-4 overflow-hidden py-2'>
-          <Sidebar categories={categories} />
+          <Sidebar />
            <div className='flex max-h-[42px] flex-wrap items-center gap-2 overflow-hidden'>
              {headerMenus.map((menu) => (
                <Link

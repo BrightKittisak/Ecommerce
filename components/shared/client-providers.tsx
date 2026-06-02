@@ -1,33 +1,39 @@
-"use client";
-import React from "react";
-import useCartSidebar from "@/hooks/use-cart-sidebar";
-import CartSidebar from "./cart-sidebar";
-import { Toaster } from "sonner";
-import { ThemeProvider } from "./theme-provider";
+'use client'
+
+import { SessionProvider } from 'next-auth/react'
+import React from 'react'
+import { Toaster } from 'sonner'
+
+import useCartSidebar from '@/hooks/use-cart-sidebar'
+
+import CartSidebar from './cart-sidebar'
+import { ThemeProvider } from './theme-provider'
 
 export default function ClientProviders({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
-  const isCartSidebarOpen = useCartSidebar();
+  const isCartSidebarOpen = useCartSidebar()
 
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
-      {isCartSidebarOpen ? (
-        <div className="flex min-h-screen">
-          <div className="flex-1 overflow-hidden">{children}</div>
-          <CartSidebar />
-        </div>
-      ) : (
-        <div>{children}</div>
-      )}
-      <Toaster />
-    </ThemeProvider>
-  );
+    <SessionProvider>
+      <ThemeProvider
+        attribute='class'
+        defaultTheme='system'
+        enableSystem
+        disableTransitionOnChange
+      >
+        {isCartSidebarOpen ? (
+          <div className='flex min-h-screen'>
+            <div className='flex-1 overflow-hidden'>{children}</div>
+            <CartSidebar />
+          </div>
+        ) : (
+          <div>{children}</div>
+        )}
+        <Toaster />
+      </ThemeProvider>
+    </SessionProvider>
+  )
 }

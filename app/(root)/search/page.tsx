@@ -13,6 +13,7 @@ import {
 } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
 import { translateCategory, translateTag } from '@/lib/i18n'
+import { normalizePaginationPage } from '@/lib/pagination'
 import { CURRENCY_SYMBOL, getFilterUrl, toSlug } from '@/lib/utils'
 
 const sortOrders = [
@@ -103,6 +104,7 @@ export default async function SearchPage(props: {
   } = searchParams
 
   const params = { q, category, tag, price, rating, sort, page }
+  const currentPage = normalizePaginationPage(page)
 
   const [categories, tags, data] = await Promise.all([
     getAllCategories(),
@@ -113,7 +115,7 @@ export default async function SearchPage(props: {
       query: q,
       price,
       rating,
-      page: Number(page),
+      page: currentPage,
       sort,
     }),
   ])
@@ -275,7 +277,7 @@ export default async function SearchPage(props: {
             ))}
           </div>
           {data.totalPages > 1 && (
-            <Pagination page={page} totalPages={data.totalPages} />
+            <Pagination page={currentPage} totalPages={data.totalPages} />
           )}
         </div>
       </div>

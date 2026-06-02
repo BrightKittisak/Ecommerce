@@ -16,6 +16,7 @@ import {
 import { PAGE_SIZE } from '@/lib/constants'
 import { connectToDatabase } from '@/lib/db'
 import Order from '@/lib/db/models/order.model'
+import { normalizePaginationPage } from '@/lib/pagination'
 import { formatDateTime, formatId } from '@/lib/utils'
 
 export const metadata: Metadata = {
@@ -38,7 +39,7 @@ export default async function AdminOrdersPage(props: {
   }
 
   const searchParams = await props.searchParams
-  const page = Number(searchParams.page) || 1
+  const page = normalizePaginationPage(searchParams.page)
   const limit = PAGE_SIZE
   const skipAmount = (page - 1) * limit
 

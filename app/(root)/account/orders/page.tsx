@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/table'
 import { getMyOrders } from '@/lib/actions/order.actions'
 import { IOrder } from '@/lib/db/models/order.model'
+import { normalizePaginationPage } from '@/lib/pagination'
 import { formatDateTime, formatId } from '@/lib/utils'
 
 const PAGE_TITLE = 'คำสั่งซื้อของคุณ'
@@ -26,7 +27,7 @@ export default async function OrdersPage(props: {
   searchParams: Promise<{ page: string }>
 }) {
   const searchParams = await props.searchParams
-  const page = Number(searchParams.page) || 1
+  const page = normalizePaginationPage(searchParams.page)
   const orders = await getMyOrders({
     page,
   })

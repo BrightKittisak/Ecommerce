@@ -14,6 +14,7 @@ import { ReviewInputSchema } from '../validator'
 import { IReviewDetails } from '@/types'
 import { PAGE_SIZE } from '../constants'
 import { serializeForClient } from '../serialization'
+import { normalizePaginationPage } from '../pagination'
 
 export async function createUpdateReview({
   data,
@@ -114,8 +115,9 @@ export async function getReviews({
   page: number
 }) {
   limit = limit || PAGE_SIZE
+  const currentPage = normalizePaginationPage(page)
   await connectToDatabase()
-  const skipAmount = (page - 1) * limit
+  const skipAmount = (currentPage - 1) * limit
   const reviews = await Review.find({ product: productId })
     .populate('user', 'name')
     .sort({

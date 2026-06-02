@@ -14,6 +14,7 @@ import { revalidatePath } from 'next/cache'
 import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE } from '../constants'
 import { CreateOrderSchema } from '../order-validator'
 import { serializeForClient } from '../serialization'
+import { normalizePaginationPage } from '../pagination'
 
 const getOrderOwnerId = (order: IOrder) => {
   if (typeof order.user === 'string') return order.user
@@ -326,12 +327,13 @@ export async function getMyOrders({
   page: number
 }) {
   limit = limit || PAGE_SIZE
+  const currentPage = normalizePaginationPage(page)
   await connectToDatabase()
   const session = await auth()
   if (!session) {
     throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
   }
-  const skipAmount = (Number(page) - 1) * limit
+  const skipAmount = (currentPage - 1) * limit
   const orders = await Order.find({
     user: session?.user?.id,
   })

@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
 
 import { formUrlQuery } from '@/lib/utils'
+import { normalizePaginationPage } from '@/lib/pagination'
 
 import { Button } from '../ui/button'
 
@@ -16,9 +17,10 @@ type PaginationProps = {
 const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const currentPage = normalizePaginationPage(page)
 
   const onClick = (btnType: string) => {
-    const pageValue = btnType === 'next' ? Number(page) + 1 : Number(page) - 1
+    const pageValue = btnType === 'next' ? currentPage + 1 : currentPage - 1
 
     const newUrl = formUrlQuery({
       params: searchParams.toString(),
@@ -35,7 +37,7 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
         variant='outline'
         className='w-28'
         onClick={() => onClick('prev')}
-        disabled={Number(page) <= 1}
+        disabled={currentPage <= 1}
       >
         ก่อนหน้า
       </Button>
@@ -44,7 +46,7 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
         variant='outline'
         className='w-28'
         onClick={() => onClick('next')}
-        disabled={Number(page) >= totalPages}
+        disabled={currentPage >= totalPages}
       >
         ถัดไป
       </Button>

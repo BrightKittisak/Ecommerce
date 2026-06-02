@@ -81,38 +81,57 @@ export const recordFailedSignIn = async (keys: RateLimitKey[]) => {
 
   const now = new Date()
   const windowStartedAfter = new Date(now.getTime() - WINDOW_MS)
+  const blockedUntil = new Date(now.getTime() + BLOCK_MS)
 
   await Promise.all(
     keys.map(async ({ key, scope }) => {
-      const existing = await AuthRateLimit.findOne({ key })
-      const shouldResetWindow =
-        !existing || existing.firstAttemptAt < windowStartedAfter
-
-      if (shouldResetWindow) {
-        await AuthRateLimit.findOneAndUpdate(
-          { key },
+      await AuthRateLimit.findOneAndUpdate(
+        { key },
+        [
           {
             $set: {
               key,
               scope,
-              attempts: 1,
-              firstAttemptAt: now,
-              lastAttemptAt: now,
-              blockedUntil: undefined,
+              shouldResetWindow: {
+                $lt: [
+                  { $ifNull: ['$firstAttemptAt', new Date(0)] },
+                  windowStartedAfter,
+                ],
+              },
             },
           },
-          { upsert: true }
-        )
-        return
-      }
-
-      const attempts = existing.attempts + 1
-      existing.attempts = attempts
-      existing.lastAttemptAt = now
-      if (attempts >= MAX_FAILED_ATTEMPTS) {
-        existing.blockedUntil = new Date(now.getTime() + BLOCK_MS)
-      }
-      await existing.save()
+          {
+            $set: {
+              attempts: {
+                $cond: [
+                  '$shouldResetWindow',
+                  1,
+                  { $add: [{ $ifNull: ['$attempts', 0] }, 1] },
+                ],
+              },
+              firstAttemptAt: {
+                $cond: ['$shouldResetWindow', now, '$firstAttemptAt'],
+              },
+              lastAttemptAt: now,
+              createdAt: { $ifNull: ['$createdAt', now] },
+              updatedAt: now,
+            },
+          },
+          {
+            $set: {
+              blockedUntil: {
+                $cond: [
+                  { $gte: ['$attempts', MAX_FAILED_ATTEMPTS] },
+                  blockedUntil,
+                  '$$REMOVE',
+                ],
+              },
+            },
+          },
+          { $unset: 'shouldResetWindow' },
+        ],
+        { upsert: true }
+      )
     })
   )
 }

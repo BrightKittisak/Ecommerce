@@ -150,7 +150,7 @@ export const createOrderFromCart = async (
 export async function getOrderById(orderId: string): Promise<IOrder | null> {
   await connectToDatabase()
   const order = await Order.findById(orderId)
-  return serializeForClient(order)
+  return serializeForClient<IOrder | null>(order)
 }
 
 export async function getOrderByIdForCurrentUser(
@@ -166,7 +166,7 @@ export async function getOrderByIdForCurrentUser(
       userId: session.user.id,
       isAdmin: session.user.role === 'Admin',
     })
-    return serializeForClient(order)
+    return serializeForClient<IOrder>(order)
   } catch {
     return null
   }
@@ -341,7 +341,7 @@ export async function getMyOrders({
   const ordersCount = await Order.countDocuments({ user: session?.user?.id })
 
   return {
-    data: serializeForClient(orders),
+    data: serializeForClient<IOrder[]>(orders),
     totalPages: Math.ceil(ordersCount / limit),
   }
 }

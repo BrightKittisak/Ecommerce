@@ -5,15 +5,18 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 import { auth } from '@/auth'
+import {
+  toReviewDetailsDTO,
+  toReviewDTO,
+} from '@/lib/application/reviews/serializers'
+import type { ReviewDetailsDTO, ReviewDTO } from '@/lib/application/reviews/dtos'
 
 import { connectToDatabase } from '../db'
 import Product from '../db/models/product.model'
-import Review, { IReview } from '../db/models/review.model'
+import Review from '../db/models/review.model'
 import { formatError } from '../utils'
 import { ReviewInputSchema } from '../validator'
-import { IReviewDetails } from '@/types'
 import { PAGE_SIZE } from '../constants'
-import { serializeForClient } from '../serialization'
 import { normalizePaginationPage } from '../pagination'
 
 export async function createUpdateReview({
@@ -127,7 +130,7 @@ export async function getReviews({
     .limit(limit)
   const reviewsCount = await Review.countDocuments({ product: productId })
   return {
-    data: serializeForClient<IReviewDetails[]>(reviews),
+    data: reviews.map((review) => toReviewDetailsDTO(review)) satisfies ReviewDetailsDTO[],
     totalPages: reviewsCount === 0 ? 1 : Math.ceil(reviewsCount / limit),
   }
 }
@@ -145,5 +148,5 @@ export const getReviewByProductId = async ({
     product: productId,
     user: session?.user?.id,
   })
-  return review ? serializeForClient<IReview>(review) : null
+  return review ? (toReviewDTO(review) satisfies ReviewDTO) : null
 }

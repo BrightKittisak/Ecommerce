@@ -52,7 +52,7 @@ import { ReviewInputSchema } from '@/lib/validator'
 import RatingSummary from '@/components/shared/product/rating-summary'
 import { IProduct } from '@/lib/db/models/product.model'
 import { Separator } from '@/components/ui/separator'
-import { IReviewDetails } from '@/types'
+import type { ReviewDetailsDTO } from '@/lib/application/reviews/dtos'
 
 const reviewFormDefaultValues = {
   title: '',
@@ -70,7 +70,7 @@ export default function ReviewList({
   const canReview = status === 'authenticated' && Boolean(userId)
   const [page, setPage] = useState(2)
   const [totalPages, setTotalPages] = useState(0)
-  const [reviews, setReviews] = useState<IReviewDetails[]>([])
+  const [reviews, setReviews] = useState<ReviewDetailsDTO[]>([])
   const { ref, inView } = useInView({ triggerOnce: true })
   const reload = async () => {
     try {
@@ -291,7 +291,7 @@ export default function ReviewList({
           </div>
         </div>
         <div className='md:col-span-3 flex flex-col gap-3'>
-          {reviews.map((review: IReviewDetails) => (
+          {reviews.map((review: ReviewDetailsDTO) => (
             <Card key={review._id}>
               <CardHeader>
                 <div className='flex-between'>

@@ -17,7 +17,7 @@ import {
   approvePayPalOrder,
   createPayPalOrder,
 } from '@/lib/actions/order.actions'
-import { IOrder } from '@/lib/db/models/order.model'
+import type { OrderDTO } from '@/lib/application/orders/dtos'
 import { formatVariantSummary, translatePaymentMethod } from '@/lib/i18n'
 import { formatDateTime } from '@/lib/utils'
 
@@ -49,7 +49,7 @@ export default function OrderPaymentForm({
   paypalClientId,
   clientSecret,
 }: {
-  order: IOrder
+  order: OrderDTO
   paypalClientId: string
   isAdmin: boolean
   clientSecret: string | null

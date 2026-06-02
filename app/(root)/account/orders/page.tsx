@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { getMyOrders } from '@/lib/actions/order.actions'
-import { IOrder } from '@/lib/db/models/order.model'
+import type { OrderDTO } from '@/lib/application/orders/dtos'
 import { normalizePaginationPage } from '@/lib/pagination'
 import { formatDateTime, formatId } from '@/lib/utils'
 
@@ -58,7 +58,7 @@ export default async function OrdersPage(props: {
                 <TableCell colSpan={6}>คุณยังไม่มีคำสั่งซื้อ</TableCell>
               </TableRow>
             )}
-            {orders.data.map((order: IOrder) => (
+            {orders.data.map((order: OrderDTO) => (
               <TableRow key={order._id}>
                 <TableCell>
                   <Link href={`/account/orders/${order._id}`}>

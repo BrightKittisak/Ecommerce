@@ -1,4 +1,5 @@
 'use client'
+
 import {
   Select,
   SelectContent,
@@ -8,7 +9,6 @@ import {
 } from '@/components/ui/select'
 import { getFilterUrl } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
-import React from 'react'
 
 export default function ProductSortSelector({
   sortOrders,
@@ -27,23 +27,26 @@ export default function ProductSortSelector({
   }
 }) {
   const router = useRouter()
+  const selectedSort = sortOrders.find((sortOrder) => sortOrder.value === sort)
+  const fallbackSort = selectedSort ?? sortOrders[0]
+
   return (
     <Select
-      onValueChange={(v) => {
-        router.push(getFilterUrl({ params, sort: v }))
+      onValueChange={(value) => {
+        router.push(getFilterUrl({ params, sort: value }))
       }}
-      value={sort}
+      value={fallbackSort?.value}
     >
       <SelectTrigger>
         <SelectValue>
-          เรียงตาม: {sortOrders.find((s) => s.value === sort)!.name}
+          เรียงตาม: {fallbackSort?.name ?? 'ค่าเริ่มต้น'}
         </SelectValue>
       </SelectTrigger>
 
       <SelectContent>
-        {sortOrders.map((s) => (
-          <SelectItem key={s.value} value={s.value}>
-            {s.name}
+        {sortOrders.map((sortOrder) => (
+          <SelectItem key={sortOrder.value} value={sortOrder.value}>
+            {sortOrder.name}
           </SelectItem>
         ))}
       </SelectContent>

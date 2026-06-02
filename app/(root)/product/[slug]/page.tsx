@@ -1,7 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 
-import { auth } from '@/auth'
 import AddToBrowsingHistory from '@/components/shared/product/add-to-browsing-history'
 import AddToCart from '@/components/shared/product/add-to-cart'
 import ProductGallery from '@/components/shared/product/product-gallery'
@@ -50,8 +49,6 @@ export default async function ProductDetails(props: {
     productId: product._id,
     page: currentPage,
   })
-
-  const session = await auth()
 
   return (
     <div>
@@ -151,7 +148,7 @@ export default async function ProductDetails(props: {
         <h2 className='h2-bold mb-2' id='reviews'>
           รีวิวจากลูกค้า
         </h2>
-        <ReviewList product={product} userId={session?.user.id} />
+        <ReviewList product={product} />
       </section>
 
       <section className='mt-10'>

@@ -4,8 +4,7 @@ import React from 'react'
 import { auth } from '@/auth'
 import { getOrderByIdForCurrentUser } from '@/lib/actions/order.actions'
 import { getPayPalClientId } from '@/lib/paypal-config'
-import { getStripeClient } from '@/lib/stripe'
-import { CURRENCY_CODE } from '@/lib/utils'
+import { createStripeCheckoutPaymentIntent } from '@/lib/infrastructure/payments/stripe-payment-adapter'
 
 import PaymentForm from './payment-form'
 
@@ -29,13 +28,10 @@ const CheckoutPaymentPage = async (props: {
 
   let client_secret = null
   if (order.paymentMethod === 'Stripe' && !order.isPaid) {
-    const stripe = getStripeClient()
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(order.totalPrice * 100),
-      currency: CURRENCY_CODE.toLowerCase(),
-      metadata: { orderId: order._id.toString() },
+    client_secret = await createStripeCheckoutPaymentIntent({
+      orderId: order._id.toString(),
+      totalPrice: order.totalPrice,
     })
-    client_secret = paymentIntent.client_secret
   }
 
   return (

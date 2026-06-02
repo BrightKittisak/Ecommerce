@@ -4,6 +4,7 @@ import { unstable_cache } from 'next/cache'
 
 import { connectToDatabase } from '@/lib/db'
 import Product, { IProduct } from '@/lib/db/models/product.model'
+import { buildProductNameSearchFilter } from '@/lib/product-search-query'
 import { PRODUCT_CARD_FIELDS } from '@/lib/product-query-fields'
 import { serializeForClient } from '@/lib/serialization'
 import { PAGE_SIZE } from '../constants'
@@ -220,15 +221,7 @@ export async function getAllProducts({
   limit = limit || PAGE_SIZE
   await connectToDatabase()
 
-  const queryFilter =
-    query && query !== 'all'
-      ? {
-          name: {
-            $regex: query,
-            $options: 'i',
-          },
-        }
-      : {}
+  const queryFilter = buildProductNameSearchFilter(query)
   const categoryFilter = category && category !== 'all' ? { category } : {}
   const tagFilter = tag && tag !== 'all' ? { tags: tag } : {}
 

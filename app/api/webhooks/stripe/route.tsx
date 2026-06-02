@@ -5,6 +5,7 @@ import { sendPurchaseReceipt } from '@/emails'
 import { connectToDatabase } from '@/lib/db'
 import Order from '@/lib/db/models/order.model'
 import { logger, serializeLogError } from '@/lib/logger'
+import { incrementProductSales } from '@/lib/product-sales'
 import { verifyStripePaymentIntent } from '@/lib/stripe-payment-verification'
 
 const getStripeClient = () => {
@@ -107,6 +108,7 @@ export async function POST(req: NextRequest) {
     pricePaid: verifiedPayment.pricePaid,
   }
   await order.save()
+  await incrementProductSales(order.items)
 
   try {
     await sendPurchaseReceipt({ order })

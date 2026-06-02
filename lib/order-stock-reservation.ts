@@ -1,12 +1,16 @@
-import { CreateOrderInput } from '@/types'
-
 export type StockReservation = {
   productId: string
   quantity: number
 }
 
+type ProductQuantityItem = {
+  product: string
+  quantity: number
+  [key: string]: unknown
+}
+
 export function aggregateStockReservations(
-  items: CreateOrderInput['items']
+  items: ProductQuantityItem[]
 ): StockReservation[] {
   const quantityByProductId = new Map<string, number>()
 

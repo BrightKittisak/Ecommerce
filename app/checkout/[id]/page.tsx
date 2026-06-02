@@ -3,6 +3,7 @@ import React from 'react'
 
 import { auth } from '@/auth'
 import { getOrderByIdForCurrentUser } from '@/lib/actions/order.actions'
+import { getPayPalClientId } from '@/lib/paypal-config'
 import { getStripeClient } from '@/lib/stripe'
 import { CURRENCY_CODE } from '@/lib/utils'
 
@@ -40,7 +41,7 @@ const CheckoutPaymentPage = async (props: {
   return (
     <PaymentForm
       order={order}
-      paypalClientId={process.env.PAYPAL_CLIENT_ID || 'sb'}
+      paypalClientId={getPayPalClientId()}
       clientSecret={client_secret}
       isAdmin={session?.user?.role === 'Admin' || false}
     />

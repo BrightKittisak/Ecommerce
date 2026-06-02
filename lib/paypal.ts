@@ -1,7 +1,10 @@
 import { formatPayPalAmount } from './paypal-capture-verification'
+import {
+  getPayPalApiBaseUrl,
+  getPayPalAppSecret,
+  getPayPalClientId,
+} from './paypal-config'
 import { CURRENCY_CODE } from './utils'
-
-const base = process.env.PAYPAL_API_URL || 'https://api-m.sandbox.paypal.com'
 
 type PayPalAccessTokenResponse = {
   access_token: string
@@ -34,6 +37,7 @@ type PayPalCaptureResponse = {
 export const paypal = {
   createOrder: async function createOrder(price: number) {
     const accessToken = await generateAccessToken()
+    const base = getPayPalApiBaseUrl()
     const url = `${base}/v2/checkout/orders`
     const response = await fetch(url, {
       method: 'post',
@@ -57,6 +61,7 @@ export const paypal = {
   },
   capturePayment: async function capturePayment(orderId: string) {
     const accessToken = await generateAccessToken()
+    const base = getPayPalApiBaseUrl()
     const url = `${base}/v2/checkout/orders/${orderId}/capture`
     const response = await fetch(url, {
       method: 'post',
@@ -71,10 +76,10 @@ export const paypal = {
 }
 
 async function generateAccessToken() {
-  const { PAYPAL_CLIENT_ID, PAYPAL_APP_SECRET } = process.env
-  const auth = Buffer.from(PAYPAL_CLIENT_ID + ':' + PAYPAL_APP_SECRET).toString(
-    'base64'
-  )
+  const auth = Buffer.from(
+    `${getPayPalClientId()}:${getPayPalAppSecret()}`
+  ).toString('base64')
+  const base = getPayPalApiBaseUrl()
   const response = await fetch(`${base}/v1/oauth2/token`, {
     method: 'post',
     body: 'grant_type=client_credentials',

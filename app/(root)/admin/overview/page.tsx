@@ -11,10 +11,7 @@ import {
 
 import { auth } from '@/auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { connectToDatabase } from '@/lib/db'
-import Order from '@/lib/db/models/order.model'
-import Product from '@/lib/db/models/product.model'
-import User from '@/lib/db/models/user.model'
+import { getAdminOverviewStats } from '@/lib/actions/admin.actions'
 import { formatCurrency, formatDateTime, formatNumber } from '@/lib/utils'
 
 export const metadata: Metadata = {
@@ -22,14 +19,6 @@ export const metadata: Metadata = {
 }
 
 export const dynamic = 'force-dynamic'
-
-type RecentOrder = {
-  _id: string
-  createdAt: Date
-  totalPrice: number
-  isPaid: boolean
-  customerName: string
-}
 
 export default async function AdminOverviewPage() {
   const session = await auth()
@@ -42,52 +31,15 @@ export default async function AdminOverviewPage() {
     notFound()
   }
 
-  await connectToDatabase()
-
-  const [
+  const {
     totalUsers,
     totalProducts,
     totalOrders,
     paidOrders,
     lowStockProducts,
-    salesAgg,
-    recentOrdersRaw,
-  ] = await Promise.all([
-    User.countDocuments(),
-    Product.countDocuments(),
-    Order.countDocuments(),
-    Order.countDocuments({ isPaid: true }),
-    Product.countDocuments({ countInStock: { $lte: 5 } }),
-    Order.aggregate([
-      { $match: { isPaid: true } },
-      {
-        $group: {
-          _id: null,
-          totalRevenue: { $sum: '$totalPrice' },
-        },
-      },
-    ]),
-    Order.find({})
-      .sort({ createdAt: -1 })
-      .limit(6)
-      .populate('user', 'name')
-      .lean(),
-  ])
-
-  const totalRevenue = salesAgg[0]?.totalRevenue ?? 0
-  const recentOrders = recentOrdersRaw.map((order) => ({
-    _id: String(order._id),
-    createdAt: order.createdAt,
-    totalPrice: order.totalPrice,
-    isPaid: order.isPaid,
-    customerName:
-      typeof order.user === 'object' &&
-      order.user &&
-      'name' in order.user &&
-      typeof order.user.name === 'string'
-        ? order.user.name
-        : 'ลูกค้าที่ไม่ได้ระบุชื่อ',
-  })) as RecentOrder[]
+    totalRevenue,
+    recentOrders,
+  } = await getAdminOverviewStats()
 
   const statCards = [
     {

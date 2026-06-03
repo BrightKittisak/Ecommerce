@@ -1,17 +1,13 @@
 'use server'
 import { auth, signIn, signOut } from '@/auth'
-import { IUserName,IUserSignIn, IUserSignUp } from '@/types'
+import { IUserName, IUserSignIn, IUserSignUp } from '@/types'
+import { toUpdatedUserNameDTO } from '@/lib/application/users/serializers'
 import bcrypt from 'bcryptjs'
 import { UserSignInSchema, UserSignUpSchema } from '../auth-validator'
 import { connectToDatabase } from '../db'
 import User from '../db/models/user.model'
 import { formatError } from '../utils'
 import { redirect } from 'next/navigation'
-import { serializeForClient } from '../serialization'
-
-type UpdatedUserName = {
-  name: string
-}
 
 const PASSWORD_HASH_SALT_ROUNDS = 12
 
@@ -61,7 +57,7 @@ export async function updateUserName(user: IUserName) {
     return {
       success: true,
       message: 'อัปเดตข้อมูลผู้ใช้เรียบร้อยแล้ว',
-      data: serializeForClient<UpdatedUserName>(updatedUser),
+      data: toUpdatedUserNameDTO(updatedUser),
     }
   } catch (error) {
     return { success: false, message: formatError(error) }

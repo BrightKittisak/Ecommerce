@@ -7,6 +7,7 @@ import {
   approvePayPalPaymentOrder,
   createPayPalPaymentOrder,
 } from '@/lib/application/orders/process-paypal-payment'
+import { paypalPaymentDeps } from '@/lib/infrastructure/payments/paypal-payment-deps'
 import { calcDeliveryDateAndPrice } from '@/lib/domain/order/pricing'
 import { CURRENCY_CODE, formatError, round2 } from '../utils'
 import { connectToDatabase } from '../db'
@@ -281,7 +282,10 @@ export async function createPayPalOrder(orderId: string) {
       }
     }
 
-    const result = await createPayPalPaymentOrder({ order })
+    const result = await createPayPalPaymentOrder({
+      order,
+      deps: paypalPaymentDeps,
+    })
     if (result.status === 'already_processed') {
       return {
         success: true,
@@ -317,6 +321,7 @@ export async function approvePayPalOrder(
     const result = await approvePayPalPaymentOrder({
       order,
       paypalOrderId: data.orderID,
+      deps: paypalPaymentDeps,
     })
     if (result.status === 'already_processed') {
       return {

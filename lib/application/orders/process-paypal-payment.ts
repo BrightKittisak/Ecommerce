@@ -1,12 +1,5 @@
 import type { OrderItem } from '../../../types'
-import type { IOrder } from '../../db/models/order.model'
-import {
-  capturePayPalCheckoutOrder,
-  createPayPalCheckoutOrder,
-  verifyPayPalCheckoutCapture,
-} from '../../infrastructure/payments/paypal-payment-adapter'
 import { PayPalCaptureLike } from '../../paypal-capture-verification'
-import { incrementProductSales } from '../../product-sales'
 
 type OrderPaymentResultRecord = {
   id?: string
@@ -25,7 +18,7 @@ export type PayPalPaymentOrder = {
   populate(path: string, select?: string): Promise<unknown>
 }
 
-type PayPalPaymentDeps = {
+export type PayPalPaymentDeps = {
   createPaymentOrder(totalPrice: number): Promise<{ id: string }>
   capturePayment(paypalOrderId: string): Promise<PayPalCaptureLike>
   verifyCapture(input: {
@@ -44,13 +37,13 @@ type PayPalPaymentDeps = {
 
 type CreatePayPalPaymentOrderInput = {
   order: PayPalPaymentOrder
-  deps?: PayPalPaymentDeps
+  deps: PayPalPaymentDeps
 }
 
 type ApprovePayPalPaymentOrderInput = {
   order: PayPalPaymentOrder
   paypalOrderId: string
-  deps?: PayPalPaymentDeps
+  deps: PayPalPaymentDeps
 }
 
 export type CreatePayPalPaymentOrderResult =
@@ -70,20 +63,9 @@ export type ApprovePayPalPaymentOrderResult =
       status: 'completed'
     }
 
-const defaultDeps: PayPalPaymentDeps = {
-  createPaymentOrder: createPayPalCheckoutOrder,
-  capturePayment: capturePayPalCheckoutOrder,
-  verifyCapture: verifyPayPalCheckoutCapture,
-  incrementSales: incrementProductSales,
-  async sendReceipt(order) {
-    const { sendPurchaseReceipt } = await import('../../../emails')
-    await sendPurchaseReceipt({ order: order as IOrder })
-  },
-}
-
 export async function createPayPalPaymentOrder({
   order,
-  deps = defaultDeps,
+  deps,
 }: CreatePayPalPaymentOrderInput): Promise<CreatePayPalPaymentOrderResult> {
   if (order.isPaid) {
     return {
@@ -109,7 +91,7 @@ export async function createPayPalPaymentOrder({
 export async function approvePayPalPaymentOrder({
   order,
   paypalOrderId,
-  deps = defaultDeps,
+  deps,
 }: ApprovePayPalPaymentOrderInput): Promise<ApprovePayPalPaymentOrderResult> {
   if (order.isPaid) {
     return {

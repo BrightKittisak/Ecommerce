@@ -6,6 +6,7 @@ import {
   ProductRecord,
   toProductDTO,
 } from '@/lib/application/products/serializers'
+import { getRelatedProductsByCategoryQuery } from '@/lib/application/products/related-products-query'
 import {
   getProductCardLinksByTag,
   getProductDTOsByTag,
@@ -18,6 +19,7 @@ import {
 import { connectToDatabase } from '@/lib/db'
 import Product from '@/lib/db/models/product.model'
 import { productCatalogFacetDeps } from '@/lib/infrastructure/products/product-catalog-facet-deps'
+import { relatedProductsQueryDeps } from '@/lib/infrastructure/products/related-products-query-deps'
 import { productSlugQueryDeps } from '@/lib/infrastructure/products/product-slug-query-deps'
 import { productTagQueryDeps } from '@/lib/infrastructure/products/product-tag-query-deps'
 import {
@@ -112,23 +114,15 @@ const getCachedRelatedProductsByCategory = unstable_cache(
     page: number
   }) => {
     await connectToDatabase()
-    const currentPage = normalizePaginationPage(page)
-    const skipAmount = (currentPage - 1) * limit
-    const conditions = {
-      isPublished: true,
-      category,
-      _id: { $ne: productId },
-    }
-    const products = await Product.find(conditions, PRODUCT_CARD_FIELDS)
-      .sort({ numSales: 'desc' })
-      .skip(skipAmount)
-      .limit(limit)
-      .lean<ProductRecord[]>()
-    const productsCount = await Product.countDocuments(conditions)
-    return {
-      data: products.map((product) => toProductDTO(product)),
-      totalPages: Math.ceil(productsCount / limit),
-    }
+    return getRelatedProductsByCategoryQuery({
+      input: {
+        category,
+        productId,
+        limit,
+        page,
+      },
+      deps: relatedProductsQueryDeps,
+    })
   },
   ['related-products-by-category'],
   {

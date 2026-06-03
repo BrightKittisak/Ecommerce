@@ -19,7 +19,7 @@ type AdminOverviewOrderUserRecord =
   | null
   | undefined
 
-type AdminOverviewOrderRecord = {
+export type AdminOverviewOrderRecord = {
   _id: string | IdLike
   createdAt: Date | string
   totalPrice: number

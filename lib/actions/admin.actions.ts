@@ -6,10 +6,12 @@ import Order from '@/lib/db/models/order.model'
 import Product from '@/lib/db/models/product.model'
 import User from '@/lib/db/models/user.model'
 import {
+  AdminOverviewOrderRecord,
   AdminOverviewRecentOrder,
   toAdminOverviewRecentOrder,
 } from '@/lib/application/admin/admin-overview'
 import {
+  AdminOrderRecord,
   AdminOrderListItem,
   toAdminOrderListItem,
 } from '@/lib/application/admin/admin-orders'
@@ -54,7 +56,7 @@ export async function getAdminOrders({
       .skip(skipAmount)
       .limit(limit)
       .populate('user', 'name email')
-      .lean(),
+      .lean<AdminOrderRecord[]>(),
     Order.countDocuments(),
   ])
 
@@ -96,7 +98,7 @@ export async function getAdminOverviewStats(): Promise<AdminOverviewStats> {
       .sort({ createdAt: -1 })
       .limit(6)
       .populate('user', 'name')
-      .lean(),
+      .lean<AdminOverviewOrderRecord[]>(),
   ])
 
   return {

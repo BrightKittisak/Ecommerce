@@ -22,7 +22,7 @@ type AdminOrderUserRecord =
   | null
   | undefined
 
-type AdminOrderRecord = {
+export type AdminOrderRecord = {
   _id: string | IdLike
   createdAt: Date | string
   paidAt?: Date | string

@@ -4,6 +4,7 @@ import { CreateOrderInput } from '@/types'
 import { toOrderDTO } from '@/lib/application/orders/serializers'
 import type { OrderDTO } from '@/lib/application/orders/dtos'
 import { buildOrderItemsFromRequest } from '@/lib/application/orders/build-order-items'
+import { getUserOrderList } from '@/lib/application/orders/user-order-list-query'
 import {
   releaseProductStock,
   reserveProductStock,
@@ -14,6 +15,7 @@ import {
 } from '@/lib/application/orders/process-paypal-payment'
 import { orderItemProductDeps } from '@/lib/infrastructure/orders/order-item-product-deps'
 import { productStockReservationDeps } from '@/lib/infrastructure/orders/product-stock-reservation-deps'
+import { userOrderListQueryDeps } from '@/lib/infrastructure/orders/user-order-list-query-deps'
 import { paypalPaymentDeps } from '@/lib/infrastructure/payments/paypal-payment-deps'
 import { calcDeliveryDateAndPrice } from '@/lib/domain/order/pricing'
 import { CURRENCY_CODE, formatError } from '../utils'
@@ -22,10 +24,8 @@ import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
 import Order, { IOrder } from '../db/models/order.model'
 import { revalidatePath } from 'next/cache'
-import { PAGE_SIZE } from '../constants'
 import { CreateOrderSchema } from '../order-validator'
 import { aggregateStockReservations } from '../order-stock-reservation'
-import { normalizePaginationPage } from '../pagination'
 
 const getOrderOwnerId = (order: IOrder) => {
   if (typeof order.user === 'string') return order.user
@@ -228,25 +228,16 @@ export async function getMyOrders({
   limit?: number
   page: number
 }) {
-  limit = limit || PAGE_SIZE
-  const currentPage = normalizePaginationPage(page)
   await connectToDatabase()
   const session = await auth()
   if (!session) {
     throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
   }
-  const skipAmount = (currentPage - 1) * limit
-  const orders = await Order.find({
-    user: session?.user?.id,
+  return getUserOrderList({
+    userId: session.user.id!,
+    limit,
+    page,
+    deps: userOrderListQueryDeps,
   })
-    .sort({ createdAt: 'desc' })
-    .skip(skipAmount)
-    .limit(limit)
-  const ordersCount = await Order.countDocuments({ user: session?.user?.id })
-
-  return {
-    data: orders.map((order) => toOrderDTO(order)),
-    totalPages: Math.ceil(ordersCount / limit),
-  }
 }
 

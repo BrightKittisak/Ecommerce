@@ -31,7 +31,3 @@ const serializeJson = (value: unknown): JsonValue =>
 export function serializeTypedForClient<T>(value: T): Serialized<T> {
   return serializeJson(value) as Serialized<T>
 }
-
-export function serializeForClient<T>(value: unknown): T {
-  return JSON.parse(JSON.stringify(value)) as T
-}

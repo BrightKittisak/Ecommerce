@@ -2,13 +2,12 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import {
-  serializeForClient,
   serializeTypedForClient,
   type Serialized,
 } from '../lib/serialization'
 
 test('serializes values into client-safe plain JSON data', () => {
-  const serialized = serializeForClient({
+  const serialized = serializeTypedForClient({
     id: {
       toJSON: () => '507f1f77bcf86cd799439011',
     },

@@ -1,8 +1,12 @@
 'use server'
 
 import { CreateOrderInput } from '@/types'
-import { toOrderDTO } from '@/lib/application/orders/serializers'
 import type { OrderDTO } from '@/lib/application/orders/dtos'
+import {
+  getOrderDTOById,
+  getOrderDTOForUser,
+  requireOrderForUser,
+} from '@/lib/application/orders/order-access-query'
 import { buildOrderItemsFromRequest } from '@/lib/application/orders/build-order-items'
 import { getUserOrderList } from '@/lib/application/orders/user-order-list-query'
 import {
@@ -13,6 +17,7 @@ import {
   approvePayPalPaymentOrder,
   createPayPalPaymentOrder,
 } from '@/lib/application/orders/process-paypal-payment'
+import { orderAccessQueryDeps } from '@/lib/infrastructure/orders/order-access-query-deps'
 import { orderItemProductDeps } from '@/lib/infrastructure/orders/order-item-product-deps'
 import { productStockReservationDeps } from '@/lib/infrastructure/orders/product-stock-reservation-deps'
 import { userOrderListQueryDeps } from '@/lib/infrastructure/orders/user-order-list-query-deps'
@@ -22,35 +27,10 @@ import { CURRENCY_CODE, formatError } from '../utils'
 import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
-import Order, { IOrder } from '../db/models/order.model'
+import Order from '../db/models/order.model'
 import { revalidatePath } from 'next/cache'
 import { CreateOrderSchema } from '../order-validator'
 import { aggregateStockReservations } from '../order-stock-reservation'
-
-const getOrderOwnerId = (order: IOrder) => {
-  if (typeof order.user === 'string') return order.user
-  if (order.user && typeof order.user === 'object' && '_id' in order.user) {
-    return String(order.user._id)
-  }
-  return String(order.user)
-}
-
-const findOrderForUser = async ({
-  orderId,
-  userId,
-  isAdmin,
-}: {
-  orderId: string
-  userId: string
-  isAdmin: boolean
-}) => {
-  const order = await Order.findById(orderId)
-  if (!order) throw new Error('ไม่พบคำสั่งซื้อ')
-  if (!isAdmin && getOrderOwnerId(order) !== userId) {
-    throw new Error('ไม่พบคำสั่งซื้อ')
-  }
-  return order
-}
 
 // CREATE
 export const createOrder = async (clientOrder: CreateOrderInput) => {
@@ -120,8 +100,10 @@ export const createOrderFromCart = async (
 
 export async function getOrderById(orderId: string): Promise<OrderDTO | null> {
   await connectToDatabase()
-  const order = await Order.findById(orderId)
-  return order ? toOrderDTO(order) : null
+  return getOrderDTOById({
+    orderId,
+    deps: orderAccessQueryDeps,
+  })
 }
 
 export async function getOrderByIdForCurrentUser(
@@ -132,12 +114,12 @@ export async function getOrderByIdForCurrentUser(
   if (!session?.user?.id) return null
 
   try {
-    const order = await findOrderForUser({
+    return getOrderDTOForUser({
       orderId,
       userId: session.user.id,
       isAdmin: session.user.role === 'Admin',
+      deps: orderAccessQueryDeps,
     })
-    return toOrderDTO(order)
   } catch {
     return null
   }
@@ -149,10 +131,11 @@ export async function createPayPalOrder(orderId: string) {
     const session = await auth()
     if (!session?.user?.id) throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
 
-    const order = await findOrderForUser({
+    const order = await requireOrderForUser({
       orderId,
       userId: session.user.id,
       isAdmin: session.user.role === 'Admin',
+      deps: orderAccessQueryDeps,
     })
 
     if (order.isPaid) {
@@ -192,10 +175,11 @@ export async function approvePayPalOrder(
     const session = await auth()
     if (!session?.user?.id) throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
 
-    const order = await findOrderForUser({
+    const order = await requireOrderForUser({
       orderId,
       userId: session.user.id,
       isAdmin: session.user.role === 'Admin',
+      deps: orderAccessQueryDeps,
     })
 
     const result = await approvePayPalPaymentOrder({

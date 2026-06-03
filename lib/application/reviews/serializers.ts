@@ -2,11 +2,11 @@ import { serializeTypedForClient } from '../../serialization'
 
 import type { ReviewDetailsDTO, ReviewDTO } from './dtos'
 
-type IdLike = {
+export type IdLike = {
   toString(): string
 }
 
-type ReviewUserRecord =
+export type ReviewUserRecord =
   | {
       name?: string | null
     }
@@ -26,11 +26,11 @@ type ReviewBaseRecord = {
   updatedAt: Date
 }
 
-type ReviewDetailsRecord = ReviewBaseRecord & {
+export type ReviewDetailsRecord = ReviewBaseRecord & {
   user: ReviewUserRecord
 }
 
-type ReviewRecord = ReviewBaseRecord & {
+export type ReviewRecord = ReviewBaseRecord & {
   user: string | IdLike
 }
 

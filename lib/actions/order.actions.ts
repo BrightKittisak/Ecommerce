@@ -5,10 +5,15 @@ import { toOrderDTO } from '@/lib/application/orders/serializers'
 import type { OrderDTO } from '@/lib/application/orders/dtos'
 import { buildOrderItemsFromRequest } from '@/lib/application/orders/build-order-items'
 import {
+  releaseProductStock,
+  reserveProductStock,
+} from '@/lib/application/orders/product-stock-reservation'
+import {
   approvePayPalPaymentOrder,
   createPayPalPaymentOrder,
 } from '@/lib/application/orders/process-paypal-payment'
 import { orderItemProductDeps } from '@/lib/infrastructure/orders/order-item-product-deps'
+import { productStockReservationDeps } from '@/lib/infrastructure/orders/product-stock-reservation-deps'
 import { paypalPaymentDeps } from '@/lib/infrastructure/payments/paypal-payment-deps'
 import { calcDeliveryDateAndPrice } from '@/lib/domain/order/pricing'
 import { CURRENCY_CODE, formatError } from '../utils'
@@ -16,14 +21,10 @@ import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
 import Order, { IOrder } from '../db/models/order.model'
-import Product from '../db/models/product.model'
 import { revalidatePath } from 'next/cache'
 import { PAGE_SIZE } from '../constants'
 import { CreateOrderSchema } from '../order-validator'
-import {
-  StockReservation,
-  aggregateStockReservations,
-} from '../order-stock-reservation'
+import { aggregateStockReservations } from '../order-stock-reservation'
 import { normalizePaginationPage } from '../pagination'
 
 const getOrderOwnerId = (order: IOrder) => {
@@ -49,51 +50,6 @@ const findOrderForUser = async ({
     throw new Error('ไม่พบคำสั่งซื้อ')
   }
   return order
-}
-
-const reserveProductStock = async (
-  reservations: StockReservation[]
-): Promise<StockReservation[]> => {
-  const reservedStock: StockReservation[] = []
-
-  for (const reservation of reservations) {
-    const result = await Product.updateOne(
-      {
-        _id: reservation.productId,
-        isPublished: true,
-        countInStock: { $gte: reservation.quantity },
-      },
-      {
-        $inc: {
-          countInStock: -reservation.quantity,
-        },
-      }
-    )
-
-    if (result.modifiedCount !== 1) {
-      await releaseProductStock(reservedStock)
-      throw new Error('สินค้าในสต็อกไม่เพียงพอสำหรับคำสั่งซื้อนี้')
-    }
-
-    reservedStock.push(reservation)
-  }
-
-  return reservedStock
-}
-
-const releaseProductStock = async (reservations: StockReservation[]) => {
-  await Promise.all(
-    reservations.map((reservation) =>
-      Product.updateOne(
-        { _id: reservation.productId },
-        {
-          $inc: {
-            countInStock: reservation.quantity,
-          },
-        }
-      )
-    )
-  )
 }
 
 // CREATE
@@ -147,11 +103,17 @@ export const createOrderFromCart = async (
     currencyCode: CURRENCY_CODE,
     expectedDeliveryDate: cart.expectedDeliveryDate,
   })
-  const reservedStock = await reserveProductStock(stockReservations)
+  const reservedStock = await reserveProductStock({
+    reservations: stockReservations,
+    deps: productStockReservationDeps,
+  })
   try {
     return await Order.create(order)
   } catch (error) {
-    await releaseProductStock(reservedStock)
+    await releaseProductStock({
+      reservations: reservedStock,
+      deps: productStockReservationDeps,
+    })
     throw error
   }
 }

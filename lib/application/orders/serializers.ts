@@ -3,19 +3,20 @@ import { serializeTypedForClient } from '../../serialization'
 import type { OrderDTO, OrderPaymentResultDTO, OrderUserDTO } from './dtos'
 import type { OrderItem, ShippingAddress } from '@/types'
 
-type IdLike = {
+export type IdLike = {
   toString(): string
 }
 
-type OrderUserRecord =
+export type OrderUserRecord =
   | string
   | IdLike
   | {
+      _id?: string | IdLike
       name?: string | null
       email?: string | null
     }
 
-type OrderRecord = {
+export type OrderRecord = {
   _id: string | IdLike
   user: OrderUserRecord
   items: OrderItem[]

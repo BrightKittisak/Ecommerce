@@ -1,25 +1,27 @@
 import { CURRENCY_CODE, round2 } from './utils'
 
-type PayPalCaptureVerificationInput = {
-  captureData: {
-    id?: string
-    status?: string
-    payer?: {
-      email_address?: string
-    }
-    purchase_units?: Array<{
-      payments?: {
-        captures?: Array<{
-          id?: string
-          status?: string
-          amount?: {
-            currency_code?: string
-            value?: string
-          }
-        }>
-      }
-    }>
+export type PayPalCaptureLike = {
+  id?: string
+  status?: string
+  payer?: {
+    email_address?: string
   }
+  purchase_units?: Array<{
+    payments?: {
+      captures?: Array<{
+        id?: string
+        status?: string
+        amount?: {
+          currency_code?: string
+          value?: string
+        }
+      }>
+    }
+  }>
+}
+
+type PayPalCaptureVerificationInput = {
+  captureData: PayPalCaptureLike
   expectedOrderId: string
   expectedTotalPrice: number
   expectedCurrencyCode?: string

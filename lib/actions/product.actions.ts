@@ -2,7 +2,10 @@
 
 import { unstable_cache } from 'next/cache'
 
-import { toProductDTO } from '@/lib/application/products/serializers'
+import {
+  ProductRecord,
+  toProductDTO,
+} from '@/lib/application/products/serializers'
 import { connectToDatabase } from '@/lib/db'
 import Product from '@/lib/db/models/product.model'
 import {
@@ -19,6 +22,16 @@ import { normalizePaginationPage } from '../pagination'
 import { PAGE_SIZE } from '../constants'
 
 const CATALOG_CACHE_REVALIDATE_SECONDS = 5 * 60
+
+type PublishedTagsAggregationRow = {
+  uniqueTags?: string[]
+}
+
+type ProductCardLinkRecord = {
+  name: string
+  slug: string
+  images?: string[]
+}
 
 const getPublishedCategories = unstable_cache(
   async () => {
@@ -39,7 +52,7 @@ const getPublishedCategories = unstable_cache(
 const getPublishedTags = unstable_cache(
   async () => {
     await connectToDatabase()
-    const tags = await Product.aggregate([
+    const tags = await Product.aggregate<PublishedTagsAggregationRow>([
       { $match: { isPublished: true } },
       { $unwind: '$tags' },
       { $group: { _id: null, uniqueTags: { $addToSet: '$tags' } } },
@@ -64,12 +77,12 @@ const getCachedProductsForCard = unstable_cache(
     )
       .sort({ createdAt: 'desc' })
       .limit(limit)
-      .lean()
+      .lean<ProductCardLinkRecord[]>()
 
     return products.map((product) => ({
       name: product.name,
       href: `/product/${product.slug}`,
-      image: product.images[0],
+      image: product.images?.[0] ?? '',
     })) as {
       name: string
       href: string
@@ -92,7 +105,7 @@ const getCachedProductsByTag = unstable_cache(
     }, PRODUCT_CARD_FIELDS)
       .sort({ createdAt: 'desc' })
       .limit(limit)
-      .lean()
+      .lean<ProductRecord[]>()
     return products.map((product) => toProductDTO(product))
   },
   ['products-by-tag'],
@@ -105,7 +118,10 @@ const getCachedProductsByTag = unstable_cache(
 const getCachedProductBySlug = unstable_cache(
   async (slug: string) => {
     await connectToDatabase()
-    const product = await Product.findOne({ slug, isPublished: true }).lean()
+    const product = await Product.findOne({
+      slug,
+      isPublished: true,
+    }).lean<ProductRecord | null>()
     if (!product) throw new Error('ไม่พบสินค้า')
     return toProductDTO(product)
   },
@@ -140,7 +156,7 @@ const getCachedRelatedProductsByCategory = unstable_cache(
       .sort({ numSales: 'desc' })
       .skip(skipAmount)
       .limit(limit)
-      .lean()
+      .lean<ProductRecord[]>()
     const productsCount = await Product.countDocuments(conditions)
     return {
       data: products.map((product) => toProductDTO(product)),
@@ -257,7 +273,7 @@ export async function getAllProducts({
       .sort(order)
       .skip(limit * (currentPage - 1))
       .limit(limit)
-      .lean(),
+      .lean<ProductRecord[]>(),
     Product.countDocuments(conditions),
   ])
   return {

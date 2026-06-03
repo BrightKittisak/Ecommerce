@@ -48,14 +48,44 @@ const findOrderForUser = async ({
   return order
 }
 
+type IdLike = {
+  toString(): string
+}
+
+type OrderItemProductRecord = {
+  _id: string | IdLike
+  name: string
+  slug: string
+  category: string
+  images: string[]
+  price: number
+  countInStock: number
+  sizes: string[]
+  colors: string[]
+}
+
+const ORDER_ITEM_PRODUCT_FIELDS = {
+  name: 1,
+  slug: 1,
+  category: 1,
+  images: 1,
+  price: 1,
+  countInStock: 1,
+  sizes: 1,
+  colors: 1,
+} as const
+
 const buildOrderItemsFromRequest = async (
   items: CreateOrderInput['items']
 ): Promise<OrderItem[]> => {
   const productIds = [...new Set(items.map((item) => item.product))]
-  const products = await Product.find({
-    _id: { $in: productIds },
-    isPublished: true,
-  }).lean()
+  const products = await Product.find(
+    {
+      _id: { $in: productIds },
+      isPublished: true,
+    },
+    ORDER_ITEM_PRODUCT_FIELDS
+  ).lean<OrderItemProductRecord[]>()
 
   const productById = new Map(
     products.map((product) => [String(product._id), product])

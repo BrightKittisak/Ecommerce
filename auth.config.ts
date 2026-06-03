@@ -1,22 +1,21 @@
 import type { NextAuthConfig } from 'next-auth'
 
+import { isAuthorizedPathAccessAllowed } from './lib/auth-authorization'
+
+type AuthorizedCallback = NonNullable<
+  NonNullable<NextAuthConfig['callbacks']>['authorized']
+>
+type AuthorizedCallbackInput = Parameters<AuthorizedCallback>[0]
+
 // Notice this is only an object, not a full Auth.js instance
 export default {
   providers: [],
   callbacks: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    authorized({ request, auth }: any) {
-      const { pathname } = request.nextUrl
-      const isAdminPath = /\/admin(\/.*)?/.test(pathname)
-      const isProtectedPath =
-        /\/checkout(\/.*)?/.test(pathname) || /\/account(\/.*)?/.test(pathname)
-
-      if (isAdminPath) {
-        return !!auth
-      }
-
-      if (isProtectedPath) return !!auth
-      return true
+    authorized({ request, auth }: AuthorizedCallbackInput) {
+      return isAuthorizedPathAccessAllowed({
+        pathname: request.nextUrl.pathname,
+        isAuthenticated: !!auth,
+      })
     },
   },
 } satisfies NextAuthConfig

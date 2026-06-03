@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import type { ProductRecord } from '@/lib/application/products/serializers'
+import { toProductDTO } from '@/lib/application/products/serializers'
 import Product from '@/lib/db/models/product.model'
 import { connectToDatabase } from '@/lib/db'
 import { parseBrowsingHistoryQuery } from '@/lib/browsing-history-query'
@@ -22,7 +24,7 @@ export const GET = async (request: NextRequest) => {
   await connectToDatabase()
   const products = await Product.find(filter, PRODUCT_CARD_FIELDS)
     .limit(listType === 'history' ? productIds.length : MAX_RELATED_PRODUCTS)
-    .lean()
+    .lean<ProductRecord[]>()
 
   if (listType === 'history')
     return NextResponse.json(
@@ -30,7 +32,7 @@ export const GET = async (request: NextRequest) => {
         (a, b) =>
           productIds.indexOf(a._id.toString()) -
           productIds.indexOf(b._id.toString())
-      )
+      ).map((product) => toProductDTO(product))
     )
-  return NextResponse.json(products)
+  return NextResponse.json(products.map((product) => toProductDTO(product)))
 }

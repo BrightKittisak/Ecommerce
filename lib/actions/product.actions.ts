@@ -6,12 +6,13 @@ import {
   ProductRecord,
   toProductDTO,
 } from '@/lib/application/products/serializers'
+import {
+  getPublishedCatalogCategories,
+  getPublishedCatalogTags,
+} from '@/lib/application/products/catalog-facet-queries'
 import { connectToDatabase } from '@/lib/db'
 import Product from '@/lib/db/models/product.model'
-import {
-  normalizeCatalogFacetValues,
-  normalizePublishedTagLabels,
-} from '@/lib/catalog-facets'
+import { productCatalogFacetDeps } from '@/lib/infrastructure/products/product-catalog-facet-deps'
 import {
   buildProductNameSearchFilter,
   buildProductPriceFilter,
@@ -23,10 +24,6 @@ import { PAGE_SIZE } from '../constants'
 
 const CATALOG_CACHE_REVALIDATE_SECONDS = 5 * 60
 
-type PublishedTagsAggregationRow = {
-  uniqueTags?: string[]
-}
-
 type ProductCardLinkRecord = {
   name: string
   slug: string
@@ -36,11 +33,7 @@ type ProductCardLinkRecord = {
 const getPublishedCategories = unstable_cache(
   async () => {
     await connectToDatabase()
-    const categories = await Product.find({ isPublished: true }).distinct(
-      'category'
-    )
-
-    return normalizeCatalogFacetValues(categories)
+    return getPublishedCatalogCategories({ deps: productCatalogFacetDeps })
   },
   ['published-categories'],
   {
@@ -52,14 +45,7 @@ const getPublishedCategories = unstable_cache(
 const getPublishedTags = unstable_cache(
   async () => {
     await connectToDatabase()
-    const tags = await Product.aggregate<PublishedTagsAggregationRow>([
-      { $match: { isPublished: true } },
-      { $unwind: '$tags' },
-      { $group: { _id: null, uniqueTags: { $addToSet: '$tags' } } },
-      { $project: { _id: 0, uniqueTags: 1 } },
-    ])
-
-    return normalizePublishedTagLabels(tags)
+    return getPublishedCatalogTags({ deps: productCatalogFacetDeps })
   },
   ['published-tags'],
   {

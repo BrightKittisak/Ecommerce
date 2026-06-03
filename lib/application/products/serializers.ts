@@ -6,7 +6,7 @@ type IdLike = {
   toString(): string
 }
 
-type ProductRecord = {
+export type ProductRecord = {
   _id: string | IdLike
   name: string
   slug: string

@@ -1,20 +1,21 @@
 'use server'
 
-import { CreateOrderInput, OrderItem, ShippingAddress } from '@/types'
+import { CreateOrderInput, OrderItem } from '@/types'
 import { toOrderDTO } from '@/lib/application/orders/serializers'
 import type { OrderDTO } from '@/lib/application/orders/dtos'
 import {
   approvePayPalPaymentOrder,
   createPayPalPaymentOrder,
 } from '@/lib/application/orders/process-paypal-payment'
-import { CURRENCY_CODE, calculateFutureDate, formatError, round2 } from '../utils'
+import { calcDeliveryDateAndPrice } from '@/lib/domain/order/pricing'
+import { CURRENCY_CODE, formatError, round2 } from '../utils'
 import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
 import Order, { IOrder } from '../db/models/order.model'
 import Product from '../db/models/product.model'
 import { revalidatePath } from 'next/cache'
-import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE } from '../constants'
+import { PAGE_SIZE } from '../constants'
 import { CreateOrderSchema } from '../order-validator'
 import {
   StockReservation,
@@ -178,11 +179,11 @@ export const createOrderFromCart = async (
   const cart = {
     ...clientOrder,
     items,
-    ...(await calcDeliveryDateAndPrice({
+    ...calcDeliveryDateAndPrice({
       items,
       shippingAddress: clientOrder.shippingAddress,
       deliveryDateIndex: clientOrder.deliveryDateIndex,
-    })),
+    }),
   }
 
   const order = OrderInputSchema.parse({
@@ -303,56 +304,6 @@ export async function approvePayPalOrder(
     return { success: false, message: formatError(err) }
   }
 }
-
-export const calcDeliveryDateAndPrice = async ({
-  items,
-  shippingAddress,
-  deliveryDateIndex,
-}: {
-  deliveryDateIndex?: number
-  items: OrderItem[]
-  shippingAddress?: ShippingAddress
-}) => {
-  const itemsPrice = round2(
-    items.reduce((acc, item) => acc + item.price * item.quantity, 0)
-  )
-
-  const fallbackDeliveryDateIndex = AVAILABLE_DELIVERY_DATES.length - 1
-  const normalizedDeliveryDateIndex =
-    typeof deliveryDateIndex === 'number' &&
-    Number.isInteger(deliveryDateIndex) &&
-    deliveryDateIndex >= 0 &&
-    deliveryDateIndex < AVAILABLE_DELIVERY_DATES.length
-      ? deliveryDateIndex
-      : fallbackDeliveryDateIndex
-
-  const deliveryDate = AVAILABLE_DELIVERY_DATES[normalizedDeliveryDateIndex]
-  const shippingPrice =
-    !shippingAddress || !deliveryDate
-      ? undefined
-      : deliveryDate.freeShippingMinPrice > 0 &&
-        itemsPrice >= deliveryDate.freeShippingMinPrice
-        ? 0
-        : deliveryDate.shippingPrice
-
-  const taxPrice = !shippingAddress ? undefined : round2(itemsPrice * 0.15)
-
-  const totalPrice = round2(
-    itemsPrice +
-    (shippingPrice ? round2(shippingPrice) : 0) +
-    (taxPrice ? round2(taxPrice) : 0)
-  )
-  return {
-    AVAILABLE_DELIVERY_DATES,
-    deliveryDateIndex: normalizedDeliveryDateIndex,
-    expectedDeliveryDate: calculateFutureDate(deliveryDate.daysToDeliver),
-    itemsPrice,
-    shippingPrice,
-    taxPrice,
-    totalPrice
-  }
-}
-
 
 // GET
 export async function getMyOrders({

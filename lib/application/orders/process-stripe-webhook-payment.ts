@@ -1,6 +1,3 @@
-import Order, { IOrder } from '../../db/models/order.model'
-import { logger, serializeLogError } from '../../logger'
-import { incrementProductSales } from '../../product-sales'
 import {
   StripePaymentIntentLike,
   verifyStripePaymentIntent,
@@ -27,7 +24,7 @@ export type StripeWebhookOrder = {
   save(): Promise<unknown>
 }
 
-type ProcessStripeWebhookPaymentDeps = {
+export type ProcessStripeWebhookPaymentDeps = {
   findOrderById(orderId: string): Promise<StripeWebhookOrder | null>
   incrementSales(items: OrderItem[]): Promise<void>
   sendReceipt(order: StripeWebhookOrder): Promise<void>
@@ -40,7 +37,7 @@ type ProcessStripeWebhookPaymentDeps = {
 
 type ProcessStripeWebhookPaymentInput = {
   paymentIntent: StripePaymentIntentLike
-  deps?: ProcessStripeWebhookPaymentDeps
+  deps: ProcessStripeWebhookPaymentDeps
 }
 
 export type ProcessStripeWebhookPaymentResult =
@@ -65,28 +62,9 @@ export type ProcessStripeWebhookPaymentResult =
       message: 'Order payment marked as completed'
     }
 
-const defaultDeps: ProcessStripeWebhookPaymentDeps = {
-  async findOrderById(orderId) {
-    const order = await Order.findById(orderId).populate('user', 'email')
-    return order
-  },
-  incrementSales: incrementProductSales,
-  async sendReceipt(order) {
-    const { sendPurchaseReceipt } = await import('../../../emails')
-    await sendPurchaseReceipt({ order: order as IOrder })
-  },
-  logReceiptError({ orderId, paymentIntentId, error }) {
-    logger.error('stripe.purchase_receipt_failed', {
-      orderId,
-      paymentIntentId,
-      error: serializeLogError(error),
-    })
-  },
-}
-
 export async function processStripeWebhookPayment({
   paymentIntent,
-  deps = defaultDeps,
+  deps,
 }: ProcessStripeWebhookPaymentInput): Promise<ProcessStripeWebhookPaymentResult> {
   const orderId = paymentIntent.metadata?.orderId
 

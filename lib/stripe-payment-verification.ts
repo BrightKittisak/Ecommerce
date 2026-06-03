@@ -1,6 +1,7 @@
-type StripePaymentIntentLike = {
+export type StripePaymentIntentLike = {
   id: string
   status: string
+  created: number
   amount?: number
   amount_received?: number
   currency: string

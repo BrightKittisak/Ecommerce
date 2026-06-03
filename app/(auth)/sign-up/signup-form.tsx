@@ -59,7 +59,7 @@ export default function SignUpForm() {
       redirect(callbackUrl)
     } catch (error) {
       if (isRedirectError(error)) throw error
-      toast.error('เน€เธเธดเธ”เธเธฑเธเธซเธฒเธเธฒเธเธญเธขเนเธฒเธ เธเธฃเธธเธ“เธฒเธฅเธญเธเนเธซเธกเนเธญเธตเธเธเธฃเธฑเนเธ')
+      toast.error('เกิดปัญหาบางอย่าง กรุณาลองใหม่อีกครั้ง')
     } finally {
       setIsSubmitting(false)
     }
@@ -75,9 +75,9 @@ export default function SignUpForm() {
             name='name'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>เธเธทเนเธญ</FormLabel>
+                <FormLabel>ชื่อ</FormLabel>
                 <FormControl>
-                  <Input placeholder='เธเธฃเธญเธเธเธทเนเธญเธเธญเธเธเธธเธ“' {...field} />
+                  <Input placeholder='กรอกชื่อของคุณ' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -89,11 +89,11 @@ export default function SignUpForm() {
             name='email'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>เธญเธตเน€เธกเธฅ</FormLabel>
+                <FormLabel>อีเมล</FormLabel>
                 <FormControl>
                   <Input
                     type='email'
-                    placeholder='เธเธฃเธญเธเธญเธตเน€เธกเธฅ'
+                    placeholder='กรอกอีเมล'
                     autoComplete='email'
                     {...field}
                   />
@@ -108,18 +108,18 @@ export default function SignUpForm() {
             name='password'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>เธฃเธซเธฑเธชเธเนเธฒเธ</FormLabel>
+                <FormLabel>รหัสผ่าน</FormLabel>
                 <FormControl>
                   <Input
                     type='password'
-                    placeholder='เธเธฃเธญเธเธฃเธซเธฑเธชเธเนเธฒเธ'
+                    placeholder='กรอกรหัสผ่าน'
                     autoComplete='new-password'
                     {...field}
                   />
                 </FormControl>
                 <p className='text-xs text-muted-foreground'>
-                  Use at least 8 characters with uppercase, lowercase, number,
-                  and special character.
+                  ใช้อย่างน้อย 8 ตัวอักษร โดยมีตัวพิมพ์ใหญ่ ตัวพิมพ์เล็ก
+                  ตัวเลข และอักขระพิเศษ
                 </p>
                 <FormMessage />
               </FormItem>
@@ -131,11 +131,11 @@ export default function SignUpForm() {
             name='confirmPassword'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>เธขเธทเธเธขเธฑเธเธฃเธซเธฑเธชเธเนเธฒเธ</FormLabel>
+                <FormLabel>ยืนยันรหัสผ่าน</FormLabel>
                 <FormControl>
                   <Input
                     type='password'
-                    placeholder='เธเธฃเธญเธเธฃเธซเธฑเธชเธเนเธฒเธเธญเธตเธเธเธฃเธฑเนเธ'
+                    placeholder='กรอกรหัสผ่านอีกครั้ง'
                     autoComplete='new-password'
                     {...field}
                   />
@@ -147,27 +147,27 @@ export default function SignUpForm() {
 
           <div>
             <Button type='submit' disabled={isSubmitting}>
-              {isSubmitting ? 'เธเธณเธฅเธฑเธเธชเธกเธฑเธเธฃเธชเธกเธฒเธเธดเธ...' : 'เธชเธกเธฑเธเธฃเธชเธกเธฒเธเธดเธ'}
+              {isSubmitting ? 'กำลังสมัครสมาชิก...' : 'สมัครสมาชิก'}
             </Button>
           </div>
 
           <div className='text-sm'>
-            เน€เธกเธทเนเธญเธชเธฃเนเธฒเธเธเธฑเธเธเธต เนเธเธฅเธงเนเธฒเธเธธเธ“เธขเธญเธกเธฃเธฑเธ{' '}
-            <Link href='/page/conditions-of-use'>เน€เธเธทเนเธญเธเนเธเธเธฒเธฃเนเธเนเธเธฒเธ</Link>{' '}
-            เนเธฅเธฐ{' '}
-            <Link href='/page/privacy-policy'>เธเนเธขเธเธฒเธขเธเธงเธฒเธกเน€เธเนเธเธชเนเธงเธเธ•เธฑเธง</Link>{' '}
-            เธเธญเธ {APP_NAME}
+            เมื่อสร้างบัญชี แปลว่าคุณยอมรับ{' '}
+            <Link href='/page/conditions-of-use'>เงื่อนไขการใช้งาน</Link>{' '}
+            และ{' '}
+            <Link href='/page/privacy-policy'>นโยบายความเป็นส่วนตัว</Link>{' '}
+            ของ {APP_NAME}
           </div>
 
           <Separator className='mb-4' />
 
           <div className='text-sm'>
-            เธกเธตเธเธฑเธเธเธตเธญเธขเธนเนเนเธฅเนเธง?{' '}
+            มีบัญชีอยู่แล้ว?{' '}
             <Link
               className='link'
               href={`/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`}
             >
-              เน€เธเนเธฒเธชเธนเนเธฃเธฐเธเธ
+              เข้าสู่ระบบ
             </Link>
           </div>
         </div>

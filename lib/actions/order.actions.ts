@@ -246,7 +246,7 @@ export async function createPayPalOrder(orderId: string) {
     if (order.isPaid) {
       return {
         success: true,
-        message: 'Order is already paid',
+        message: 'คำสั่งซื้อนี้ชำระเงินแล้ว',
       }
     }
 
@@ -286,12 +286,12 @@ export async function approvePayPalOrder(
     if (order.isPaid) {
       return {
         success: true,
-        message: 'Order is already paid',
+        message: 'คำสั่งซื้อนี้ชำระเงินแล้ว',
       }
     }
 
     if (data.orderID !== order.paymentResult?.id) {
-      throw new Error('PayPal order does not match this order')
+      throw new Error('รายการชำระเงิน PayPal ไม่ตรงกับคำสั่งซื้อนี้')
     }
 
     const captureData = await paypal.capturePayment(data.orderID)

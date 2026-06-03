@@ -15,7 +15,7 @@ type RateLimitKey = {
 
 export class AuthRateLimitError extends Error {
   constructor() {
-    super('Too many sign-in attempts. Please try again later.')
+    super('พยายามเข้าสู่ระบบหลายครั้งเกินไป กรุณาลองใหม่อีกครั้งภายหลัง')
     this.name = 'AuthRateLimitError'
   }
 }

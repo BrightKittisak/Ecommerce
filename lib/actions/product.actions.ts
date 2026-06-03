@@ -10,6 +10,7 @@ import {
   getProductCardLinksByTag,
   getProductDTOsByTag,
 } from '@/lib/application/products/product-tag-queries'
+import { getPublishedProductBySlug } from '@/lib/application/products/product-slug-query'
 import {
   getPublishedCatalogCategories,
   getPublishedCatalogTags,
@@ -17,6 +18,7 @@ import {
 import { connectToDatabase } from '@/lib/db'
 import Product from '@/lib/db/models/product.model'
 import { productCatalogFacetDeps } from '@/lib/infrastructure/products/product-catalog-facet-deps'
+import { productSlugQueryDeps } from '@/lib/infrastructure/products/product-slug-query-deps'
 import { productTagQueryDeps } from '@/lib/infrastructure/products/product-tag-query-deps'
 import {
   buildProductNameSearchFilter,
@@ -88,12 +90,7 @@ const getCachedProductsByTag = unstable_cache(
 const getCachedProductBySlug = unstable_cache(
   async (slug: string) => {
     await connectToDatabase()
-    const product = await Product.findOne({
-      slug,
-      isPublished: true,
-    }).lean<ProductRecord | null>()
-    if (!product) throw new Error('ไม่พบสินค้า')
-    return toProductDTO(product)
+    return getPublishedProductBySlug({ slug, deps: productSlugQueryDeps })
   },
   ['product-by-slug'],
   {

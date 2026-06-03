@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 import { Cart, OrderItem, ShippingAddress } from '@/types'
-import { calcDeliveryDateAndPrice } from '@/lib/actions/order.actions'
+import { calcDeliveryDateAndPrice } from '@/lib/domain/order/pricing'
 
 const initialState: Cart = {
   items: [],
@@ -64,10 +64,10 @@ const useCartStore = create(
           cart: {
             ...get().cart,
             items: updatedCartItems,
-            ...(await calcDeliveryDateAndPrice({
+            ...calcDeliveryDateAndPrice({
               items: updatedCartItems,
               shippingAddress,
-            })),
+            }),
           },
         })
         const foundItem = updatedCartItems.find(
@@ -104,10 +104,10 @@ const useCartStore = create(
           cart: {
             ...get().cart,
             items: updatedCartItems,
-            ...(await calcDeliveryDateAndPrice({
+            ...calcDeliveryDateAndPrice({
               items: updatedCartItems,
               shippingAddress,
-            })),
+            }),
           },
         })
       },
@@ -123,10 +123,10 @@ const useCartStore = create(
           cart: {
             ...get().cart,
             items: updatedCartItems,
-            ...(await calcDeliveryDateAndPrice({
+            ...calcDeliveryDateAndPrice({
               items: updatedCartItems,
               shippingAddress,
-            })),
+            }),
           },
         })
       },
@@ -136,10 +136,10 @@ const useCartStore = create(
           cart: {
             ...get().cart,
             shippingAddress,
-            ...(await calcDeliveryDateAndPrice({
+            ...calcDeliveryDateAndPrice({
               items,
               shippingAddress,
-            })),
+            }),
           },
         })
       },
@@ -157,11 +157,11 @@ const useCartStore = create(
         set({
           cart: {
             ...get().cart,
-            ...(await calcDeliveryDateAndPrice({
+            ...calcDeliveryDateAndPrice({
               items,
               shippingAddress,
               deliveryDateIndex: index,
-            })),
+            }),
           },
         })
       },

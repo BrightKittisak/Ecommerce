@@ -3,15 +3,16 @@
 import { CreateOrderInput, OrderItem, ShippingAddress } from '@/types'
 import { toOrderDTO } from '@/lib/application/orders/serializers'
 import type { OrderDTO } from '@/lib/application/orders/dtos'
+import {
+  approvePayPalPaymentOrder,
+  createPayPalPaymentOrder,
+} from '@/lib/application/orders/process-paypal-payment'
 import { CURRENCY_CODE, calculateFutureDate, formatError, round2 } from '../utils'
 import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
 import Order, { IOrder } from '../db/models/order.model'
 import Product from '../db/models/product.model'
-import { paypal } from '../paypal'
-import { verifyPayPalCapture } from '../paypal-capture-verification'
-import { sendPurchaseReceipt } from '@/emails'
 import { revalidatePath } from 'next/cache'
 import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE } from '../constants'
 import { CreateOrderSchema } from '../order-validator'
@@ -19,7 +20,6 @@ import {
   StockReservation,
   aggregateStockReservations,
 } from '../order-stock-reservation'
-import { incrementProductSales } from '../product-sales'
 import { normalizePaginationPage } from '../pagination'
 
 const getOrderOwnerId = (order: IOrder) => {
@@ -250,18 +250,18 @@ export async function createPayPalOrder(orderId: string) {
       }
     }
 
-    const paypalOrder = await paypal.createOrder(order.totalPrice)
-    order.paymentResult = {
-      id: paypalOrder.id,
-      email_address: '',
-      status: '',
-      pricePaid: '0',
+    const result = await createPayPalPaymentOrder({ order })
+    if (result.status === 'already_processed') {
+      return {
+        success: true,
+        message: 'คำสั่งซื้อนี้ชำระเงินแล้ว',
+      }
     }
-    await order.save()
+
     return {
       success: true,
       message: 'สร้างรายการชำระเงินผ่าน PayPal เรียบร้อยแล้ว',
-      data: paypalOrder.id,
+      data: result.paypalOrderId,
     }
   } catch (err) {
     return { success: false, message: formatError(err) }
@@ -283,40 +283,17 @@ export async function approvePayPalOrder(
       isAdmin: session.user.role === 'Admin',
     })
 
-    if (order.isPaid) {
+    const result = await approvePayPalPaymentOrder({
+      order,
+      paypalOrderId: data.orderID,
+    })
+    if (result.status === 'already_processed') {
       return {
         success: true,
         message: 'คำสั่งซื้อนี้ชำระเงินแล้ว',
       }
     }
 
-    if (data.orderID !== order.paymentResult?.id) {
-      throw new Error('รายการชำระเงิน PayPal ไม่ตรงกับคำสั่งซื้อนี้')
-    }
-
-    const captureData = await paypal.capturePayment(data.orderID)
-    let verifiedCapture
-    try {
-      verifiedCapture = verifyPayPalCapture({
-        captureData,
-        expectedOrderId: data.orderID,
-        expectedTotalPrice: order.totalPrice,
-      })
-    } catch {
-      throw new Error('เกิดข้อผิดพลาดในการชำระเงินผ่าน PayPal')
-    }
-    order.isPaid = true
-    order.paidAt = new Date()
-    order.paymentResult = {
-      id: verifiedCapture.captureId,
-      status: verifiedCapture.status,
-      email_address: verifiedCapture.payerEmail,
-      pricePaid: verifiedCapture.pricePaid,
-    }
-    await order.populate('user', 'email')
-    await order.save()
-    await incrementProductSales(order.items)
-    await sendPurchaseReceipt({ order })
     revalidatePath(`/account/orders/${orderId}`)
     return {
       success: true,

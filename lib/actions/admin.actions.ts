@@ -11,18 +11,11 @@ import {
   toAdminOverviewRecentOrder,
 } from '@/lib/application/admin/admin-overview'
 import {
-  AdminOrderRecord,
-  AdminOrderListItem,
-  toAdminOrderListItem,
+  AdminOrdersResult,
+  getAdminOrderList,
 } from '@/lib/application/admin/admin-orders'
+import { adminOrderListQueryDeps } from '@/lib/infrastructure/admin/admin-order-list-query-deps'
 import { normalizePaginationPage } from '@/lib/pagination'
-
-export type AdminOrdersResult = {
-  orders: AdminOrderListItem[]
-  page: number
-  totalPages: number
-  totalOrders: number
-}
 
 type SalesAggregationRow = {
   totalRevenue?: number
@@ -46,26 +39,14 @@ export async function getAdminOrders({
   limit?: number
 }): Promise<AdminOrdersResult> {
   const currentPage = normalizePaginationPage(page)
-  const skipAmount = (currentPage - 1) * limit
 
   await connectToDatabase()
 
-  const [ordersRaw, ordersCount] = await Promise.all([
-    Order.find({})
-      .sort({ createdAt: -1 })
-      .skip(skipAmount)
-      .limit(limit)
-      .populate('user', 'name email')
-      .lean<AdminOrderRecord[]>(),
-    Order.countDocuments(),
-  ])
-
-  return {
-    orders: ordersRaw.map(toAdminOrderListItem),
+  return getAdminOrderList({
     page: currentPage,
-    totalPages: Math.ceil(ordersCount / limit),
-    totalOrders: ordersCount,
-  }
+    limit,
+    deps: adminOrderListQueryDeps,
+  })
 }
 
 export async function getAdminOverviewStats(): Promise<AdminOverviewStats> {

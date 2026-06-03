@@ -9,6 +9,21 @@ export type AdminOrderListItem = {
   customerName: string
 }
 
+export type AdminOrdersResult = {
+  orders: AdminOrderListItem[]
+  page: number
+  totalPages: number
+  totalOrders: number
+}
+
+export type AdminOrderListQueryDeps = {
+  findAdminOrders(input: {
+    skip: number
+    limit: number
+  }): Promise<AdminOrderRecord[]>
+  countAdminOrders(): Promise<number>
+}
+
 type IdLike = {
   toString(): string
 }
@@ -61,5 +76,31 @@ export function toAdminOrderListItem(
     isDelivered: order.isDelivered,
     totalPrice: order.totalPrice,
     customerName: getCustomerName(order.user),
+  }
+}
+
+export async function getAdminOrderList({
+  page,
+  limit,
+  deps,
+}: {
+  page: number
+  limit: number
+  deps: AdminOrderListQueryDeps
+}): Promise<AdminOrdersResult> {
+  const skip = (page - 1) * limit
+  const [ordersRaw, ordersCount] = await Promise.all([
+    deps.findAdminOrders({
+      skip,
+      limit,
+    }),
+    deps.countAdminOrders(),
+  ])
+
+  return {
+    orders: ordersRaw.map(toAdminOrderListItem),
+    page,
+    totalPages: Math.ceil(ordersCount / limit),
+    totalOrders: ordersCount,
   }
 }

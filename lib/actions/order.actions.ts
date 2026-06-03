@@ -2,35 +2,26 @@
 
 import { CreateOrderInput } from '@/types'
 import type { OrderDTO } from '@/lib/application/orders/dtos'
+import { createOrderFromCart } from '@/lib/application/orders/create-order-from-cart'
 import {
   getOrderDTOById,
   getOrderDTOForUser,
   requireOrderForUser,
 } from '@/lib/application/orders/order-access-query'
-import { buildOrderItemsFromRequest } from '@/lib/application/orders/build-order-items'
 import { getUserOrderList } from '@/lib/application/orders/user-order-list-query'
-import {
-  releaseProductStock,
-  reserveProductStock,
-} from '@/lib/application/orders/product-stock-reservation'
 import {
   approvePayPalPaymentOrder,
   createPayPalPaymentOrder,
 } from '@/lib/application/orders/process-paypal-payment'
 import { orderAccessQueryDeps } from '@/lib/infrastructure/orders/order-access-query-deps'
-import { orderItemProductDeps } from '@/lib/infrastructure/orders/order-item-product-deps'
-import { productStockReservationDeps } from '@/lib/infrastructure/orders/product-stock-reservation-deps'
+import { createOrderFromCartDeps } from '@/lib/infrastructure/orders/create-order-from-cart-deps'
 import { userOrderListQueryDeps } from '@/lib/infrastructure/orders/user-order-list-query-deps'
 import { paypalPaymentDeps } from '@/lib/infrastructure/payments/paypal-payment-deps'
-import { calcDeliveryDateAndPrice } from '@/lib/domain/order/pricing'
-import { CURRENCY_CODE, formatError } from '../utils'
+import { formatError } from '../utils'
 import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
-import { OrderInputSchema } from '../validator'
-import Order from '../db/models/order.model'
 import { revalidatePath } from 'next/cache'
 import { CreateOrderSchema } from '../order-validator'
-import { aggregateStockReservations } from '../order-stock-reservation'
 
 // CREATE
 export const createOrder = async (clientOrder: CreateOrderInput) => {
@@ -40,8 +31,11 @@ export const createOrder = async (clientOrder: CreateOrderInput) => {
     if (!session) throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
     // recalculate price and delivery date on the server
     const createdOrder = await createOrderFromCart(
-      CreateOrderSchema.parse(clientOrder),
-      session.user.id!
+      {
+        clientOrder: CreateOrderSchema.parse(clientOrder),
+        userId: session.user.id!,
+        deps: createOrderFromCartDeps,
+      }
     )
     return {
       success: true,
@@ -50,51 +44,6 @@ export const createOrder = async (clientOrder: CreateOrderInput) => {
     }
   } catch (error) {
     return { success: false, message: formatError(error) }
-  }
-}
-export const createOrderFromCart = async (
-  clientOrder: CreateOrderInput,
-  userId: string
-) => {
-  const items = await buildOrderItemsFromRequest({
-    items: clientOrder.items,
-    deps: orderItemProductDeps,
-  })
-  const stockReservations = aggregateStockReservations(clientOrder.items)
-  const cart = {
-    ...clientOrder,
-    items,
-    ...calcDeliveryDateAndPrice({
-      items,
-      shippingAddress: clientOrder.shippingAddress,
-      deliveryDateIndex: clientOrder.deliveryDateIndex,
-    }),
-  }
-
-  const order = OrderInputSchema.parse({
-    user: userId,
-    items: cart.items,
-    shippingAddress: cart.shippingAddress,
-    paymentMethod: cart.paymentMethod,
-    itemsPrice: cart.itemsPrice,
-    shippingPrice: cart.shippingPrice,
-    taxPrice: cart.taxPrice,
-    totalPrice: cart.totalPrice,
-    currencyCode: CURRENCY_CODE,
-    expectedDeliveryDate: cart.expectedDeliveryDate,
-  })
-  const reservedStock = await reserveProductStock({
-    reservations: stockReservations,
-    deps: productStockReservationDeps,
-  })
-  try {
-    return await Order.create(order)
-  } catch (error) {
-    await releaseProductStock({
-      reservations: reservedStock,
-      deps: productStockReservationDeps,
-    })
-    throw error
   }
 }
 

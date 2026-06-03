@@ -1,15 +1,17 @@
 'use server'
 
-import { CreateOrderInput, OrderItem } from '@/types'
+import { CreateOrderInput } from '@/types'
 import { toOrderDTO } from '@/lib/application/orders/serializers'
 import type { OrderDTO } from '@/lib/application/orders/dtos'
+import { buildOrderItemsFromRequest } from '@/lib/application/orders/build-order-items'
 import {
   approvePayPalPaymentOrder,
   createPayPalPaymentOrder,
 } from '@/lib/application/orders/process-paypal-payment'
+import { orderItemProductDeps } from '@/lib/infrastructure/orders/order-item-product-deps'
 import { paypalPaymentDeps } from '@/lib/infrastructure/payments/paypal-payment-deps'
 import { calcDeliveryDateAndPrice } from '@/lib/domain/order/pricing'
-import { CURRENCY_CODE, formatError, round2 } from '../utils'
+import { CURRENCY_CODE, formatError } from '../utils'
 import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
@@ -47,93 +49,6 @@ const findOrderForUser = async ({
     throw new Error('ไม่พบคำสั่งซื้อ')
   }
   return order
-}
-
-type IdLike = {
-  toString(): string
-}
-
-type OrderItemProductRecord = {
-  _id: string | IdLike
-  name: string
-  slug: string
-  category: string
-  images: string[]
-  price: number
-  countInStock: number
-  sizes: string[]
-  colors: string[]
-}
-
-const ORDER_ITEM_PRODUCT_FIELDS = {
-  name: 1,
-  slug: 1,
-  category: 1,
-  images: 1,
-  price: 1,
-  countInStock: 1,
-  sizes: 1,
-  colors: 1,
-} as const
-
-const buildOrderItemsFromRequest = async (
-  items: CreateOrderInput['items']
-): Promise<OrderItem[]> => {
-  const productIds = [...new Set(items.map((item) => item.product))]
-  const products = await Product.find(
-    {
-      _id: { $in: productIds },
-      isPublished: true,
-    },
-    ORDER_ITEM_PRODUCT_FIELDS
-  ).lean<OrderItemProductRecord[]>()
-
-  const productById = new Map(
-    products.map((product) => [String(product._id), product])
-  )
-
-  return items.map((item) => {
-    const product = productById.get(item.product)
-
-    if (!product) {
-      throw new Error('ไม่พบสินค้าที่ต้องการสั่งซื้อ')
-    }
-
-    if (item.quantity > product.countInStock) {
-      throw new Error(`สินค้า ${product.name} มีในสต็อกไม่เพียงพอ`)
-    }
-
-    if (item.size && product.sizes.length > 0 && !product.sizes.includes(item.size)) {
-      throw new Error(`ไซซ์ ${item.size} ของสินค้า ${product.name} ไม่ถูกต้อง`)
-    }
-
-    if (
-      item.color &&
-      product.colors.length > 0 &&
-      !product.colors.includes(item.color)
-    ) {
-      throw new Error(`สี ${item.color} ของสินค้า ${product.name} ไม่ถูกต้อง`)
-    }
-
-    const primaryImage = product.images[0]
-    if (!primaryImage) {
-      throw new Error(`สินค้า ${product.name} ไม่มีรูปภาพสำหรับสร้างคำสั่งซื้อ`)
-    }
-
-    return {
-      clientId: item.clientId,
-      product: String(product._id),
-      name: product.name,
-      slug: product.slug,
-      category: product.category,
-      quantity: item.quantity,
-      countInStock: product.countInStock,
-      image: primaryImage,
-      price: round2(product.price),
-      size: item.size,
-      color: item.color,
-    }
-  })
 }
 
 const reserveProductStock = async (
@@ -205,7 +120,10 @@ export const createOrderFromCart = async (
   clientOrder: CreateOrderInput,
   userId: string
 ) => {
-  const items = await buildOrderItemsFromRequest(clientOrder.items)
+  const items = await buildOrderItemsFromRequest({
+    items: clientOrder.items,
+    deps: orderItemProductDeps,
+  })
   const stockReservations = aggregateStockReservations(clientOrder.items)
   const cart = {
     ...clientOrder,

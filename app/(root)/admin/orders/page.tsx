@@ -13,10 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { PAGE_SIZE } from '@/lib/constants'
-import { connectToDatabase } from '@/lib/db'
-import Order from '@/lib/db/models/order.model'
-import { normalizePaginationPage } from '@/lib/pagination'
+import { getAdminOrders } from '@/lib/actions/admin.actions'
 import { formatDateTime, formatId } from '@/lib/utils'
 
 export const metadata: Metadata = {
@@ -39,38 +36,9 @@ export default async function AdminOrdersPage(props: {
   }
 
   const searchParams = await props.searchParams
-  const page = normalizePaginationPage(searchParams.page)
-  const limit = PAGE_SIZE
-  const skipAmount = (page - 1) * limit
-
-  await connectToDatabase()
-
-  const [ordersRaw, ordersCount] = await Promise.all([
-    Order.find({})
-      .sort({ createdAt: -1 })
-      .skip(skipAmount)
-      .limit(limit)
-      .populate('user', 'name email')
-      .lean(),
-    Order.countDocuments(),
-  ])
-
-  const orders = ordersRaw.map((order) => ({
-    _id: String(order._id),
-    createdAt: order.createdAt,
-    paidAt: order.paidAt,
-    deliveredAt: order.deliveredAt,
-    isPaid: order.isPaid,
-    isDelivered: order.isDelivered,
-    totalPrice: order.totalPrice,
-    customerName:
-      typeof order.user === 'object' &&
-      order.user &&
-      'name' in order.user &&
-      typeof order.user.name === 'string'
-        ? order.user.name
-        : 'ลูกค้าที่ไม่ได้ระบุชื่อ',
-  }))
+  const { orders, page, totalPages } = await getAdminOrders({
+    page: searchParams.page,
+  })
 
   return (
     <div className='mx-auto w-full max-w-6xl space-y-6'>
@@ -133,9 +101,7 @@ export default async function AdminOrdersPage(props: {
         </Table>
       </div>
 
-      {ordersCount > limit && (
-        <Pagination page={page} totalPages={Math.ceil(ordersCount / limit)} />
-      )}
+      {totalPages > 1 && <Pagination page={page} totalPages={totalPages} />}
     </div>
   )
 }

@@ -9,6 +9,7 @@ import {
 const validPaymentIntent = {
   id: 'pi_123',
   status: 'succeeded',
+  created: 1_780_000_000,
   amount: 12050,
   amount_received: 12050,
   currency: 'thb',

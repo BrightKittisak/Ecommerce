@@ -13,6 +13,10 @@ type RateLimitKey = {
   scope: RateLimitScope
 }
 
+type BlockedAuthRateLimitRecord = {
+  _id: unknown
+}
+
 export class AuthRateLimitError extends Error {
   constructor() {
     super('พยายามเข้าสู่ระบบหลายครั้งเกินไป กรุณาลองใหม่อีกครั้งภายหลัง')
@@ -69,7 +73,9 @@ export const assertSignInAllowed = async (keys: RateLimitKey[]) => {
   const blockedRecord = await AuthRateLimit.findOne({
     key: { $in: keys.map((item) => item.key) },
     blockedUntil: { $gt: now },
-  }).lean()
+  })
+    .select({ _id: 1 })
+    .lean<BlockedAuthRateLimitRecord | null>()
 
   if (blockedRecord) {
     throw new AuthRateLimitError()

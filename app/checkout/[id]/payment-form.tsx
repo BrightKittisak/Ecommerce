@@ -86,7 +86,7 @@ export default function OrderPaymentForm({
     const res = await createPayPalOrder(order._id)
     if (!res.success || !res.data) {
       const message = res.success
-        ? 'Unable to create PayPal order'
+        ? 'ไม่สามารถสร้างรายการชำระเงิน PayPal ได้'
         : res.message
       toast.error(message)
       throw new Error(message)

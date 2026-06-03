@@ -13,12 +13,12 @@ import { APP_NAME } from '@/lib/constants'
 import { GoogleSignInForm } from './google-signin-form'
 
 export const metadata: Metadata = {
-  title: 'เน€เธเนเธฒเธชเธนเนเธฃเธฐเธเธ',
+  title: 'เข้าสู่ระบบ',
 }
 
 const authErrorMessages: Record<string, string> = {
   OAuthAccountNotLinked:
-    'This email is already using a different sign-in method. Please sign in with the original method first.',
+    'อีเมลนี้ผูกกับวิธีเข้าสู่ระบบแบบอื่นอยู่ กรุณาเข้าสู่ระบบด้วยวิธีเดิมก่อน',
 }
 
 export default async function SignIn(props: {
@@ -43,7 +43,7 @@ export default async function SignIn(props: {
     <div className='w-full'>
       <Card>
         <CardHeader>
-          <CardTitle className='text-2xl'>เน€เธเนเธฒเธชเธนเนเธฃเธฐเธเธ</CardTitle>
+          <CardTitle className='text-2xl'>เข้าสู่ระบบ</CardTitle>
         </CardHeader>
         <CardContent>
           {authError && (
@@ -60,11 +60,11 @@ export default async function SignIn(props: {
           </div>
         </CardContent>
       </Card>
-      <SeparatorWithOr>เน€เธเธดเนเธเน€เธเธขเนเธเน {APP_NAME} เนเธเนเนเธซเธก?</SeparatorWithOr>
+      <SeparatorWithOr>เพิ่งเคยใช้ {APP_NAME} ใช่ไหม?</SeparatorWithOr>
 
       <Link href={`/sign-up?callbackUrl=${encodeURIComponent(safeCallbackUrl)}`}>
         <Button className='w-full' variant='outline'>
-          เธชเธฃเนเธฒเธเธเธฑเธเธเธต {APP_NAME}
+          สร้างบัญชี {APP_NAME}
         </Button>
       </Link>
     </div>

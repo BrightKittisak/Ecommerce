@@ -7,12 +7,17 @@ import {
   toProductDTO,
 } from '@/lib/application/products/serializers'
 import {
+  getProductCardLinksByTag,
+  getProductDTOsByTag,
+} from '@/lib/application/products/product-tag-queries'
+import {
   getPublishedCatalogCategories,
   getPublishedCatalogTags,
 } from '@/lib/application/products/catalog-facet-queries'
 import { connectToDatabase } from '@/lib/db'
 import Product from '@/lib/db/models/product.model'
 import { productCatalogFacetDeps } from '@/lib/infrastructure/products/product-catalog-facet-deps'
+import { productTagQueryDeps } from '@/lib/infrastructure/products/product-tag-query-deps'
 import {
   buildProductNameSearchFilter,
   buildProductPriceFilter,
@@ -23,12 +28,6 @@ import { normalizePaginationPage } from '../pagination'
 import { PAGE_SIZE } from '../constants'
 
 const CATALOG_CACHE_REVALIDATE_SECONDS = 5 * 60
-
-type ProductCardLinkRecord = {
-  name: string
-  slug: string
-  images?: string[]
-}
 
 const getPublishedCategories = unstable_cache(
   async () => {
@@ -57,23 +56,11 @@ const getPublishedTags = unstable_cache(
 const getCachedProductsForCard = unstable_cache(
   async (tag: string, limit: number) => {
     await connectToDatabase()
-    const products = await Product.find(
-      { tags: { $in: [tag] }, isPublished: true },
-      { name: 1, slug: 1, images: 1 }
-    )
-      .sort({ createdAt: 'desc' })
-      .limit(limit)
-      .lean<ProductCardLinkRecord[]>()
-
-    return products.map((product) => ({
-      name: product.name,
-      href: `/product/${product.slug}`,
-      image: product.images?.[0] ?? '',
-    })) as {
-      name: string
-      href: string
-      image: string
-    }[]
+    return getProductCardLinksByTag({
+      tag,
+      limit,
+      deps: productTagQueryDeps,
+    })
   },
   ['products-for-card'],
   {
@@ -85,14 +72,11 @@ const getCachedProductsForCard = unstable_cache(
 const getCachedProductsByTag = unstable_cache(
   async (tag: string, limit: number) => {
     await connectToDatabase()
-    const products = await Product.find({
-      tags: { $in: [tag] },
-      isPublished: true,
-    }, PRODUCT_CARD_FIELDS)
-      .sort({ createdAt: 'desc' })
-      .limit(limit)
-      .lean<ProductRecord[]>()
-    return products.map((product) => toProductDTO(product))
+    return getProductDTOsByTag({
+      tag,
+      limit,
+      deps: productTagQueryDeps,
+    })
   },
   ['products-by-tag'],
   {

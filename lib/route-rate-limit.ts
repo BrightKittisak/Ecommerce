@@ -18,11 +18,6 @@ type RouteRateLimitRecord = {
 }
 
 export const ROUTE_RATE_LIMIT_POLICIES = {
-  catalogCategories: {
-    route: 'api:catalog-categories',
-    limit: 120,
-    windowMs: 60 * 1000,
-  },
   browsingHistoryProducts: {
     route: 'api:browsing-history-products',
     limit: 60,

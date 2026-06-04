@@ -4,10 +4,10 @@ import { getBrowsingHistoryProducts } from '@/lib/application/products/browsing-
 import { connectToDatabase } from '@/lib/db'
 import { browsingHistoryProductDeps } from '@/lib/infrastructure/products/browsing-history-product-deps'
 import { parseBrowsingHistoryQuery } from '@/lib/browsing-history-query'
+import { getBrowsingHistoryHeaders } from '@/lib/browsing-history-response-headers'
 import {
   assertRouteRateLimit,
   createRateLimitedResponse,
-  getRateLimitHeaders,
   ROUTE_RATE_LIMIT_POLICIES,
 } from '@/lib/route-rate-limit'
 
@@ -23,7 +23,7 @@ export const GET = async (request: NextRequest) => {
 
   if (!parsedQuery) {
     return NextResponse.json([], {
-      headers: getRateLimitHeaders(rateLimit),
+      headers: getBrowsingHistoryHeaders(rateLimit),
     })
   }
 
@@ -34,6 +34,6 @@ export const GET = async (request: NextRequest) => {
   })
 
   return NextResponse.json(products, {
-    headers: getRateLimitHeaders(rateLimit),
+    headers: getBrowsingHistoryHeaders(rateLimit),
   })
 }

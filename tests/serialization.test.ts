@@ -26,6 +26,29 @@ test('serializes values into client-safe plain JSON data', () => {
   })
 })
 
+test('omits undefined object fields and converts undefined array items to null', () => {
+  const serialized = serializeTypedForClient({
+    name: 'Client Payload',
+    omitted: undefined,
+    values: [1, undefined, new Date('2026-06-01T00:00:00.000Z')],
+  })
+
+  assert.deepEqual(serialized, {
+    name: 'Client Payload',
+    values: [1, null, '2026-06-01T00:00:00.000Z'],
+  })
+})
+
+test('rejects unsupported client serialization values', () => {
+  assert.throws(
+    () =>
+      serializeTypedForClient({
+        amount: BigInt(1),
+      }),
+    /Cannot serialize unsupported value/
+  )
+})
+
 test('typed serializer exposes the serialized output shape', () => {
   type ServerValue = {
     _id: { toJSON: () => string }

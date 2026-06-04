@@ -8,12 +8,8 @@ import {
   ROUTE_RATE_LIMIT_POLICIES,
 } from '../lib/route-rate-limit'
 
-test('declares route rate-limit policies for browser-facing APIs', () => {
-  assert.deepEqual(ROUTE_RATE_LIMIT_POLICIES.catalogCategories, {
-    route: 'api:catalog-categories',
-    limit: 120,
-    windowMs: 60_000,
-  })
+test('declares rate-limit policies only for non-cacheable browser-facing APIs', () => {
+  assert.equal('catalogCategories' in ROUTE_RATE_LIMIT_POLICIES, false)
   assert.deepEqual(ROUTE_RATE_LIMIT_POLICIES.browsingHistoryProducts, {
     route: 'api:browsing-history-products',
     limit: 60,
@@ -22,7 +18,7 @@ test('declares route rate-limit policies for browser-facing APIs', () => {
 })
 
 test('uses forwarded client ip as the route rate-limit identity', () => {
-  const request = new Request('https://example.test/api/catalog/categories', {
+  const request = new Request('https://example.test/api/products/browsing-history', {
     headers: {
       'x-forwarded-for': '203.0.113.5, 203.0.113.6',
     },
@@ -51,7 +47,7 @@ test('formats rate-limit headers from a decision', () => {
   )
 })
 
-test('creates a 429 response with retry headers', async () => {
+test('creates a 429 response with retry headers and Thai copy', async () => {
   const response = createRateLimitedResponse({
     allowed: false,
     limit: 60,

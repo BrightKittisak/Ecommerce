@@ -17,6 +17,10 @@ type RouteRateLimitRecord = {
   windowStartedAt: Date
 }
 
+type MongoDuplicateKeyError = {
+  code?: unknown
+}
+
 export const ROUTE_RATE_LIMIT_POLICIES = {
   browsingHistoryProducts: {
     route: 'api:browsing-history-products',
@@ -44,28 +48,31 @@ const hashRouteRateLimitKey = ({
 const getResetAt = (windowStartedAt: Date, windowMs: number) =>
   new Date(windowStartedAt.getTime() + windowMs)
 
+export const isMongoDuplicateKeyError = (
+  error: unknown
+): error is MongoDuplicateKeyError =>
+  typeof error === 'object' &&
+  error !== null &&
+  'code' in error &&
+  (error as MongoDuplicateKeyError).code === 11000
+
 export const getRouteRateLimitIdentity = (request: Request) =>
   getClientIp(request)
 
-export const assertRouteRateLimit = async ({
+const updateRouteRateLimitRecord = async ({
+  expiresAt,
+  key,
+  now,
   policy,
-  request,
+  windowStartedAfter,
 }: {
+  expiresAt: Date
+  key: string
+  now: Date
   policy: RouteRateLimitPolicy
-  request: Request
-}): Promise<RouteRateLimitDecision> => {
-  const now = new Date()
-  const windowStartedAfter = new Date(now.getTime() - policy.windowMs)
-  const expiresAt = new Date(now.getTime() + policy.windowMs)
-  const identity = getRouteRateLimitIdentity(request)
-  const key = hashRouteRateLimitKey({
-    identifier: identity,
-    route: policy.route,
-  })
-
-  await connectToDatabase()
-
-  const record = await RouteRateLimit.findOneAndUpdate(
+  windowStartedAfter: Date
+}) =>
+  RouteRateLimit.findOneAndUpdate(
     { key },
     [
       {
@@ -103,6 +110,46 @@ export const assertRouteRateLimit = async ({
   )
     .select({ count: 1, windowStartedAt: 1 })
     .lean<RouteRateLimitRecord>()
+
+export const assertRouteRateLimit = async ({
+  policy,
+  request,
+}: {
+  policy: RouteRateLimitPolicy
+  request: Request
+}): Promise<RouteRateLimitDecision> => {
+  const now = new Date()
+  const windowStartedAfter = new Date(now.getTime() - policy.windowMs)
+  const expiresAt = new Date(now.getTime() + policy.windowMs)
+  const identity = getRouteRateLimitIdentity(request)
+  const key = hashRouteRateLimitKey({
+    identifier: identity,
+    route: policy.route,
+  })
+
+  await connectToDatabase()
+
+  let record: RouteRateLimitRecord | null
+
+  try {
+    record = await updateRouteRateLimitRecord({
+      expiresAt,
+      key,
+      now,
+      policy,
+      windowStartedAfter,
+    })
+  } catch (error) {
+    if (!isMongoDuplicateKeyError(error)) throw error
+
+    record = await updateRouteRateLimitRecord({
+      expiresAt,
+      key,
+      now,
+      policy,
+      windowStartedAfter,
+    })
+  }
 
   const count = record?.count ?? 1
   const resetAt = getResetAt(record?.windowStartedAt ?? now, policy.windowMs)

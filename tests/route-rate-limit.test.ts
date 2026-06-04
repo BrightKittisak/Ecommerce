@@ -5,6 +5,7 @@ import {
   createRateLimitedResponse,
   getRateLimitHeaders,
   getRouteRateLimitIdentity,
+  isMongoDuplicateKeyError,
   ROUTE_RATE_LIMIT_POLICIES,
 } from '../lib/route-rate-limit'
 
@@ -62,4 +63,11 @@ test('creates a 429 response with retry headers and Thai copy', async () => {
   assert.deepEqual(await response.json(), {
     message: 'ส่งคำขอมากเกินไป กรุณาลองใหม่อีกครั้งภายหลัง',
   })
+})
+
+test('detects Mongo duplicate-key errors for concurrent limiter upserts', () => {
+  assert.equal(isMongoDuplicateKeyError({ code: 11000 }), true)
+  assert.equal(isMongoDuplicateKeyError({ code: '11000' }), false)
+  assert.equal(isMongoDuplicateKeyError(new Error('boom')), false)
+  assert.equal(isMongoDuplicateKeyError(null), false)
 })

@@ -1,6 +1,9 @@
 import { createHash } from 'crypto'
 
 import AuthRateLimit from './db/models/auth-rate-limit.model'
+import { getClientIp } from './request-ip'
+
+export { getClientIp } from './request-ip'
 
 const MAX_FAILED_ATTEMPTS = 5
 const WINDOW_MS = 15 * 60 * 1000
@@ -26,17 +29,6 @@ export class AuthRateLimitError extends Error {
 
 const hashRateLimitValue = (scope: RateLimitScope, value: string) =>
   `${scope}:${createHash('sha256').update(value).digest('hex')}`
-
-export const getClientIp = (request: Request) => {
-  const forwardedFor = request.headers.get('x-forwarded-for')
-  if (forwardedFor) return forwardedFor.split(',')[0]?.trim()
-
-  return (
-    request.headers.get('cf-connecting-ip') ||
-    request.headers.get('x-real-ip') ||
-    'unknown'
-  )
-}
 
 export const getSignInRateLimitKeys = ({
   email,

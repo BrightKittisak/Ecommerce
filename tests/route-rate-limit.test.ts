@@ -64,6 +64,6 @@ test('creates a 429 response with retry headers', async () => {
   assert.equal(response.headers.get('Retry-After'), '12')
   assert.equal(response.headers.get('RateLimit-Limit'), '60')
   assert.deepEqual(await response.json(), {
-    message: 'Too many requests. Please try again later.',
+    message: 'ส่งคำขอมากเกินไป กรุณาลองใหม่อีกครั้งภายหลัง',
   })
 })

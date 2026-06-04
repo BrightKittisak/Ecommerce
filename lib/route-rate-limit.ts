@@ -137,7 +137,7 @@ export const getRateLimitHeaders = (decision: RouteRateLimitDecision) => ({
 
 export const createRateLimitedResponse = (decision: RouteRateLimitDecision) =>
   NextResponse.json(
-    { message: 'Too many requests. Please try again later.' },
+    { message: 'ส่งคำขอมากเกินไป กรุณาลองใหม่อีกครั้งภายหลัง' },
     {
       status: 429,
       headers: {

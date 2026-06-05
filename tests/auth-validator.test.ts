@@ -35,22 +35,31 @@ test('normalizes credential emails during sign-up and sign-in', () => {
 })
 
 test('rejects weak credential passwords during sign-up', () => {
-  const weakPasswords = [
-    'short1!',
-    'lowercase1!',
-    'UPPERCASE1!',
-    'NoNumber!',
-    'NoSpecial1',
+  const weakPasswordCases = [
+    ['short1!', 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร'],
+    [
+      'lowercase1!',
+      'รหัสผ่านต้องมีตัวอักษรภาษาอังกฤษพิมพ์ใหญ่อย่างน้อย 1 ตัว',
+    ],
+    [
+      'UPPERCASE1!',
+      'รหัสผ่านต้องมีตัวอักษรภาษาอังกฤษพิมพ์เล็กอย่างน้อย 1 ตัว',
+    ],
+    ['NoNumber!', 'รหัสผ่านต้องมีตัวเลขอย่างน้อย 1 ตัว'],
+    ['NoSpecial1', 'รหัสผ่านต้องมีอักขระพิเศษอย่างน้อย 1 ตัว'],
   ]
 
-  for (const password of weakPasswords) {
-    assert.throws(() =>
-      UserSignUpSchema.parse({
+  for (const [password, message] of weakPasswordCases) {
+    const result = UserSignUpSchema.safeParse({
         ...validSignUpInput,
         password,
         confirmPassword: password,
       })
-    )
+
+    assert.equal(result.success, false)
+    if (!result.success) {
+      assert.equal(result.error.issues[0]?.message, message)
+    }
   }
 })
 
@@ -61,7 +70,7 @@ test('rejects sign-up when password confirmation does not match', () => {
         ...validSignUpInput,
         confirmPassword: 'Different1!',
       }),
-    /Passwords do not match/
+    /รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน/
   )
 })
 

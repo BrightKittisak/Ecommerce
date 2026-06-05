@@ -2,37 +2,37 @@ import { z } from 'zod'
 
 const UserName = z
   .string()
-  .min(2, { message: 'Name must be at least 2 characters' })
-  .max(50, { message: 'Name must be 50 characters or fewer' })
+  .min(2, { message: 'ชื่อต้องมีอย่างน้อย 2 ตัวอักษร' })
+  .max(50, { message: 'ชื่อต้องไม่เกิน 50 ตัวอักษร' })
 
 const Email = z
   .string()
   .trim()
   .toLowerCase()
-  .min(1, 'Email is required')
-  .email('Email is invalid')
+  .min(1, 'กรุณากรอกอีเมล')
+  .email('อีเมลไม่ถูกต้อง')
 
 const StrongPassword = z
   .string()
-  .min(8, 'Password must be at least 8 characters')
-  .max(100, 'Password must be 100 characters or fewer')
+  .min(8, 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร')
+  .max(100, 'รหัสผ่านต้องไม่เกิน 100 ตัวอักษร')
   .refine((value) => /[a-z]/.test(value), {
-    message: 'Password must include at least one lowercase letter',
+    message: 'รหัสผ่านต้องมีตัวอักษรภาษาอังกฤษพิมพ์เล็กอย่างน้อย 1 ตัว',
   })
   .refine((value) => /[A-Z]/.test(value), {
-    message: 'Password must include at least one uppercase letter',
+    message: 'รหัสผ่านต้องมีตัวอักษรภาษาอังกฤษพิมพ์ใหญ่อย่างน้อย 1 ตัว',
   })
   .refine((value) => /\d/.test(value), {
-    message: 'Password must include at least one number',
+    message: 'รหัสผ่านต้องมีตัวเลขอย่างน้อย 1 ตัว',
   })
   .refine((value) => /[^A-Za-z0-9]/.test(value), {
-    message: 'Password must include at least one special character',
+    message: 'รหัสผ่านต้องมีอักขระพิเศษอย่างน้อย 1 ตัว',
   })
 
 const ExistingPassword = z
   .string()
-  .min(1, 'Password is required')
-  .max(100, 'Password must be 100 characters or fewer')
+  .min(1, 'กรุณากรอกรหัสผ่าน')
+  .max(100, 'รหัสผ่านต้องไม่เกิน 100 ตัวอักษร')
 
 export const UserSignInSchema = z.object({
   email: Email,
@@ -47,6 +47,6 @@ export const UserSignUpSchema = z
     confirmPassword: StrongPassword,
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
+    message: 'รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน',
     path: ['confirmPassword'],
   })

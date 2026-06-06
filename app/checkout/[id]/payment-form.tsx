@@ -19,6 +19,7 @@ import {
 } from '@/lib/actions/order.actions'
 import type { OrderDTO } from '@/lib/application/orders/dtos'
 import { formatVariantSummary, translatePaymentMethod } from '@/lib/i18n'
+import { getStripePublicConfigErrorMessage } from '@/lib/stripe-config-copy'
 import { formatDateTime } from '@/lib/utils'
 
 import CheckoutFooter from '../checkout-footer'
@@ -28,9 +29,7 @@ const getStripePublishableKey = () => {
   const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 
   if (!publishableKey) {
-    throw new Error(
-      'Missing environment variable: "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"'
-    )
+    throw new Error(getStripePublicConfigErrorMessage())
   }
 
   return publishableKey

@@ -55,7 +55,7 @@ export default function Sidebar() {
             <DrawerClose asChild>
               <Button variant='ghost' size='icon' className='mr-2 text-background hover:bg-white/10 hover:text-background'>
                 <X className='h-5 w-5' />
-                <span className='sr-only'>Close</span>
+                <span className='sr-only'>ปิด</span>
               </Button>
             </DrawerClose>
           </div>

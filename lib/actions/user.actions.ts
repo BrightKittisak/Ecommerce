@@ -7,7 +7,7 @@ import { userAccountDeps } from '@/lib/infrastructure/users/user-account-deps'
 import { IUserName, IUserSignIn, IUserSignUp } from '@/types'
 import { redirect } from 'next/navigation'
 
-import { UserSignInSchema } from '../auth-validator'
+import { UserSignInSchema } from '../domain/user/auth.schema'
 import { connectToDatabase } from '../db'
 import { getUserActionErrorMessage } from '../user-action-errors'
 

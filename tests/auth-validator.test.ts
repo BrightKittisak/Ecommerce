@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { UserSignInSchema, UserSignUpSchema } from '../lib/auth-validator'
+import {
+  UserSignInSchema,
+  UserSignUpSchema,
+} from '../lib/domain/user/auth.schema'
 
 const validSignUpInput = {
   name: 'Buyer Example',

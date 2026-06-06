@@ -4,6 +4,11 @@ import {
   getPayPalAppSecret,
   getPayPalClientId,
 } from './paypal-config'
+import {
+  createPayPalApiError,
+  getPayPalApiErrorLogMetadata,
+} from './paypal-response'
+import { logger } from './logger'
 import { CURRENCY_CODE } from './utils'
 
 type PayPalAccessTokenResponse = {
@@ -97,6 +102,30 @@ async function handleResponse<T = unknown>(response: Response): Promise<T> {
     return (await response.json()) as T
   }
 
-  const errorMessage = (await response.text()) || response.statusText
-  throw new Error(errorMessage)
+  let body = ''
+
+  try {
+    body = await response.text()
+  } catch (error) {
+    logger.error(
+      'paypal_api_error_body_read_failed',
+      getPayPalApiErrorLogMetadata({
+        error,
+        status: response.status,
+        statusText: response.statusText,
+      })
+    )
+    throw createPayPalApiError()
+  }
+
+  logger.error(
+    'paypal_api_error',
+    getPayPalApiErrorLogMetadata({
+      body,
+      status: response.status,
+      statusText: response.statusText,
+    })
+  )
+
+  throw createPayPalApiError()
 }

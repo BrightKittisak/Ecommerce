@@ -152,6 +152,4 @@ export const UserInputSchema = z.object({
   }),
 })
 
-export const UserNameSchema = z.object({
-  name: UserName,
-})
+export { UserNameSchema } from './domain/user/profile.schema'

@@ -17,8 +17,8 @@ import { orderAccessQueryDeps } from '@/lib/infrastructure/orders/order-access-q
 import { createOrderFromCartDeps } from '@/lib/infrastructure/orders/create-order-from-cart-deps'
 import { userOrderListQueryDeps } from '@/lib/infrastructure/orders/user-order-list-query-deps'
 import { paypalPaymentDeps } from '@/lib/infrastructure/payments/paypal-payment-deps'
+import { getOrderActionErrorMessage } from '@/lib/order-action-errors'
 import { getPayPalActionErrorMessage } from '@/lib/paypal-action-errors'
-import { formatError } from '../utils'
 import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
 import { revalidatePath } from 'next/cache'
@@ -44,7 +44,7 @@ export const createOrder = async (clientOrder: CreateOrderInput) => {
       data: { orderId: createdOrder._id.toString() },
     }
   } catch (error) {
-    return { success: false, message: formatError(error) }
+    return { success: false, message: getOrderActionErrorMessage(error) }
   }
 }
 

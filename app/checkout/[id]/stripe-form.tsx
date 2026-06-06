@@ -9,6 +9,7 @@ import {
   import { Button } from '@/components/ui/button'
   import ProductPrice from '@/components/shared/product/product-price'
   import { SERVER_URL } from '@/lib/constants'
+  import { getStripeClientErrorMessage } from '@/lib/stripe-client-copy'
   
   export default function StripeForm({
     priceInCents,
@@ -42,7 +43,7 @@ import {
       }
 
       if (error.type === 'card_error' || error.type === 'validation_error') {
-        setErrorMessage(error.message)
+        setErrorMessage(getStripeClientErrorMessage())
       } else {
         setErrorMessage('เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ')
       }

@@ -13,7 +13,7 @@ import { reviewDeps } from '@/lib/infrastructure/reviews/review-deps'
 
 import { PAGE_SIZE } from '../constants'
 import { connectToDatabase } from '../db'
-import { formatError } from '../utils'
+import { getReviewActionErrorMessage } from '../review-action-errors'
 import { ReviewInputSchema } from '../validator'
 
 export async function createUpdateReview({
@@ -51,7 +51,7 @@ export async function createUpdateReview({
   } catch (error) {
     return {
       success: false,
-      message: formatError(error),
+      message: getReviewActionErrorMessage(error),
     }
   }
 }

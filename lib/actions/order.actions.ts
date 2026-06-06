@@ -17,6 +17,7 @@ import { orderAccessQueryDeps } from '@/lib/infrastructure/orders/order-access-q
 import { createOrderFromCartDeps } from '@/lib/infrastructure/orders/create-order-from-cart-deps'
 import { userOrderListQueryDeps } from '@/lib/infrastructure/orders/user-order-list-query-deps'
 import { paypalPaymentDeps } from '@/lib/infrastructure/payments/paypal-payment-deps'
+import { getPayPalActionErrorMessage } from '@/lib/paypal-action-errors'
 import { formatError } from '../utils'
 import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
@@ -111,7 +112,7 @@ export async function createPayPalOrder(orderId: string) {
       data: result.paypalOrderId,
     }
   } catch (err) {
-    return { success: false, message: formatError(err) }
+    return { success: false, message: getPayPalActionErrorMessage(err) }
   }
 }
 
@@ -149,7 +150,7 @@ export async function approvePayPalOrder(
       message: 'ชำระเงินผ่าน PayPal สำหรับคำสั่งซื้อนี้เรียบร้อยแล้ว',
     }
   } catch (err) {
-    return { success: false, message: formatError(err) }
+    return { success: false, message: getPayPalActionErrorMessage(err) }
   }
 }
 

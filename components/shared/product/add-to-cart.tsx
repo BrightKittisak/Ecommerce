@@ -9,13 +9,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import useCartStore from '@/hooks/use-cart-store'
-import { toast } from "sonner"
+import {
+  CART_ADD_BUTTON_LABEL,
+  getCartClientErrorMessage,
+} from '@/lib/cart-client-copy'
+import { toast } from 'sonner'
 import { OrderItem } from '@/types'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-
-const getErrorMessage = (error: unknown) =>
-  error instanceof Error ? error.message : 'Something went wrong'
 
 export default function AddToCart({
   item,
@@ -41,12 +42,12 @@ export default function AddToCart({
               </Button>
             ),
           })
-        } catch (error) {
-          toast.error(getErrorMessage(error))
+        } catch {
+          toast.error(getCartClientErrorMessage())
         }
       }}
     >
-      Add to Cart
+      {CART_ADD_BUTTON_LABEL}
     </Button>
   ) : (
     <div className='w-full space-y-2'>
@@ -73,8 +74,8 @@ export default function AddToCart({
           try {
             const itemId = await addItem(item, quantity)
             router.push(`/cart/${itemId}`)
-          } catch (error) {
-            toast.error(getErrorMessage(error))
+          } catch {
+            toast.error(getCartClientErrorMessage())
           }
         }}
       >
@@ -87,8 +88,8 @@ export default function AddToCart({
           try {
             await addItem(item, quantity)
             router.push(`/checkout`)
-          } catch (error) {
-            toast.error(getErrorMessage(error))
+          } catch {
+            toast.error(getCartClientErrorMessage())
           }
         }}
         className='w-full rounded-full '

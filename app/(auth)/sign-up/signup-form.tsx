@@ -10,7 +10,7 @@ import { isRedirectError } from 'next/dist/client/components/redirect-error'
 
 import { registerUser, signInWithCredentials } from '@/lib/actions/user.actions'
 import { sanitizeAuthCallbackUrl } from '@/lib/auth-callback-url'
-import { UserSignUpSchema } from '@/lib/auth-validator'
+import { UserSignUpSchema } from '@/lib/domain/user/auth.schema'
 import { APP_NAME } from '@/lib/constants'
 import { IUserSignUp } from '@/types'
 import { Button } from '@/components/ui/button'

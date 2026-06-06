@@ -1,6 +1,6 @@
 import type { IUserSignUp } from '../../../types'
 
-import { UserSignUpSchema } from '../../auth-validator'
+import { UserSignUpSchema } from '../../domain/user/auth.schema'
 
 type CreateUserAccountInput = {
   name: string

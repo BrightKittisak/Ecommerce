@@ -18,7 +18,7 @@ import { signInWithCredentials } from '@/lib/actions/user.actions'
 
 import { toast } from 'sonner'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { UserSignInSchema } from '@/lib/auth-validator'
+import { UserSignInSchema } from '@/lib/domain/user/auth.schema'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { sanitizeAuthCallbackUrl } from '@/lib/auth-callback-url'
 import { APP_NAME } from '@/lib/constants'

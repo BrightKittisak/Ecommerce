@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { getAllCategories } from '@/lib/actions/product.actions'
+import { getCatalogCategoriesHeaders } from '@/lib/catalog-categories-response-headers'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,8 +9,6 @@ export async function GET() {
   const categories = await getAllCategories()
 
   return NextResponse.json(categories, {
-    headers: {
-      'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
-    },
+    headers: getCatalogCategoriesHeaders(),
   })
 }

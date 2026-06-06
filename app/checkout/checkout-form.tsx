@@ -47,7 +47,7 @@ import {
   formatDateTime,
   timeUntilMidnight,
 } from '@/lib/utils'
-import { ShippingAddressSchema } from '@/lib/validator'
+import { ShippingAddressSchema } from '@/lib/domain/order/shipping-address.schema'
 import { ShippingAddress } from '@/types'
 
 import CheckoutFooter from './checkout-footer'

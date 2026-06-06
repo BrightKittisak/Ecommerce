@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { ShippingAddressSchema } from './domain/order/shipping-address.schema'
 import { CURRENCY_CODE, formatNumberWithDecimal } from './utils'
 
 const MongoId = z
@@ -77,15 +78,7 @@ export const OrderItemSchema = z.object({
   color: z.string().optional(),
 })
 
-export const ShippingAddressSchema = z.object({
-  fullName: z.string().min(1, 'กรุณากรอกชื่อผู้รับ'),
-  street: z.string().min(1, 'กรุณากรอกที่อยู่'),
-  city: z.string().min(1, 'กรุณากรอกอำเภอหรือเขต'),
-  postalCode: z.string().min(1, 'กรุณากรอกรหัสไปรษณีย์'),
-  province: z.string().min(1, 'กรุณากรอกจังหวัด'),
-  phone: z.string().min(1, 'กรุณากรอกเบอร์โทรศัพท์'),
-  country: z.string().min(1, 'กรุณากรอกประเทศ'),
-})
+export { ShippingAddressSchema } from './domain/order/shipping-address.schema'
 
 export const OrderInputSchema = z.object({
   user: z.union([

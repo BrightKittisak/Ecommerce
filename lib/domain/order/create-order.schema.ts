@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { AVAILABLE_DELIVERY_DATES, AVAILABLE_PAYMENT_METHODS } from '../../constants'
-import { ShippingAddressSchema } from '../../validator'
+import { ShippingAddressSchema } from './shipping-address.schema'
 
 const MongoId = z
   .string()

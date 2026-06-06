@@ -143,12 +143,6 @@ export default function Header() {
                  {menu.name}
                </Link>
              ))}
-            <Link
-              href='/page/customer-service'
-              className='header-button !px-3 !py-1.5 text-[13px] text-muted-foreground hover:text-foreground sm:text-sm'
-            >
-              บริการลูกค้า
-            </Link>
             <HeaderDropdown label='สำรวจ' links={exploreLinks} />
             <HeaderDropdown label='นโยบาย' links={policyLinks} />
           </div>

@@ -9,7 +9,7 @@ import { redirect } from 'next/navigation'
 
 import { UserSignInSchema } from '../auth-validator'
 import { connectToDatabase } from '../db'
-import { formatError } from '../utils'
+import { getUserActionErrorMessage } from '../user-action-errors'
 
 export async function signInWithCredentials(user: IUserSignIn) {
   const credentials = UserSignInSchema.parse(user)
@@ -37,7 +37,7 @@ export async function registerUser(userSignUp: IUserSignUp) {
       message: 'สร้างบัญชีผู้ใช้เรียบร้อยแล้ว',
     }
   } catch (error) {
-    return { success: false, error: formatError(error) }
+    return { success: false, error: getUserActionErrorMessage(error) }
   }
 }
 
@@ -57,6 +57,6 @@ export async function updateUserName(user: IUserName) {
       data: updatedUser,
     }
   } catch (error) {
-    return { success: false, message: formatError(error) }
+    return { success: false, message: getUserActionErrorMessage(error) }
   }
 }

@@ -22,7 +22,7 @@ import { getPayPalActionErrorMessage } from '@/lib/paypal-action-errors'
 import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
 import { revalidatePath } from 'next/cache'
-import { CreateOrderSchema } from '../order-validator'
+import { CreateOrderSchema } from '../domain/order/create-order.schema'
 
 // CREATE
 export const createOrder = async (clientOrder: CreateOrderInput) => {

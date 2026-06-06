@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import { DEFAULT_PAYMENT_METHOD } from '../lib/constants'
-import { CreateOrderSchema } from '../lib/order-validator'
+import { CreateOrderSchema } from '../lib/domain/order/create-order.schema'
 
 const validOrderInput = {
   items: [

@@ -33,6 +33,10 @@ export type PayPalPaymentDeps = {
   }
   incrementSales(items: OrderItem[]): Promise<void>
   sendReceipt(order: PayPalPaymentOrder): Promise<void>
+  logReceiptError(input: {
+    paypalOrderId: string
+    error: unknown
+  }): void
 }
 
 type CreatePayPalPaymentOrderInput = {
@@ -126,7 +130,15 @@ export async function approvePayPalPaymentOrder({
   await order.populate('user', 'email')
   await order.save()
   await deps.incrementSales(order.items)
-  await deps.sendReceipt(order)
+
+  try {
+    await deps.sendReceipt(order)
+  } catch (error) {
+    deps.logReceiptError({
+      paypalOrderId,
+      error,
+    })
+  }
 
   return {
     status: 'completed',

@@ -60,6 +60,7 @@ const createDeps = () => ({
   }),
   incrementSales: async () => undefined,
   sendReceipt: async () => undefined,
+  logReceiptError: () => undefined,
 })
 
 test('creates a PayPal payment order and stores its id on the order', async () => {
@@ -156,4 +157,35 @@ test('marks a verified PayPal payment as paid', async () => {
   assert.deepEqual(result, {
     status: 'completed',
   })
+})
+
+test('keeps PayPal approval completed when receipt sending fails', async () => {
+  let receiptError:
+    | {
+        paypalOrderId: string
+        error: unknown
+      }
+    | undefined
+  const order = createOrder()
+
+  const result = await approvePayPalPaymentOrder({
+    order,
+    paypalOrderId: 'paypal-order-1',
+    deps: {
+      ...createDeps(),
+      sendReceipt: async () => {
+        throw new Error('receipt failed')
+      },
+      logReceiptError: (input) => {
+        receiptError = input
+      },
+    },
+  })
+
+  assert.equal(order.isPaid, true)
+  assert.deepEqual(result, {
+    status: 'completed',
+  })
+  assert.equal(receiptError?.paypalOrderId, 'paypal-order-1')
+  assert.equal((receiptError?.error as Error).message, 'receipt failed')
 })

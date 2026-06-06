@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { updateUserName } from '@/lib/actions/user.actions'
-import { UserNameSchema } from '@/lib/validator'
+import { UserNameSchema } from '@/lib/domain/user/profile.schema'
 
 export const ProfileForm = () => {
   const router = useRouter()

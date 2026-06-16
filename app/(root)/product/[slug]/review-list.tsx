@@ -48,7 +48,7 @@ import {
   getReviewByProductId,
   getReviews,
 } from '@/lib/actions/review.actions'
-import { ReviewInputSchema } from '@/lib/validator'
+import { ReviewInputSchema } from '@/lib/domain/review/review.schema'
 import RatingSummary from '@/components/shared/product/rating-summary'
 import type { ProductDTO } from '@/lib/application/products/dtos'
 import { Separator } from '@/components/ui/separator'

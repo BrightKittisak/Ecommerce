@@ -1,7 +1,7 @@
 import type { CreateOrderInput, IOrderInput, OrderItem } from '../../../types'
 import { CURRENCY_CODE } from '../../utils'
 import { calcDeliveryDateAndPrice } from '../../domain/order/pricing'
-import { OrderInputSchema } from '../../validator'
+import { OrderInputSchema } from '../../domain/order/order.schema'
 import {
   type ProductStockReservationDeps,
   releaseProductStock,

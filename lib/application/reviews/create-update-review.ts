@@ -1,6 +1,6 @@
 import type { z } from 'zod'
 
-import type { ReviewInputSchema } from '../../validator'
+import type { ReviewInputSchema } from '../../domain/review/review.schema'
 
 type ReviewInput = z.infer<typeof ReviewInputSchema>
 

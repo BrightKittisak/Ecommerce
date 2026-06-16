@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { ShippingAddressSchema } from './domain/order/shipping-address.schema'
+import { ReviewInputSchema } from './domain/review/review.schema'
 import { CURRENCY_CODE, formatNumberWithDecimal } from './utils'
 
 const MongoId = z
@@ -13,18 +14,7 @@ const Price = (field: string) =>
     `${field} ต้องมีทศนิยม 2 ตำแหน่ง เช่น 49.99`
   )
 
-export const ReviewInputSchema = z.object({
-  product: MongoId,
-  user: MongoId,
-  isVerifiedPurchase: z.boolean(),
-  title: z.string().min(1, 'กรุณากรอกหัวข้อรีวิว'),
-  comment: z.string().min(1, 'กรุณากรอกความคิดเห็น'),
-  rating: z.coerce
-    .number()
-    .int()
-    .min(1, 'คะแนนต้องไม่น้อยกว่า 1')
-    .max(5, 'คะแนนต้องไม่เกิน 5'),
-})
+export { ReviewInputSchema } from './domain/review/review.schema'
 
 export const ProductInputSchema = z.object({
   name: z.string().min(3, 'ชื่อสินค้าต้องมีอย่างน้อย 3 ตัวอักษร'),

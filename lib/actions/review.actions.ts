@@ -13,8 +13,8 @@ import { reviewDeps } from '@/lib/infrastructure/reviews/review-deps'
 
 import { PAGE_SIZE } from '../constants'
 import { connectToDatabase } from '../db'
+import { ReviewInputSchema } from '../domain/review/review.schema'
 import { getReviewActionErrorMessage } from '../review-action-errors'
-import { ReviewInputSchema } from '../validator'
 
 export async function createUpdateReview({
   data,

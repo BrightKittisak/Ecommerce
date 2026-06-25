@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { getBrowsingHistoryProducts } from '@/lib/application/products/browsing-history-query'
-import { connectToDatabase } from '@/lib/db'
 import { browsingHistoryProductDeps } from '@/lib/infrastructure/products/browsing-history-product-deps'
 import { parseBrowsingHistoryQuery } from '@/lib/browsing-history-query'
 import { getBrowsingHistoryHeaders } from '@/lib/browsing-history-response-headers'
@@ -27,7 +26,6 @@ export const GET = async (request: NextRequest) => {
     })
   }
 
-  await connectToDatabase()
   const products = await getBrowsingHistoryProducts({
     query: parsedQuery,
     deps: browsingHistoryProductDeps,

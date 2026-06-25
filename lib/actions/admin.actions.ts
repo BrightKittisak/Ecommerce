@@ -1,7 +1,6 @@
 'use server'
 
 import { PAGE_SIZE } from '@/lib/constants'
-import { connectToDatabase } from '@/lib/db'
 import {
   AdminOverviewStats,
   getAdminOverview,
@@ -23,8 +22,6 @@ export async function getAdminOrders({
 }): Promise<AdminOrdersResult> {
   const currentPage = normalizePaginationPage(page)
 
-  await connectToDatabase()
-
   return getAdminOrderList({
     page: currentPage,
     limit,
@@ -33,8 +30,6 @@ export async function getAdminOrders({
 }
 
 export async function getAdminOverviewStats(): Promise<AdminOverviewStats> {
-  await connectToDatabase()
-
   return getAdminOverview({
     recentOrderLimit: 6,
     deps: adminOverviewQueryDeps,

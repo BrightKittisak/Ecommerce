@@ -6,10 +6,13 @@ import { CartSchema } from '@/lib/domain/order/cart.schema'
 import { ShippingAddressSchema } from '@/lib/domain/order/shipping-address.schema'
 import { ProductInputSchema } from '@/lib/domain/product/product.schema'
 import { ReviewInputSchema } from '@/lib/domain/review/review.schema'
+import { UserSignInSchema, UserSignUpSchema } from '@/lib/domain/user/auth.schema'
 import { UserNameSchema } from '@/lib/domain/user/profile.schema'
 import { UserInputSchema } from '@/lib/domain/user/user.schema'
-import { UserSignInSchema, UserSignUpSchema } from '@/lib/auth-validator'
-import { CreateOrderItemSchema, CreateOrderSchema } from '@/lib/order-validator'
+import {
+  CreateOrderItemSchema,
+  CreateOrderSchema,
+} from '@/lib/domain/order/create-order.schema'
 import { z } from 'zod'
 
 export type IReviewInput = z.infer<typeof ReviewInputSchema>

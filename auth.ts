@@ -11,7 +11,7 @@ import {
   getSignInRateLimitKeys,
   recordFailedSignIn,
 } from './lib/auth-rate-limit'
-import { UserSignInSchema } from './lib/auth-validator'
+import { UserSignInSchema } from './lib/domain/user/auth.schema'
 
 import NextAuth, { type DefaultSession } from 'next-auth'
 import authConfig from './auth.config'

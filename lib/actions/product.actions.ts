@@ -13,7 +13,6 @@ import {
   getPublishedCatalogCategories,
   getPublishedCatalogTags,
 } from '@/lib/application/products/catalog-facet-queries'
-import { connectToDatabase } from '@/lib/db'
 import { productCatalogFacetDeps } from '@/lib/infrastructure/products/product-catalog-facet-deps'
 import { productListingQueryDeps } from '@/lib/infrastructure/products/product-listing-query-deps'
 import { relatedProductsQueryDeps } from '@/lib/infrastructure/products/related-products-query-deps'
@@ -25,7 +24,6 @@ const CATALOG_CACHE_REVALIDATE_SECONDS = 5 * 60
 
 const getPublishedCategories = unstable_cache(
   async () => {
-    await connectToDatabase()
     return getPublishedCatalogCategories({ deps: productCatalogFacetDeps })
   },
   ['published-categories'],
@@ -37,7 +35,6 @@ const getPublishedCategories = unstable_cache(
 
 const getPublishedTags = unstable_cache(
   async () => {
-    await connectToDatabase()
     return getPublishedCatalogTags({ deps: productCatalogFacetDeps })
   },
   ['published-tags'],
@@ -49,7 +46,6 @@ const getPublishedTags = unstable_cache(
 
 const getCachedProductsForCard = unstable_cache(
   async (tag: string, limit: number) => {
-    await connectToDatabase()
     return getProductCardLinksByTag({
       tag,
       limit,
@@ -65,7 +61,6 @@ const getCachedProductsForCard = unstable_cache(
 
 const getCachedProductsByTag = unstable_cache(
   async (tag: string, limit: number) => {
-    await connectToDatabase()
     return getProductDTOsByTag({
       tag,
       limit,
@@ -81,7 +76,6 @@ const getCachedProductsByTag = unstable_cache(
 
 const getCachedProductBySlug = unstable_cache(
   async (slug: string) => {
-    await connectToDatabase()
     return getPublishedProductBySlug({ slug, deps: productSlugQueryDeps })
   },
   ['product-by-slug'],
@@ -103,7 +97,6 @@ const getCachedRelatedProductsByCategory = unstable_cache(
     limit: number
     page: number
   }) => {
-    await connectToDatabase()
     return getRelatedProductsByCategoryQuery({
       input: {
         category,
@@ -190,7 +183,6 @@ export async function getAllProducts({
   rating?: string
   sort?: string
 }) {
-  await connectToDatabase()
   return getProductListing({
     input: {
       query,

@@ -12,7 +12,6 @@ import {
 import { reviewDeps } from '@/lib/infrastructure/reviews/review-deps'
 
 import { PAGE_SIZE } from '../constants'
-import { connectToDatabase } from '../db'
 import { ReviewInputSchema } from '../domain/review/review.schema'
 import { getReviewActionErrorMessage } from '../review-action-errors'
 
@@ -34,7 +33,6 @@ export async function createUpdateReview({
       user: session.user.id,
     })
 
-    await connectToDatabase()
     const result = await createUpdateProductReview({
       review,
       deps: reviewDeps,
@@ -65,7 +63,6 @@ export async function getReviews({
   limit?: number
   page: number
 }) {
-  await connectToDatabase()
   return getProductReviews({
     productId,
     limit: limit || PAGE_SIZE,
@@ -79,7 +76,6 @@ export const getReviewByProductId = async ({
 }: {
   productId: string
 }) => {
-  await connectToDatabase()
   const session = await auth()
   if (!session?.user?.id) {
     throw new Error('กรุณาเข้าสู่ระบบก่อนรีวิวสินค้า')

@@ -6,26 +6,32 @@ import {
   buildReviewRatingSummary,
   type ReviewRatingAggregationRow,
 } from '@/lib/application/reviews/rating-summary'
+import { connectToDatabase } from '@/lib/db'
 import Product from '@/lib/db/models/product.model'
 import Review from '@/lib/db/models/review.model'
 
 export const reviewDeps: CreateUpdateReviewDeps & ReviewReadDeps = {
-  countReviewsByProduct(productId) {
+  async countReviewsByProduct(productId) {
+    await connectToDatabase()
     return Review.countDocuments({ product: productId })
   },
-  createReview(review) {
+  async createReview(review) {
+    await connectToDatabase()
     return Review.create(review)
   },
-  findCurrentUserReview({ productId, userId }) {
+  async findCurrentUserReview({ productId, userId }) {
+    await connectToDatabase()
     return Review.findOne({
       product: productId,
       user: userId,
     })
   },
-  findReviewByProductAndUser({ product, user }) {
+  async findReviewByProductAndUser({ product, user }) {
+    await connectToDatabase()
     return Review.findOne({ product, user })
   },
-  findReviewsByProduct({ productId, skip, limit }) {
+  async findReviewsByProduct({ productId, skip, limit }) {
+    await connectToDatabase()
     return Review.find({ product: productId })
       .populate('user', 'name')
       .sort({
@@ -35,6 +41,7 @@ export const reviewDeps: CreateUpdateReviewDeps & ReviewReadDeps = {
       .limit(limit)
   },
   async updateProductReviewRating(productId) {
+    await connectToDatabase()
     const result = await Review.aggregate<ReviewRatingAggregationRow>([
       { $match: { product: new mongoose.Types.ObjectId(productId) } },
       {

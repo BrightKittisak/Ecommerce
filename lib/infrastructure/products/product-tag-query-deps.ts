@@ -3,11 +3,13 @@ import type {
   ProductTagQueryDeps,
 } from '@/lib/application/products/product-tag-queries'
 import type { ProductRecord } from '@/lib/application/products/serializers'
+import { connectToDatabase } from '@/lib/db'
 import Product from '@/lib/db/models/product.model'
 import { PRODUCT_CARD_FIELDS } from '@/lib/product-query-fields'
 
 export const productTagQueryDeps: ProductTagQueryDeps = {
-  findProductCardLinksByTag({ tag, limit }) {
+  async findProductCardLinksByTag({ tag, limit }) {
+    await connectToDatabase()
     return Product.find(
       { tags: { $in: [tag] }, isPublished: true },
       { name: 1, slug: 1, images: 1 }
@@ -16,7 +18,8 @@ export const productTagQueryDeps: ProductTagQueryDeps = {
       .limit(limit)
       .lean<ProductCardLinkRecord[]>()
   },
-  findProductsByTag({ tag, limit }) {
+  async findProductsByTag({ tag, limit }) {
+    await connectToDatabase()
     return Product.find({
       tags: { $in: [tag] },
       isPublished: true,

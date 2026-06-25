@@ -2,13 +2,16 @@ import type {
   ProductCatalogFacetDeps,
   PublishedTagsAggregationRow,
 } from '@/lib/application/products/catalog-facet-queries'
+import { connectToDatabase } from '@/lib/db'
 import Product from '@/lib/db/models/product.model'
 
 export const productCatalogFacetDeps: ProductCatalogFacetDeps = {
-  findPublishedCategories() {
+  async findPublishedCategories() {
+    await connectToDatabase()
     return Product.find({ isPublished: true }).distinct('category')
   },
-  findPublishedTagRows() {
+  async findPublishedTagRows() {
+    await connectToDatabase()
     return Product.aggregate<PublishedTagsAggregationRow>([
       { $match: { isPublished: true } },
       { $unwind: '$tags' },

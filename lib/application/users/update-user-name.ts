@@ -18,15 +18,17 @@ type UpdateUserNameInput = {
   deps: UpdateUserNameDeps
 }
 
+const USER_ACCOUNT_NOT_FOUND_MESSAGE = 'ไม่พบบัญชีผู้ใช้'
+
 export async function updateUserNameForAccount({
   userId,
   user,
   deps,
 }: UpdateUserNameInput): Promise<UpdatedUserNameDTO> {
-  if (!userId) throw new Error('ไม่พบบัญชีผู้ใช้')
+  if (!userId) throw new Error(USER_ACCOUNT_NOT_FOUND_MESSAGE)
 
   const currentUser = await deps.findUserById(userId)
-  if (!currentUser) throw new Error('ไม่พบบัญชีผู้ใช้')
+  if (!currentUser) throw new Error(USER_ACCOUNT_NOT_FOUND_MESSAGE)
 
   currentUser.name = user.name
   const updatedUser = await currentUser.save()

@@ -8,7 +8,6 @@ import { IUserName, IUserSignIn, IUserSignUp } from '@/types'
 import { redirect } from 'next/navigation'
 
 import { UserSignInSchema } from '../domain/user/auth.schema'
-import { connectToDatabase } from '../db'
 import { getUserActionErrorMessage } from '../user-action-errors'
 
 export async function signInWithCredentials(user: IUserSignIn) {
@@ -27,7 +26,6 @@ export const SignInWithGoogle = async () => {
 
 export async function registerUser(userSignUp: IUserSignUp) {
   try {
-    await connectToDatabase()
     await registerUserAccount({
       userSignUp,
       deps: userAccountDeps,
@@ -43,7 +41,6 @@ export async function registerUser(userSignUp: IUserSignUp) {
 
 export async function updateUserName(user: IUserName) {
   try {
-    await connectToDatabase()
     const session = await auth()
     const updatedUser = await updateUserNameForAccount({
       userId: session?.user?.id,

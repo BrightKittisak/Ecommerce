@@ -2,6 +2,7 @@ import type {
   BuildOrderItemsDeps,
   OrderItemProductRecord,
 } from '@/lib/application/orders/build-order-items'
+import { connectToDatabase } from '@/lib/db'
 import Product from '@/lib/db/models/product.model'
 
 const ORDER_ITEM_PRODUCT_FIELDS = {
@@ -16,7 +17,8 @@ const ORDER_ITEM_PRODUCT_FIELDS = {
 } as const
 
 export const orderItemProductDeps: BuildOrderItemsDeps = {
-  findPublishedProductsForOrderItems(productIds) {
+  async findPublishedProductsForOrderItems(productIds) {
+    await connectToDatabase()
     return Product.find(
       {
         _id: { $in: productIds },

@@ -19,7 +19,6 @@ import { userOrderListQueryDeps } from '@/lib/infrastructure/orders/user-order-l
 import { paypalPaymentDeps } from '@/lib/infrastructure/payments/paypal-payment-deps'
 import { getOrderActionErrorMessage } from '@/lib/order-action-errors'
 import { getPayPalActionErrorMessage } from '@/lib/paypal-action-errors'
-import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
 import { revalidatePath } from 'next/cache'
 import { CreateOrderSchema } from '../domain/order/create-order.schema'
@@ -27,7 +26,6 @@ import { CreateOrderSchema } from '../domain/order/create-order.schema'
 // CREATE
 export const createOrder = async (clientOrder: CreateOrderInput) => {
   try {
-    await connectToDatabase()
     const session = await auth()
     if (!session) throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
     // recalculate price and delivery date on the server
@@ -49,7 +47,6 @@ export const createOrder = async (clientOrder: CreateOrderInput) => {
 }
 
 export async function getOrderById(orderId: string): Promise<OrderDTO | null> {
-  await connectToDatabase()
   return getOrderDTOById({
     orderId,
     deps: orderAccessQueryDeps,
@@ -59,7 +56,6 @@ export async function getOrderById(orderId: string): Promise<OrderDTO | null> {
 export async function getOrderByIdForCurrentUser(
   orderId: string
 ): Promise<OrderDTO | null> {
-  await connectToDatabase()
   const session = await auth()
   if (!session?.user?.id) return null
 
@@ -76,7 +72,6 @@ export async function getOrderByIdForCurrentUser(
 }
 
 export async function createPayPalOrder(orderId: string) {
-  await connectToDatabase()
   try {
     const session = await auth()
     if (!session?.user?.id) throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
@@ -120,7 +115,6 @@ export async function approvePayPalOrder(
   orderId: string,
   data: { orderID: string }
 ) {
-  await connectToDatabase()
   try {
     const session = await auth()
     if (!session?.user?.id) throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
@@ -162,7 +156,6 @@ export async function getMyOrders({
   limit?: number
   page: number
 }) {
-  await connectToDatabase()
   const session = await auth()
   if (!session) {
     throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')

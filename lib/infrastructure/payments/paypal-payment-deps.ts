@@ -2,6 +2,7 @@ import type {
   PayPalPaymentDeps,
   PayPalPaymentOrder,
 } from '@/lib/application/orders/process-paypal-payment'
+import { connectToDatabase } from '@/lib/db'
 import type { IOrder } from '@/lib/db/models/order.model'
 import { logger, serializeLogError } from '@/lib/logger'
 import { incrementProductSales } from '@/lib/product-sales'
@@ -16,7 +17,10 @@ export const paypalPaymentDeps: PayPalPaymentDeps = {
   createPaymentOrder: createPayPalCheckoutOrder,
   capturePayment: capturePayPalCheckoutOrder,
   verifyCapture: verifyPayPalCheckoutCapture,
-  incrementSales: incrementProductSales,
+  async incrementSales(items) {
+    await connectToDatabase()
+    return incrementProductSales(items)
+  },
   async sendReceipt(order: PayPalPaymentOrder) {
     const { sendPurchaseReceipt } = await import('../../../emails')
     await sendPurchaseReceipt({ order: order as IOrder })

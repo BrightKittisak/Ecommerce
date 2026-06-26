@@ -77,9 +77,7 @@ export default function ReviewList({
       const res = await getReviews({ productId: product._id, page: 1 })
       setReviews([...res.data])
       setTotalPages(res.totalPages)
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
+    } catch {
       toast('เกิดข้อผิดพลาดในการโหลดรีวิว')
     }
   }
@@ -96,19 +94,40 @@ export default function ReviewList({
 
   const [loadingReviews, setLoadingReviews] = useState(false)
   useEffect(() => {
-    const loadReviews = async () => {
-      setLoadingReviews(true)
-      const res = await getReviews({ productId: product._id, page: 1 })
-      setReviews([...res.data])
-      setTotalPages(res.totalPages)
-      setLoadingReviews(false)
+    if (!inView) {
+      return
     }
 
-    if (inView) {
-      loadReviews()
+    let isCurrent = true
+
+    const loadReviews = async () => {
+      setLoadingReviews(true)
+      try {
+        const res = await getReviews({ productId: product._id, page: 1 })
+
+        if (!isCurrent) {
+          return
+        }
+
+        setReviews([...res.data])
+        setTotalPages(res.totalPages)
+      } catch {
+        if (isCurrent) {
+          toast('เกิดข้อผิดพลาดในการโหลดรีวิว')
+        }
+      } finally {
+        if (isCurrent) {
+          setLoadingReviews(false)
+        }
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView])
+
+    loadReviews()
+
+    return () => {
+      isCurrent = false
+    }
+  }, [inView, product._id])
 
   type CustomerReview = z.infer<typeof ReviewInputSchema>
   const form = useForm<CustomerReview>({

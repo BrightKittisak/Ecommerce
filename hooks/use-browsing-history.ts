@@ -1,38 +1,47 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+
+type BrowsingHistoryProduct = { id: string; category: string }
+
 type BrowsingHistory = {
-  products: { id: string; category: string }[]
+  products: BrowsingHistoryProduct[]
+  addItem: (product: BrowsingHistoryProduct) => void
+  clear: () => void
 }
-const initialState: BrowsingHistory = {
+
+const initialProductsState = {
   products: [],
 }
 
+export function updateBrowsingHistoryProducts(
+  products: BrowsingHistoryProduct[],
+  product: BrowsingHistoryProduct
+) {
+  return [
+    product,
+    ...products.filter((existingProduct) => existingProduct.id !== product.id),
+  ].slice(0, 10)
+}
+
 export const browsingHistoryStore = create<BrowsingHistory>()(
-  persist(() => initialState, {
-    name: 'browsingHistoryStore',
-  })
+  persist(
+    (set) => ({
+      ...initialProductsState,
+      addItem: (product) => {
+        set((state) => ({
+          products: updateBrowsingHistoryProducts(state.products, product),
+        }))
+      },
+      clear: () => {
+        set({ products: [] })
+      },
+    }),
+    {
+      name: 'browsingHistoryStore',
+    }
+  )
 )
 
 export default function useBrowsingHistory() {
-  const { products } = browsingHistoryStore()
-  return {
-    products,
-    addItem: (product: { id: string; category: string }) => {
-      const index = products.findIndex((p) => p.id === product.id)
-      if (index !== -1) products.splice(index, 1) // Remove duplicate if it exists
-      products.unshift(product) // Add id to the start
-
-      if (products.length > 10) products.pop() // Remove excess items if length exceeds 10
-
-      browsingHistoryStore.setState({
-        products,
-      })
-    },
-
-    clear: () => {
-      browsingHistoryStore.setState({
-        products: [],
-      })
-    },
-  }
+  return browsingHistoryStore()
 }

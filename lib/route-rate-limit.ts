@@ -2,19 +2,28 @@ import { createHash } from 'crypto'
 
 import { NextResponse } from 'next/server'
 
-import { connectToDatabase } from './db'
-import RouteRateLimit from './db/models/route-rate-limit.model'
+import { routeRateLimitDeps } from './infrastructure/rate-limit/route-rate-limit-deps'
 import { getClientIp } from './request-ip'
 
-type RouteRateLimitPolicy = {
+export type RouteRateLimitPolicy = {
   route: string
   limit: number
   windowMs: number
 }
 
-type RouteRateLimitRecord = {
+export type RouteRateLimitRecord = {
   count: number
   windowStartedAt: Date
+}
+
+export type RouteRateLimitPersistenceDeps = {
+  updateRouteRateLimitRecord(input: {
+    expiresAt: Date
+    key: string
+    now: Date
+    policy: RouteRateLimitPolicy
+    windowStartedAfter: Date
+  }): Promise<RouteRateLimitRecord | null>
 }
 
 type MongoDuplicateKeyError = {
@@ -36,6 +45,9 @@ export type RouteRateLimitDecision = {
   resetAt: Date
   retryAfterSeconds: number
 }
+
+const RATE_LIMITED_MESSAGE =
+  'ส่งคำขอมากเกินไป กรุณาลองใหม่อีกครั้งภายหลัง'
 
 const hashRouteRateLimitKey = ({
   identifier,
@@ -59,62 +71,12 @@ export const isMongoDuplicateKeyError = (
 export const getRouteRateLimitIdentity = (request: Request) =>
   getClientIp(request)
 
-const updateRouteRateLimitRecord = async ({
-  expiresAt,
-  key,
-  now,
-  policy,
-  windowStartedAfter,
-}: {
-  expiresAt: Date
-  key: string
-  now: Date
-  policy: RouteRateLimitPolicy
-  windowStartedAfter: Date
-}) =>
-  RouteRateLimit.findOneAndUpdate(
-    { key },
-    [
-      {
-        $set: {
-          key,
-          route: policy.route,
-          shouldResetWindow: {
-            $lt: [
-              { $ifNull: ['$windowStartedAt', new Date(0)] },
-              windowStartedAfter,
-            ],
-          },
-        },
-      },
-      {
-        $set: {
-          count: {
-            $cond: [
-              '$shouldResetWindow',
-              1,
-              { $add: [{ $ifNull: ['$count', 0] }, 1] },
-            ],
-          },
-          windowStartedAt: {
-            $cond: ['$shouldResetWindow', now, '$windowStartedAt'],
-          },
-          expiresAt,
-          createdAt: { $ifNull: ['$createdAt', now] },
-          updatedAt: now,
-        },
-      },
-      { $unset: 'shouldResetWindow' },
-    ],
-    { upsert: true, new: true }
-  )
-    .select({ count: 1, windowStartedAt: 1 })
-    .lean<RouteRateLimitRecord>()
-
 export const assertRouteRateLimit = async ({
+  deps = routeRateLimitDeps,
   policy,
   request,
 }: {
+  deps?: RouteRateLimitPersistenceDeps
   policy: RouteRateLimitPolicy
   request: Request
 }): Promise<RouteRateLimitDecision> => {
@@ -127,12 +89,10 @@ export const assertRouteRateLimit = async ({
     route: policy.route,
   })
 
-  await connectToDatabase()
-
   let record: RouteRateLimitRecord | null
 
   try {
-    record = await updateRouteRateLimitRecord({
+    record = await deps.updateRouteRateLimitRecord({
       expiresAt,
       key,
       now,
@@ -142,7 +102,7 @@ export const assertRouteRateLimit = async ({
   } catch (error) {
     if (!isMongoDuplicateKeyError(error)) throw error
 
-    record = await updateRouteRateLimitRecord({
+    record = await deps.updateRouteRateLimitRecord({
       expiresAt,
       key,
       now,
@@ -179,7 +139,7 @@ export const getRateLimitHeaders = (decision: RouteRateLimitDecision) => ({
 
 export const createRateLimitedResponse = (decision: RouteRateLimitDecision) =>
   NextResponse.json(
-    { message: 'ส่งคำขอมากเกินไป กรุณาลองใหม่อีกครั้งภายหลัง' },
+    { message: RATE_LIMITED_MESSAGE },
     {
       status: 429,
       headers: {

@@ -48,6 +48,10 @@ test('normalizes paths and accepts threshold gates', () => {
       '800',
       '--max-failure-rate',
       '0.01',
+      '--min-rps',
+      '100.5',
+      '--min-requests',
+      '5000',
     ],
     emptyEnv,
   )
@@ -59,6 +63,8 @@ test('normalizes paths and accepts threshold gates', () => {
   assert.equal(options.timeoutMs, 3000)
   assert.equal(options.maxP95Ms, 800)
   assert.equal(options.maxFailureRate, 0.01)
+  assert.equal(options.minRps, 100.5)
+  assert.equal(options.minRequests, 5000)
 })
 
 test('rejects invalid numeric flags', () => {
@@ -69,6 +75,14 @@ test('rejects invalid numeric flags', () => {
   assert.throws(
     () => parseArgs(['--max-failure-rate', '2'], emptyEnv),
     /number from 0 to 1/,
+  )
+  assert.throws(
+    () => parseArgs(['--min-rps', '0'], emptyEnv),
+    /positive number/,
+  )
+  assert.throws(
+    () => parseArgs(['--min-requests', '0'], emptyEnv),
+    /positive integer/,
   )
 })
 
@@ -108,4 +122,10 @@ test('reports threshold failures without enforcing default gates', () => {
     evaluateThresholds(summary, { maxFailureRate: 0.5 }),
     ['failure rate 1 exceeded 0.5'],
   )
+  assert.deepEqual(evaluateThresholds(summary, { minRps: 2 }), [
+    'requests per second 1 was below 2',
+  ])
+  assert.deepEqual(evaluateThresholds(summary, { minRequests: 2 }), [
+    'requests 1 was below 2',
+  ])
 })

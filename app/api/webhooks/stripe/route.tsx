@@ -6,6 +6,7 @@ import { stripeWebhookPaymentDeps } from '@/lib/infrastructure/payments/stripe-w
 import { logger } from '@/lib/logger'
 import {
   getStripeWebhookInvalidSignatureResponse,
+  getStripeWebhookMissingSignatureResponse,
   getStripeWebhookSignatureLogMetadata,
 } from '@/lib/stripe-webhook-response'
 
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
 
   if (!signature) {
     return NextResponse.json(
-      { message: 'Missing Stripe signature header' },
+      getStripeWebhookMissingSignatureResponse(),
       { status: 400 }
     )
   }

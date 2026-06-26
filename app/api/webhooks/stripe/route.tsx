@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { connectToDatabase } from '@/lib/db'
 import { processStripeWebhookPayment } from '@/lib/application/orders/process-stripe-webhook-payment'
 import { constructStripeWebhookEvent } from '@/lib/infrastructure/payments/stripe-payment-adapter'
 import { stripeWebhookPaymentDeps } from '@/lib/infrastructure/payments/stripe-webhook-payment-deps'
@@ -39,8 +38,6 @@ export async function POST(req: NextRequest) {
   if (event.type !== 'payment_intent.succeeded') {
     return NextResponse.json({ received: true })
   }
-
-  await connectToDatabase()
 
   const result = await processStripeWebhookPayment({
     paymentIntent: event.data.object,

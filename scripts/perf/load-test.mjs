@@ -26,11 +26,13 @@ Options:
   --timeout <milliseconds>    Per-request timeout. Default: 5000.
   --max-p95-ms <milliseconds> Optional p95 latency gate.
   --max-failure-rate <number> Optional failure-rate gate from 0 to 1.
+  --min-rps <number>          Optional minimum measured requests per second gate.
+  --min-requests <number>     Optional minimum measured request count gate.
   --help                      Show this help.
 
 Examples:
   npm run load:test -- --path /api/health --concurrency 50 --duration 60
-  npm run load:test -- --url https://staging.example.com --path /search --max-p95-ms 800
+  npm run load:test:gate -- --url https://staging.example.com --path /search --min-rps 100
 `)
 }
 
@@ -64,6 +66,16 @@ function parseOptionalRate(value, name) {
   return parsed
 }
 
+function parsePositiveNumber(value, name) {
+  const parsed = Number(value)
+
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    throw new Error(`${name} must be a positive number`)
+  }
+
+  return parsed
+}
+
 function readFlag(args, index, flag) {
   const value = args[index + 1]
 
@@ -81,6 +93,8 @@ export function parseArgs(argv = process.argv.slice(2), env = process.env) {
     url: '',
     maxP95Ms: undefined,
     maxFailureRate: undefined,
+    minRps: undefined,
+    minRequests: undefined,
     help: false,
   }
 
@@ -142,6 +156,18 @@ export function parseArgs(argv = process.argv.slice(2), env = process.env) {
 
     if (flag === '--max-failure-rate') {
       options.maxFailureRate = parseOptionalRate(readFlag(argv, index, flag), flag)
+      index += 1
+      continue
+    }
+
+    if (flag === '--min-rps') {
+      options.minRps = parsePositiveNumber(readFlag(argv, index, flag), flag)
+      index += 1
+      continue
+    }
+
+    if (flag === '--min-requests') {
+      options.minRequests = parsePositiveInteger(readFlag(argv, index, flag), flag)
       index += 1
       continue
     }
@@ -218,6 +244,22 @@ export function evaluateThresholds(summary, options) {
     failures.push(
       `failure rate ${summary.failureRate} exceeded ${options.maxFailureRate}`,
     )
+  }
+
+  if (
+    options.minRps !== undefined &&
+    summary.requestsPerSecond < options.minRps
+  ) {
+    failures.push(
+      `requests per second ${summary.requestsPerSecond} was below ${options.minRps}`,
+    )
+  }
+
+  if (
+    options.minRequests !== undefined &&
+    summary.requests < options.minRequests
+  ) {
+    failures.push(`requests ${summary.requests} was below ${options.minRequests}`)
   }
 
   return failures

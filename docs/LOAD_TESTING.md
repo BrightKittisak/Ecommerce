@@ -25,8 +25,27 @@ Run against staging:
 npm run load:test -- --url https://staging.example.com --path /search --concurrency 100 --duration 120 --warmup 10 --max-p95-ms 800 --max-failure-rate 0.01
 ```
 
+Run the default health gate before a release candidate:
+
+```bash
+npm run load:test:gate -- --url https://staging.example.com
+```
+
 The command prints request counts, success and failure totals, request rate,
 latency percentiles, and HTTP status counts.
+
+## Gates
+
+Use threshold gates for repeatable release checks:
+
+- `--max-p95-ms`: fails when p95 latency is above the budget.
+- `--max-failure-rate`: fails when the measured failure rate is above the budget.
+- `--min-rps`: fails when measured throughput is below the minimum.
+- `--min-requests`: fails when the measured request count is below the minimum.
+
+The npm `load:test:gate` script is the default low-risk smoke gate for
+`GET /api/health`. Override `--url` for staging, and raise or lower the gates
+per endpoint based on historical baselines.
 
 ## Recommended Scenarios
 
@@ -53,4 +72,6 @@ limits, and provider quota checks.
 
 Use this runner as a gate for regressions and staging readiness. For the
 100,000-concurrent-user goal, promote the same scenarios to a distributed tool
-such as k6, Artillery, Locust, or a managed load-testing platform.
+such as k6, Artillery, Locust, or a managed load-testing platform. Keep the
+same latency, failure-rate, and throughput budgets so local smoke checks and
+distributed tests measure the same production risks.

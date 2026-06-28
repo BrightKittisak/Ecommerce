@@ -82,3 +82,54 @@ Use this runner as a gate for regressions and staging readiness. For the
 such as k6, Artillery, Locust, or a managed load-testing platform. Keep the
 same latency, failure-rate, and throughput budgets so local smoke checks and
 distributed tests measure the same production risks.
+
+## Distributed k6 Scenario
+
+Install k6 separately, then run the read-only smoke profile against staging:
+
+```powershell
+$env:BASE_URL='https://staging.example.com'
+$env:PRODUCT_SLUG='known-published-product'
+npm run load:test:k6
+```
+
+The script defaults to 50 virtual users with a three-second think time. It
+mixes health, home, search, and optional product-detail reads. It excludes
+checkout, writes, webhooks, admin routes, and `/api/ready`.
+
+Tests above 1,000 virtual users are locked unless the operator explicitly sets
+`LARGE_TEST_APPROVED=true`. Before any 100,000-VU test, pass 1%, 10%, 25%, and
+50% capacity stages, verify dashboards and quotas, and record a rollback owner.
+
+For a four-generator 100,000-VU capacity run, configure the same environment on
+every generator:
+
+```powershell
+$env:BASE_URL='https://staging.example.com'
+$env:PRODUCT_SLUG='known-published-product'
+$env:TARGET_VUS='100000'
+$env:LOAD_PROFILE='capacity'
+$env:LARGE_TEST_APPROVED='true'
+```
+
+Run one non-overlapping segment on each synchronized generator:
+
+```bash
+k6 run --execution-segment "0:1/4" --execution-segment-sequence "0,1/4,2/4,3/4,1" scripts/perf/k6/distributed-read.js
+k6 run --execution-segment "1/4:2/4" --execution-segment-sequence "0,1/4,2/4,3/4,1" scripts/perf/k6/distributed-read.js
+k6 run --execution-segment "2/4:3/4" --execution-segment-sequence "0,1/4,2/4,3/4,1" scripts/perf/k6/distributed-read.js
+k6 run --execution-segment "3/4:1" --execution-segment-sequence "0,1/4,2/4,3/4,1" scripts/perf/k6/distributed-read.js
+```
+
+k6 scales VUs for each execution segment, so the combined target remains
+100,000 rather than 100,000 per generator. Four generators are only a starting
+topology; benchmark generator CPU, memory, network, and dropped iterations
+before trusting results. See the official [large-test guide](https://grafana.com/docs/k6/latest/testing-guides/running-large-tests/),
+[execution-segment options](https://grafana.com/docs/k6/latest/using-k6/k6-options/reference/#execution-segment),
+and [threshold documentation](https://grafana.com/docs/k6/latest/using-k6/thresholds/).
+
+The run passes only when checks exceed 99%, HTTP failures remain below 1%, and
+endpoint p95 latency stays within the script thresholds. Archive the k6 summary,
+application metrics, MongoDB saturation, CDN hit ratio, provider quota usage,
+and incident timeline as evidence. Without that evidence, do not claim the
+system supports 100,000 concurrent users.

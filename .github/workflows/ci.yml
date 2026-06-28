@@ -51,3 +51,6 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Check bundle budgets
+        run: npm run build:budget

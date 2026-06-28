@@ -9,6 +9,7 @@
     "sync:orders:thb": "npx tsx ./lib/db/sync-order-currency-thb.ts",
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:budget": "node scripts/perf/check-bundle-budget.mjs",
     "start": "next start",
     "lint": "eslint .",
     "test": "node --test --require sucrase/register tests/*.test.ts",

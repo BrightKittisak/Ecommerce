@@ -52,6 +52,7 @@ per endpoint based on historical baselines.
 Use low-risk read endpoints first:
 
 - `GET /api/health`
+- `GET /api/ready` at low concurrency to verify database readiness.
 - `GET /`
 - `GET /search`
 - `GET /product/{slug}`
@@ -69,6 +70,12 @@ a rollback owner, and monitoring open. A single developer machine cannot prove
 support for 100,000 concurrent users; that target needs distributed load
 generation, database capacity planning, CDN/cache strategy, queueing, rate
 limits, and provider quota checks.
+
+Use `/api/health` for high-frequency liveness and load-generator checks because
+it does not call dependencies. Use `/api/ready` for deployment readiness and
+low-frequency monitoring only; each request includes a database ping and returns
+HTTP 503 when the database is unavailable or the two-second application timeout
+is exceeded.
 
 Use this runner as a gate for regressions and staging readiness. For the
 100,000-concurrent-user goal, promote the same scenarios to a distributed tool

@@ -60,45 +60,27 @@ Lush คือเว็บ e-commerce ที่พัฒนาด้วย Next.
 npm install
 ```
 
-2. สร้างไฟล์ `.env`
+2. สร้าง `.env` จากไฟล์ตัวอย่าง แล้วแทนที่ค่าตัวอย่างด้วยค่าของ environment
 
-```env
-MONGODB_URI=
-MONGODB_DNS_SERVERS=1.1.1.1,8.8.8.8
-
-AUTH_SECRET=
-AUTH_GOOGLE_ID=
-AUTH_GOOGLE_SECRET=
-
-NEXT_PUBLIC_SERVER_URL=http://localhost:3000
-NEXT_PUBLIC_APP_SLOGAN=ช้อปง่าย ดูละมุน และมั่นใจทุกวัน
-NEXT_PUBLIC_APP_DESCRIPTION=Lush คือหน้าร้านออนไลน์ที่ช่วยให้การค้นหา เปรียบเทียบ และตัดสินใจซื้อเป็นเรื่องง่ายขึ้น สวยขึ้น และมั่นใจขึ้น
-NEXT_PUBLIC_APP_COPYRIGHT=(c) 2026 Lush. สงวนลิขสิทธิ์
-
-STRIPE_SECRET_KEY=
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
-STRIPE_WEBHOOK_SECRET=
-
-PAYPAL_CLIENT_ID=
-PAYPAL_APP_SECRET=
-PAYPAL_API_URL=https://api-m.sandbox.paypal.com
-
-RESEND_API_KEY=
-SENDER_EMAIL=onboarding@resend.dev
-SENDER_NAME=Lush
-
-PAGE_SIZE=9
-FREE_SHIPPING_MIN_PRICE=300
-DEFAULT_PAYMENT_METHOD=PayPal
+```powershell
+Copy-Item .env.example .env
 ```
 
-3. รัน seed data ถ้าต้องการข้อมูลตั้งต้น
+3. ตรวจสอบว่า environment variables ครบและมีรูปแบบถูกต้อง
+
+```bash
+npm run env:check
+```
+
+คำสั่งนี้รายงานเฉพาะชื่อตัวแปรและกฎที่ไม่ผ่าน โดยไม่แสดงค่า secret
+
+4. รัน seed data ถ้าต้องการข้อมูลตั้งต้น
 
 ```bash
 npm run seed
 ```
 
-4. เปิด dev server
+5. เปิด dev server
 
 ```bash
 npm run dev

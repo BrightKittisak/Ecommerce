@@ -14,7 +14,8 @@
     "lint": "eslint .",
     "test": "node --test --require sucrase/register tests/*.test.ts",
     "load:test": "node scripts/perf/load-test.mjs",
-    "load:test:gate": "node scripts/perf/load-test.mjs --path /api/health --concurrency 50 --duration 60 --warmup 10 --max-p95-ms 800 --max-failure-rate 0.01 --min-rps 50"
+    "load:test:gate": "node scripts/perf/load-test.mjs --path /api/health --concurrency 50 --duration 60 --warmup 10 --max-p95-ms 800 --max-failure-rate 0.01 --min-rps 50",
+    "load:test:k6": "k6 run scripts/perf/k6/distributed-read.js"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.7.4",

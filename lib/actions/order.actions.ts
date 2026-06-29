@@ -27,12 +27,12 @@ import { CreateOrderSchema } from '../domain/order/create-order.schema'
 export const createOrder = async (clientOrder: CreateOrderInput) => {
   try {
     const session = await auth()
-    if (!session) throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
+    if (!session?.user?.id) throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
     // recalculate price and delivery date on the server
     const createdOrder = await createOrderFromCart(
       {
         clientOrder: CreateOrderSchema.parse(clientOrder),
-        userId: session.user.id!,
+        userId: session.user.id,
         deps: createOrderFromCartDeps,
       }
     )
@@ -157,11 +157,11 @@ export async function getMyOrders({
   page: number
 }) {
   const session = await auth()
-  if (!session) {
+  if (!session?.user?.id) {
     throw new Error('กรุณาเข้าสู่ระบบก่อนทำรายการ')
   }
   return getUserOrderList({
-    userId: session.user.id!,
+    userId: session.user.id,
     limit,
     page,
     deps: userOrderListQueryDeps,

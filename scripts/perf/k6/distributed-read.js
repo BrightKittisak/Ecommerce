@@ -1,6 +1,7 @@
 import http from 'k6/http'
 import { check, sleep } from 'k6'
 
+import { createLoadTestEvidence } from './load-evidence.mjs'
 import { createLoadStages, parseLoadProfile } from './load-profile.mjs'
 
 const profile = parseLoadProfile(__ENV)
@@ -48,4 +49,13 @@ export default function runReadTraffic() {
   })
 
   sleep(profile.thinkTimeSeconds)
+}
+
+export function handleSummary(data) {
+  const evidence = createLoadTestEvidence({ summary: data, profile })
+
+  return {
+    [profile.summaryPath]: JSON.stringify(evidence, null, 2),
+    stdout: `Load evidence written to ${profile.summaryPath}; thresholds passed: ${evidence.result.thresholdsPassed}\n`,
+  }
 }

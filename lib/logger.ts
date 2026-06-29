@@ -5,16 +5,22 @@ type SerializedLogError = {
   message: string
 }
 
+const URI_CREDENTIALS_PATTERN = /([a-z][a-z\d+.-]*:\/\/)[^@\s/]+@/gi
+
+function redactLogMessage(message: string) {
+  return message.replace(URI_CREDENTIALS_PATTERN, '$1[REDACTED]@')
+}
+
 export function serializeLogError(error: unknown): SerializedLogError {
   if (error instanceof Error) {
     return {
       name: error.name,
-      message: error.message,
+      message: redactLogMessage(error.message),
     }
   }
 
   if (typeof error === 'string') {
-    return { message: error }
+    return { message: redactLogMessage(error) }
   }
 
   return { message: 'Unknown error' }

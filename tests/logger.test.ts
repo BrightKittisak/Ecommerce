@@ -18,3 +18,18 @@ test('serializes string and unknown errors without dumping objects', () => {
     message: 'Unknown error',
   })
 })
+
+test('redacts URI credentials from error messages and strings', () => {
+  const message =
+    'Failed mongodb://admin:database-secret@database.internal/shop'
+
+  assert.deepEqual(serializeLogError(new Error(message)), {
+    name: 'Error',
+    message:
+      'Failed mongodb://[REDACTED]@database.internal/shop',
+  })
+  assert.deepEqual(serializeLogError(message), {
+    message:
+      'Failed mongodb://[REDACTED]@database.internal/shop',
+  })
+})

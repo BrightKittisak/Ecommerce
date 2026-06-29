@@ -18,15 +18,31 @@ export type ReadinessResult = {
   body: ReadinessStatus
 }
 
+export type ReadinessFailure = {
+  check: 'database'
+  error: unknown
+  timedOut: boolean
+  timeoutMs: number
+}
+
 type CheckReadinessInput = {
   deps: ReadinessDeps
   now?: () => Date
+  onFailure?: (failure: ReadinessFailure) => void
   timeoutMs?: number
+}
+
+class ReadinessTimeoutError extends Error {
+  constructor() {
+    super('Readiness check timed out')
+    this.name = 'ReadinessTimeoutError'
+  }
 }
 
 export async function checkReadiness({
   deps,
   now = () => new Date(),
+  onFailure,
   timeoutMs = 2000,
 }: CheckReadinessInput): Promise<ReadinessResult> {
   let timeout: ReturnType<typeof setTimeout> | undefined
@@ -36,7 +52,7 @@ export async function checkReadiness({
       deps.checkDatabase(),
       new Promise<never>((_, reject) => {
         timeout = setTimeout(
-          () => reject(new Error('Readiness check timed out')),
+          () => reject(new ReadinessTimeoutError()),
           timeoutMs
         )
       }),
@@ -51,7 +67,18 @@ export async function checkReadiness({
         timestamp: now().toISOString(),
       },
     }
-  } catch {
+  } catch (error) {
+    try {
+      onFailure?.({
+        check: 'database',
+        error,
+        timedOut: error instanceof ReadinessTimeoutError,
+        timeoutMs,
+      })
+    } catch {
+      // Observability must not change readiness semantics.
+    }
+
     return {
       status: 503,
       body: {

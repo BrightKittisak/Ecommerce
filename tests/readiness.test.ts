@@ -29,6 +29,7 @@ test('reports ready when the database check succeeds', async () => {
 })
 
 test('reports not ready without exposing database errors', async () => {
+  const failures: unknown[] = []
   const result = await checkReadiness({
     deps: {
       async checkDatabase() {
@@ -36,6 +37,7 @@ test('reports not ready without exposing database errors', async () => {
       },
     },
     now,
+    onFailure: (failure) => failures.push(failure),
   })
 
   assert.deepEqual(result, {
@@ -48,18 +50,48 @@ test('reports not ready without exposing database errors', async () => {
     },
   })
   assert.equal(JSON.stringify(result).includes('secret'), false)
+  assert.equal(failures.length, 1)
+  assert.deepEqual(failures[0], {
+    check: 'database',
+    error: new Error('mongodb://user:secret@database.internal'),
+    timedOut: false,
+    timeoutMs: 2000,
+  })
 })
 
 test('reports not ready when the database check exceeds its timeout', async () => {
+  let failure: { timedOut: boolean; timeoutMs: number } | undefined
   const result = await checkReadiness({
     deps: {
       checkDatabase: () => new Promise(() => undefined),
     },
     now,
     timeoutMs: 1,
+    onFailure: (readinessFailure) => {
+      failure = readinessFailure
+    },
   })
 
   assert.equal(result.status, 503)
   assert.equal(result.body.ready, false)
   assert.equal(result.body.checks.database, 'down')
+  assert.equal(failure?.timedOut, true)
+  assert.equal(failure?.timeoutMs, 1)
+})
+
+test('keeps readiness response stable when failure reporting throws', async () => {
+  const result = await checkReadiness({
+    deps: {
+      async checkDatabase() {
+        throw new Error('Database unavailable')
+      },
+    },
+    now,
+    onFailure: () => {
+      throw new Error('Logger unavailable')
+    },
+  })
+
+  assert.equal(result.status, 503)
+  assert.equal(result.body.ready, false)
 })

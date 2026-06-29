@@ -12,6 +12,7 @@ import {
   recordFailedSignIn,
 } from './lib/auth-rate-limit'
 import { UserSignInSchema } from './lib/domain/user/auth.schema'
+import { getAuthUserDisplayName } from './lib/auth-user-display-name'
 
 import NextAuth, { type DefaultSession } from 'next-auth'
 import authConfig from './auth.config'
@@ -81,17 +82,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     jwt: async ({ token, user }) => {
       // Sign in
       if (user) {
+        const displayName = getAuthUserDisplayName(user)
+
         // Update database if user has no name (first sign-in)
         if (!user.name) {
           await connectToDatabase()
           await User.findByIdAndUpdate(user.id, {
-            name: user.email!.split('@')[0],
+            name: displayName,
             role: (user as IUser).role || 'User', // Preserve existing role
           })
         }
         
         // Set token properties from user object
-        token.name = user.name || user.email!.split('@')[0]
+        token.name = displayName
         token.role = (user as { role?: string }).role || 'User'
       }
       

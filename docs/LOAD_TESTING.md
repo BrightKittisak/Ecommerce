@@ -110,15 +110,27 @@ $env:PRODUCT_SLUG='known-published-product'
 $env:TARGET_VUS='100000'
 $env:LOAD_PROFILE='capacity'
 $env:LARGE_TEST_APPROVED='true'
+$env:RUN_ID='capacity-2026-06-29'
 ```
 
-Run one non-overlapping segment on each synchronized generator:
+Set a unique generator ID, matching execution-segment metadata, and summary path
+on each synchronized generator before running its non-overlapping segment. The
+metadata does not control k6 segmentation; it records the exact CLI segment in
+the evidence artifact.
 
-```bash
+```powershell
+$env:GENERATOR_ID='generator-1'
+$env:EXECUTION_SEGMENT='0:1/4'
+$env:SUMMARY_PATH='artifacts/generator-1.json'
 k6 run --execution-segment "0:1/4" --execution-segment-sequence "0,1/4,2/4,3/4,1" scripts/perf/k6/distributed-read.js
-k6 run --execution-segment "1/4:2/4" --execution-segment-sequence "0,1/4,2/4,3/4,1" scripts/perf/k6/distributed-read.js
-k6 run --execution-segment "2/4:3/4" --execution-segment-sequence "0,1/4,2/4,3/4,1" scripts/perf/k6/distributed-read.js
-k6 run --execution-segment "3/4:1" --execution-segment-sequence "0,1/4,2/4,3/4,1" scripts/perf/k6/distributed-read.js
+```
+
+Repeat with `generator-2` and `1/4:2/4`, `generator-3` and `2/4:3/4`, then
+`generator-4` and `3/4:1`. Collect the four JSON files into one directory and
+validate them before accepting the run:
+
+```powershell
+npm run load:test:evidence -- --dir artifacts/capacity-2026-06-29 --run-id capacity-2026-06-29 --base-url https://staging.example.com --target-vus 100000 --expected-generators 4
 ```
 
 k6 scales VUs for each execution segment, so the combined target remains
@@ -133,3 +145,9 @@ endpoint p95 latency stays within the script thresholds. Archive the k6 summary,
 application metrics, MongoDB saturation, CDN hit ratio, provider quota usage,
 and incident timeline as evidence. Without that evidence, do not claim the
 system supports 100,000 concurrent users.
+
+The evidence validator also requires every generator summary to belong to the
+same run and target, use a unique identity and segment, pass all k6 thresholds,
+contain a measured duration, and collectively report at least the target VU
+count. This validates test artifacts, not infrastructure dashboards or provider
+quotas; those remain mandatory operator evidence.

@@ -41,11 +41,41 @@ test('requires explicit approval above one thousand virtual users', () => {
     LARGE_TEST_APPROVED: 'true',
     THINK_TIME_SECONDS: '5',
     PRODUCT_SLUG: 'running-shoe',
+    RUN_ID: 'capacity-2026-06-29',
+    GENERATOR_ID: 'generator-1',
+    EXECUTION_SEGMENT: '0:1/4',
+    SUMMARY_PATH: 'artifacts/generator-1.json',
   })
 
   assert.equal(profile.targetVus, 100000)
   assert.equal(profile.thinkTimeSeconds, 5)
   assert.equal(profile.productSlug, 'running-shoe')
+  assert.equal(profile.runId, 'capacity-2026-06-29')
+  assert.equal(profile.generatorId, 'generator-1')
+  assert.equal(profile.executionSegment, '0:1/4')
+  assert.equal(profile.summaryPath, 'artifacts/generator-1.json')
+})
+
+test('requires auditable evidence metadata for large tests', () => {
+  assert.throws(
+    () =>
+      parseLoadProfile({
+        BASE_URL: 'https://staging.example.com',
+        TARGET_VUS: '100000',
+        LOAD_PROFILE: 'capacity',
+        LARGE_TEST_APPROVED: 'true',
+      }),
+    /RUN_ID is required/
+  )
+
+  assert.throws(
+    () =>
+      parseLoadProfile({
+        BASE_URL: 'https://staging.example.com',
+        EXECUTION_SEGMENT: '3/4:1/4',
+      }),
+    /start must be lower/
+  )
 })
 
 test('rejects unsafe configuration values', () => {

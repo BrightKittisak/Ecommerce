@@ -1,3 +1,5 @@
+import { parseExecutionSegment } from './load-evidence.mjs'
+
 export const LARGE_TEST_VU_THRESHOLD = 1000
 
 const PROFILE_STAGES = {
@@ -33,6 +35,16 @@ function parsePositiveNumber(value, name, fallback) {
   return parsed
 }
 
+function parseRequiredEvidenceValue(env, name, fallback, largeTest) {
+  const value = env[name] || fallback
+
+  if (largeTest && !env[name]) {
+    throw new Error(`${name} is required for large tests`)
+  }
+
+  return value
+}
+
 export function parseLoadProfile(env = {}) {
   const baseUrl = env.BASE_URL?.replace(/\/$/, '')
   const targetVus = parsePositiveInteger(env.TARGET_VUS, 'TARGET_VUS', 50)
@@ -43,6 +55,7 @@ export function parseLoadProfile(env = {}) {
   )
   const profileName = env.LOAD_PROFILE ?? 'smoke'
   const stageDurations = PROFILE_STAGES[profileName]
+  const largeTest = targetVus > LARGE_TEST_VU_THRESHOLD
 
   if (!baseUrl || !/^https?:\/\//.test(baseUrl)) {
     throw new Error('BASE_URL must be an absolute HTTP or HTTPS URL')
@@ -53,12 +66,37 @@ export function parseLoadProfile(env = {}) {
   }
 
   if (
-    targetVus > LARGE_TEST_VU_THRESHOLD &&
-    env.LARGE_TEST_APPROVED !== 'true'
+    largeTest && env.LARGE_TEST_APPROVED !== 'true'
   ) {
     throw new Error(
       `Tests above ${LARGE_TEST_VU_THRESHOLD} VUs require LARGE_TEST_APPROVED=true`
     )
+  }
+
+  const runId = parseRequiredEvidenceValue(env, 'RUN_ID', 'local', largeTest)
+  const generatorId = parseRequiredEvidenceValue(
+    env,
+    'GENERATOR_ID',
+    'local',
+    largeTest
+  )
+  const executionSegment = parseRequiredEvidenceValue(
+    env,
+    'EXECUTION_SEGMENT',
+    '0:1',
+    largeTest
+  )
+  const summaryPath = parseRequiredEvidenceValue(
+    env,
+    'SUMMARY_PATH',
+    'k6-summary.json',
+    largeTest
+  )
+
+  parseExecutionSegment(executionSegment)
+
+  if (summaryPath === 'stdout' || summaryPath === 'stderr') {
+    throw new Error('SUMMARY_PATH must be a file path')
   }
 
   return {
@@ -68,6 +106,10 @@ export function parseLoadProfile(env = {}) {
     productSlug: env.PRODUCT_SLUG || undefined,
     profileName,
     stageDurations,
+    runId,
+    generatorId,
+    executionSegment,
+    summaryPath,
   }
 }
 

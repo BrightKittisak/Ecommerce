@@ -10,6 +10,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "build:budget": "node scripts/perf/check-bundle-budget.mjs",
+    "env:check": "node scripts/validate-env.mjs",
     "start": "next start",
     "lint": "eslint .",
     "test": "node --test --require sucrase/register tests/*.test.ts",

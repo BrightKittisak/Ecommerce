@@ -40,6 +40,8 @@ Lush คือเว็บ e-commerce ที่พัฒนาด้วย Next.
   - phased roadmap for production hardening, scale, security, and refactor work
 - [docs/PHASE_1_EXECUTION_PLAN.md](/C:/Users/kitti/Documents/Learning/Backend/Ecommerce/docs/PHASE_1_EXECUTION_PLAN.md)
   - first implementation slices, branch names, dependencies, and acceptance criteria
+- [docs/INCIDENT_RESPONSE.md](/C:/Users/kitti/Documents/Learning/Backend/Ecommerce/docs/INCIDENT_RESPONSE.md)
+  - production alerts, incident roles, payment and database runbooks, rollback, and evidence requirements
 
 ## โครงสร้างสำคัญ
 

@@ -5,19 +5,37 @@ import { constructStripeWebhookEvent } from '@/lib/infrastructure/payments/strip
 import { stripeWebhookPaymentDeps } from '@/lib/infrastructure/payments/stripe-webhook-payment-deps'
 import { logger } from '@/lib/logger'
 import {
+  readRequestTextWithLimit,
+  RequestBodyTooLargeError,
+} from '@/lib/request-body'
+import {
   getStripeWebhookInvalidSignatureResponse,
   getStripeWebhookMissingSignatureResponse,
+  getStripeWebhookPayloadTooLargeResponse,
   getStripeWebhookSignatureLogMetadata,
 } from '@/lib/stripe-webhook-response'
 
+const STRIPE_WEBHOOK_MAX_BODY_BYTES = 1024 * 1024
+
 export async function POST(req: NextRequest) {
-  const body = await req.text()
   const signature = req.headers.get('stripe-signature')
 
   if (!signature) {
     return NextResponse.json(
       getStripeWebhookMissingSignatureResponse(),
       { status: 400 }
+    )
+  }
+
+  let body: string
+  try {
+    body = await readRequestTextWithLimit(req, STRIPE_WEBHOOK_MAX_BODY_BYTES)
+  } catch (error) {
+    if (!(error instanceof RequestBodyTooLargeError)) throw error
+
+    return NextResponse.json(
+      getStripeWebhookPayloadTooLargeResponse(),
+      { status: 413 }
     )
   }
 

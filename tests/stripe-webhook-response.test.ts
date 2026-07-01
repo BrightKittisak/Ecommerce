@@ -4,8 +4,10 @@ import test from 'node:test'
 import {
   getStripeWebhookInvalidSignatureResponse,
   getStripeWebhookMissingSignatureResponse,
+  getStripeWebhookPayloadTooLargeResponse,
   getStripeWebhookSignatureLogMetadata,
   STRIPE_WEBHOOK_INVALID_SIGNATURE_MESSAGE,
+  STRIPE_WEBHOOK_PAYLOAD_TOO_LARGE_MESSAGE,
 } from '../lib/stripe-webhook-response'
 
 test('returns a generic Stripe webhook signature error to callers', () => {
@@ -21,6 +23,16 @@ test('returns the same generic response when the Stripe signature is missing', (
   assert.deepEqual(
     getStripeWebhookMissingSignatureResponse(),
     getStripeWebhookInvalidSignatureResponse()
+  )
+})
+
+test('returns a safe response when the Stripe payload is too large', () => {
+  assert.deepEqual(getStripeWebhookPayloadTooLargeResponse(), {
+    message: STRIPE_WEBHOOK_PAYLOAD_TOO_LARGE_MESSAGE,
+  })
+  assert.equal(
+    getStripeWebhookPayloadTooLargeResponse().message.includes('1048576'),
+    false
   )
 })
 

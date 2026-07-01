@@ -27,6 +27,9 @@ test('uses observable production event names in dependency runbooks', () => {
     'paypal_api_error',
     'paypal_api_error_body_read_failed',
     'paypal.purchase_receipt_failed',
+    'auth.sign_in_rate_limited',
+    'auth.registration_rate_limited',
+    'api.browsing_history_rate_limited',
   ]) {
     assert.equal(runbook.includes(event), true, event)
   }

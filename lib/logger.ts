@@ -1,4 +1,5 @@
 type LogMetadata = Record<string, unknown>
+type LogLevel = 'error' | 'warn'
 
 type SerializedLogError = {
   name?: string
@@ -26,15 +27,27 @@ export function serializeLogError(error: unknown): SerializedLogError {
   return { message: 'Unknown error' }
 }
 
+function writeLog(
+  level: LogLevel,
+  event: string,
+  metadata: LogMetadata,
+  output: (message: string) => void
+) {
+  output(
+    JSON.stringify({
+      ...metadata,
+      level,
+      event,
+      timestamp: new Date().toISOString(),
+    })
+  )
+}
+
 export const logger = {
   error(event: string, metadata: LogMetadata = {}) {
-    console.error(
-      JSON.stringify({
-        level: 'error',
-        event,
-        timestamp: new Date().toISOString(),
-        ...metadata,
-      })
-    )
+    writeLog('error', event, metadata, console.error)
+  },
+  warn(event: string, metadata: LogMetadata = {}) {
+    writeLog('warn', event, metadata, console.warn)
   },
 }

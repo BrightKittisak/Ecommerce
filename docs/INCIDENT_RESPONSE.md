@@ -56,6 +56,8 @@ silencing payment-integrity or availability signals.
 | Stripe webhook delivery failures | Any sustained failure or provider retry backlog | SEV-1 when payment updates are delayed |
 | `paypal_api_error` or `paypal_api_error_body_read_failed` | Sustained increase over 5 minutes | SEV-2 |
 | `stripe.purchase_receipt_failed` or `paypal.purchase_receipt_failed` | Any occurrence | SEV-3; payment remains authoritative |
+| `auth.sign_in_rate_limited` or `auth.registration_rate_limited` | Sustained increase above baseline | SEV-2 security investigation |
+| `api.browsing_history_rate_limited` | Sustained increase above baseline | SEV-3; SEV-2 with customer impact |
 | MongoDB connection, CPU, memory, or pool saturation | Above provider safe range for 10 minutes | SEV-2 |
 | CDN cache hit ratio | Material drop from the accepted load-test baseline | SEV-2 during traffic pressure |
 

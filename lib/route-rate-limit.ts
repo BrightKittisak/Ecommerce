@@ -155,6 +155,15 @@ export const getRateLimitHeaders = (decision: RouteRateLimitDecision) => ({
   'RateLimit-Reset': String(Math.ceil(decision.resetAt.getTime() / 1000)),
 })
 
+export const getRateLimitLogMetadata = (
+  policy: RouteRateLimitPolicy,
+  decision: RouteRateLimitDecision
+) => ({
+  operation: policy.route,
+  limit: decision.limit,
+  retryAfterSeconds: decision.retryAfterSeconds,
+})
+
 export const createRateLimitedResponse = (decision: RouteRateLimitDecision) =>
   NextResponse.json(
     { message: RATE_LIMITED_MESSAGE },

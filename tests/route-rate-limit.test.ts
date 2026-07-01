@@ -6,6 +6,7 @@ import {
   assertRouteRateLimitForIdentity,
   createRateLimitedResponse,
   getRateLimitHeaders,
+  getRateLimitLogMetadata,
   getRouteRateLimitIdentity,
   isMongoDuplicateKeyError,
   ROUTE_RATE_LIMIT_POLICIES,
@@ -54,6 +55,27 @@ test('formats rate-limit headers from a decision', () => {
       'RateLimit-Reset': '1780549230',
     }
   )
+})
+
+test('builds rate-limit log metadata without request identities', () => {
+  const metadata = getRateLimitLogMetadata(
+    ROUTE_RATE_LIMIT_POLICIES.userRegistration,
+    {
+      allowed: false,
+      limit: 10,
+      remaining: 0,
+      resetAt: new Date('2026-07-01T00:15:00.000Z'),
+      retryAfterSeconds: 120,
+    }
+  )
+
+  assert.deepEqual(metadata, {
+    operation: 'action:user-registration',
+    limit: 10,
+    retryAfterSeconds: 120,
+  })
+  assert.equal('identity' in metadata, false)
+  assert.equal('key' in metadata, false)
 })
 
 test('creates a 429 response with retry headers and Thai copy', async () => {

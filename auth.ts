@@ -6,6 +6,7 @@ import { connectToDatabase } from './lib/db'
 import getMongoClient from './lib/db/client'
 import User, { type IUser } from './lib/db/models/user.model'
 import {
+  AuthRateLimitError,
   assertSignInAllowed,
   clearSignInFailures,
   getSignInRateLimitKeys,
@@ -13,6 +14,7 @@ import {
 } from './lib/auth-rate-limit'
 import { UserSignInSchema } from './lib/domain/user/auth.schema'
 import { getAuthUserDisplayName } from './lib/auth-user-display-name'
+import { logger } from './lib/logger'
 
 import NextAuth, { type DefaultSession } from 'next-auth'
 import authConfig from './auth.config'
@@ -56,7 +58,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const { email: rawEmail, password } = parsedCredentials.data
         const email = rawEmail.trim().toLowerCase()
         const rateLimitKeys = getSignInRateLimitKeys({ email, request })
-        await assertSignInAllowed(rateLimitKeys)
+        try {
+          await assertSignInAllowed(rateLimitKeys)
+        } catch (error) {
+          if (error instanceof AuthRateLimitError) {
+            logger.warn('auth.sign_in_rate_limited', {
+              scopes: rateLimitKeys.map(({ scope }) => scope),
+            })
+          }
+          throw error
+        }
 
         const user = await User.findOne({ email })
           .collation({ locale: 'en', strength: 2 })

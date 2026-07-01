@@ -4,6 +4,7 @@ import { auth, signIn, signOut } from '@/auth'
 import { registerUserAccount } from '@/lib/application/users/register-user-account'
 import { updateUserNameForAccount } from '@/lib/application/users/update-user-name'
 import { userAccountDeps } from '@/lib/infrastructure/users/user-account-deps'
+import { logger } from '@/lib/logger'
 import { IUserName, IUserSignIn, IUserSignUp } from '@/types'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
@@ -13,6 +14,7 @@ import { RateLimitError } from '../rate-limit-error'
 import { getClientIpFromHeaders } from '../request-ip'
 import {
   assertRouteRateLimitForIdentity,
+  getRateLimitLogMetadata,
   ROUTE_RATE_LIMIT_POLICIES,
 } from '../route-rate-limit'
 import { getUserActionErrorMessage } from '../user-action-errors'
@@ -39,7 +41,16 @@ export async function registerUser(userSignUp: IUserSignUp) {
       policy: ROUTE_RATE_LIMIT_POLICIES.userRegistration,
     })
 
-    if (!rateLimit.allowed) throw new RateLimitError()
+    if (!rateLimit.allowed) {
+      logger.warn(
+        'auth.registration_rate_limited',
+        getRateLimitLogMetadata(
+          ROUTE_RATE_LIMIT_POLICIES.userRegistration,
+          rateLimit
+        )
+      )
+      throw new RateLimitError()
+    }
 
     await registerUserAccount({
       userSignUp,

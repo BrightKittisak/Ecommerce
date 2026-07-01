@@ -1,6 +1,7 @@
 import { ZodError } from 'zod'
 
 import { formatError } from './utils'
+import { RateLimitError } from './rate-limit-error'
 
 export const USER_ACTION_ERROR_MESSAGE =
   'เกิดข้อผิดพลาดในการจัดการบัญชีผู้ใช้ กรุณาลองใหม่อีกครั้ง'
@@ -19,7 +20,9 @@ const isDuplicateKeyError = (error: unknown): error is DuplicateKeyError =>
   isRecord(error.keyValue)
 
 const isSafeUserActionError = (error: unknown) =>
-  error instanceof ZodError || isDuplicateKeyError(error)
+  error instanceof ZodError ||
+  error instanceof RateLimitError ||
+  isDuplicateKeyError(error)
 
 export const getUserActionErrorMessage = (error: unknown) =>
   isSafeUserActionError(error) ? formatError(error) : USER_ACTION_ERROR_MESSAGE

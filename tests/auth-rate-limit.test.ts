@@ -6,6 +6,7 @@ import {
   getClientIp,
   getSignInRateLimitKeys,
 } from '../lib/auth-rate-limit'
+import { getClientIpFromHeaders } from '../lib/request-ip'
 
 test('reads the first forwarded client ip', () => {
   const request = new Request('https://example.test', {
@@ -15,6 +16,7 @@ test('reads the first forwarded client ip', () => {
   })
 
   assert.equal(getClientIp(request), '203.0.113.1')
+  assert.equal(getClientIpFromHeaders(request.headers), '203.0.113.1')
 })
 
 test('builds hashed sign-in rate limit keys without exposing raw identifiers', () => {

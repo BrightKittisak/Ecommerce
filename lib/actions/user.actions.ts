@@ -6,8 +6,15 @@ import { updateUserNameForAccount } from '@/lib/application/users/update-user-na
 import { userAccountDeps } from '@/lib/infrastructure/users/user-account-deps'
 import { IUserName, IUserSignIn, IUserSignUp } from '@/types'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 
 import { UserSignInSchema } from '../domain/user/auth.schema'
+import { RateLimitError } from '../rate-limit-error'
+import { getClientIpFromHeaders } from '../request-ip'
+import {
+  assertRouteRateLimitForIdentity,
+  ROUTE_RATE_LIMIT_POLICIES,
+} from '../route-rate-limit'
 import { getUserActionErrorMessage } from '../user-action-errors'
 
 export async function signInWithCredentials(user: IUserSignIn) {
@@ -26,6 +33,14 @@ export const SignInWithGoogle = async () => {
 
 export async function registerUser(userSignUp: IUserSignUp) {
   try {
+    const requestHeaders = await headers()
+    const rateLimit = await assertRouteRateLimitForIdentity({
+      identity: getClientIpFromHeaders(requestHeaders),
+      policy: ROUTE_RATE_LIMIT_POLICIES.userRegistration,
+    })
+
+    if (!rateLimit.allowed) throw new RateLimitError()
+
     await registerUserAccount({
       userSignUp,
       deps: userAccountDeps,

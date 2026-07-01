@@ -6,6 +6,7 @@ import {
   getUserActionErrorMessage,
   USER_ACTION_ERROR_MESSAGE,
 } from '../lib/user-action-errors'
+import { RATE_LIMITED_MESSAGE, RateLimitError } from '../lib/rate-limit-error'
 
 test('uses a safe generic user action error for internal failures', () => {
   const message = getUserActionErrorMessage(
@@ -38,5 +39,12 @@ test('preserves user-facing validation and duplicate email messages', () => {
       keyValue: { email: 'buyer@example.com' },
     }),
     'email มีอยู่แล้วในระบบ'
+  )
+})
+
+test('preserves the safe registration rate-limit message', () => {
+  assert.equal(
+    getUserActionErrorMessage(new RateLimitError()),
+    RATE_LIMITED_MESSAGE
   )
 })

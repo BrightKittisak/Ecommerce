@@ -83,6 +83,19 @@ such as k6, Artillery, Locust, or a managed load-testing platform. Keep the
 same latency, failure-rate, and throughput budgets so local smoke checks and
 distributed tests measure the same production risks.
 
+## Search Cache Behavior
+
+Product listing reads use a per-process hot-query cache with a 30-second TTL,
+concurrent request coalescing, and a 200-entry LRU bound. Record cold and warm
+search measurements separately; a warm result demonstrates repeated-query
+protection, while the cold result exposes the underlying MongoDB cost.
+
+This cache is not shared across application instances and does not protect the
+database from a high-cardinality stream of unique searches. Distributed load
+evidence must therefore include MongoDB query and saturation metrics. A
+dedicated search index or service remains required before claiming broad search
+scalability at the 100,000-concurrent-user target.
+
 ## Distributed k6 Scenario
 
 Install k6 separately, then run the read-only smoke profile against staging:

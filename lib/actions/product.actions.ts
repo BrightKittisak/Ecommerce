@@ -18,6 +18,7 @@ import { productListingQueryDeps } from '@/lib/infrastructure/products/product-l
 import { relatedProductsQueryDeps } from '@/lib/infrastructure/products/related-products-query-deps'
 import { productSlugQueryDeps } from '@/lib/infrastructure/products/product-slug-query-deps'
 import { productTagQueryDeps } from '@/lib/infrastructure/products/product-tag-query-deps'
+import { getCachedProductListing } from '@/lib/product-listing-cache'
 import { PAGE_SIZE } from '../constants'
 
 const CATALOG_CACHE_REVALIDATE_SECONDS = 5 * 60
@@ -183,19 +184,23 @@ export async function getAllProducts({
   rating?: string
   sort?: string
 }) {
-  return getProductListing({
-    input: {
-      query,
-      category,
-      tag,
-      limit,
-      page,
-      price,
-      rating,
-      sort,
-    },
-    deps: productListingQueryDeps,
-  })
+  const input = {
+    query,
+    category,
+    tag,
+    limit,
+    page,
+    price,
+    rating,
+    sort,
+  }
+
+  return getCachedProductListing(input, () =>
+    getProductListing({
+      input,
+      deps: productListingQueryDeps,
+    })
+  )
 }
 
 export async function getAllTags() {

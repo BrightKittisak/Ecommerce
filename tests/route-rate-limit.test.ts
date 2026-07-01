@@ -3,6 +3,7 @@ import test from 'node:test'
 
 import {
   assertRouteRateLimit,
+  assertRouteRateLimitForIdentity,
   createRateLimitedResponse,
   getRateLimitHeaders,
   getRouteRateLimitIdentity,
@@ -11,12 +12,17 @@ import {
   type RouteRateLimitPersistenceDeps,
 } from '../lib/route-rate-limit'
 
-test('declares rate-limit policies only for non-cacheable browser-facing APIs', () => {
+test('declares rate-limit policies for expensive non-cacheable operations', () => {
   assert.equal('catalogCategories' in ROUTE_RATE_LIMIT_POLICIES, false)
   assert.deepEqual(ROUTE_RATE_LIMIT_POLICIES.browsingHistoryProducts, {
     route: 'api:browsing-history-products',
     limit: 60,
     windowMs: 60_000,
+  })
+  assert.deepEqual(ROUTE_RATE_LIMIT_POLICIES.userRegistration, {
+    route: 'action:user-registration',
+    limit: 10,
+    windowMs: 15 * 60_000,
   })
 })
 
@@ -102,4 +108,29 @@ test('retries once when a concurrent limiter upsert hits a duplicate key', async
   assert.equal(attempts, 2)
   assert.equal(decision.allowed, true)
   assert.equal(decision.remaining, 58)
+})
+
+test('hashes direct identities for server-action rate limits', async () => {
+  let storedKey = ''
+  const deps: RouteRateLimitPersistenceDeps = {
+    async updateRouteRateLimitRecord(input) {
+      storedKey = input.key
+      return {
+        count: 1,
+        windowStartedAt: input.now,
+      }
+    },
+  }
+
+  const decision = await assertRouteRateLimitForIdentity({
+    deps,
+    identity: '203.0.113.25',
+    now: new Date('2026-07-01T00:00:00.000Z'),
+    policy: ROUTE_RATE_LIMIT_POLICIES.userRegistration,
+  })
+
+  assert.equal(decision.allowed, true)
+  assert.equal(decision.remaining, 9)
+  assert.equal(storedKey.startsWith('action:user-registration:'), true)
+  assert.equal(storedKey.includes('203.0.113.25'), false)
 })

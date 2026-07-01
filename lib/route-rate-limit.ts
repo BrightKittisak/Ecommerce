@@ -3,6 +3,7 @@ import { createHash } from 'crypto'
 import { NextResponse } from 'next/server'
 
 import { routeRateLimitDeps } from './infrastructure/rate-limit/route-rate-limit-deps'
+import { RATE_LIMITED_MESSAGE } from './rate-limit-error'
 import { getClientIp } from './request-ip'
 
 export type RouteRateLimitPolicy = {
@@ -36,6 +37,11 @@ export const ROUTE_RATE_LIMIT_POLICIES = {
     limit: 60,
     windowMs: 60 * 1000,
   },
+  userRegistration: {
+    route: 'action:user-registration',
+    limit: 10,
+    windowMs: 15 * 60 * 1000,
+  },
 } as const satisfies Record<string, RouteRateLimitPolicy>
 
 export type RouteRateLimitDecision = {
@@ -45,9 +51,6 @@ export type RouteRateLimitDecision = {
   resetAt: Date
   retryAfterSeconds: number
 }
-
-const RATE_LIMITED_MESSAGE =
-  'ส่งคำขอมากเกินไป กรุณาลองใหม่อีกครั้งภายหลัง'
 
 const hashRouteRateLimitKey = ({
   identifier,
@@ -71,19 +74,19 @@ export const isMongoDuplicateKeyError = (
 export const getRouteRateLimitIdentity = (request: Request) =>
   getClientIp(request)
 
-export const assertRouteRateLimit = async ({
+export const assertRouteRateLimitForIdentity = async ({
   deps = routeRateLimitDeps,
+  identity,
+  now = new Date(),
   policy,
-  request,
 }: {
   deps?: RouteRateLimitPersistenceDeps
+  identity: string
+  now?: Date
   policy: RouteRateLimitPolicy
-  request: Request
 }): Promise<RouteRateLimitDecision> => {
-  const now = new Date()
   const windowStartedAfter = new Date(now.getTime() - policy.windowMs)
   const expiresAt = new Date(now.getTime() + policy.windowMs)
-  const identity = getRouteRateLimitIdentity(request)
   const key = hashRouteRateLimitKey({
     identifier: identity,
     route: policy.route,
@@ -127,6 +130,21 @@ export const assertRouteRateLimit = async ({
     retryAfterSeconds,
   }
 }
+
+export const assertRouteRateLimit = ({
+  deps,
+  policy,
+  request,
+}: {
+  deps?: RouteRateLimitPersistenceDeps
+  policy: RouteRateLimitPolicy
+  request: Request
+}) =>
+  assertRouteRateLimitForIdentity({
+    deps,
+    identity: getRouteRateLimitIdentity(request),
+    policy,
+  })
 
 export const getRateLimitHeaders = (decision: RouteRateLimitDecision) => ({
   RateLimit: `limit=${decision.limit}, remaining=${decision.remaining}, reset=${Math.ceil(

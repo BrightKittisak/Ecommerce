@@ -28,6 +28,7 @@ test('canonicalizes equivalent product listing cache keys', () => {
       price: 'invalid',
       rating: 'invalid',
       sort: 'invalid',
+      limit: -1,
     })
   )
 })

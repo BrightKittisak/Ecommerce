@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react'
 
-export default function useCatalogCategories() {
-  const [categories, setCategories] = useState<string[]>([])
+export default function useCatalogCategories(initialCategories: string[] = []) {
+  const [categories, setCategories] = useState<string[]>(initialCategories)
 
   useEffect(() => {
+    if (initialCategories.length > 0) return
+
     const controller = new AbortController()
 
     async function loadCategories() {
@@ -35,7 +37,7 @@ export default function useCatalogCategories() {
     loadCategories()
 
     return () => controller.abort()
-  }, [])
+  }, [initialCategories.length])
 
   return categories
 }

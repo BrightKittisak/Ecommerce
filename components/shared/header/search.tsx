@@ -7,8 +7,12 @@ import useCatalogCategories from '@/hooks/use-catalog-categories'
 import { translateCategory } from '@/lib/i18n'
 import { APP_NAME } from '@/lib/constants'
 
-export default function Search() {
-  const categories = useCatalogCategories()
+export default function Search({
+  initialCategories = [],
+}: {
+  initialCategories?: string[]
+}) {
+  const categories = useCatalogCategories(initialCategories)
 
   return (
     <form

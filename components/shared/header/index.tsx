@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { getAllCategories } from '@/lib/actions/product.actions'
 import { APP_NAME } from '@/lib/constants'
 import { exploreLinks, policyLinks } from '@/lib/site-navigation'
 
@@ -84,7 +85,9 @@ function HeaderDropdown({
   )
 }
 
-export default function Header() {
+export default async function Header() {
+  const categories = await getAllCategories()
+
   return (
     <header className='sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur-xl'>
       <div className='bg-[linear-gradient(90deg,#18352c,#2f5a49,#b55b34)] text-white'>
@@ -121,28 +124,28 @@ export default function Header() {
             </Link>
           </div>
           <div className='hidden max-w-xl flex-1 md:block'>
-            <Search />
+            <Search initialCategories={categories} />
           </div>
           <Menu />
         </div>
         <div className='block pt-3 md:hidden'>
-          <Search />
+          <Search initialCategories={categories} />
         </div>
       </div>
 
       <div className='border-t border-border/60 bg-card/70'>
         <div className='page-shell flex items-center gap-4 overflow-hidden py-2'>
-          <Sidebar />
-           <div className='flex max-h-[42px] flex-wrap items-center gap-2 overflow-hidden'>
-             {headerMenus.map((menu) => (
-               <Link
-                 href={menu.href}
-                 key={menu.href}
-                 className='header-button !px-3 !py-1.5 text-[13px] text-muted-foreground hover:text-foreground sm:text-sm'
-               >
-                 {menu.name}
-               </Link>
-             ))}
+          <Sidebar initialCategories={categories} />
+          <div className='flex max-h-[42px] flex-wrap items-center gap-2 overflow-hidden'>
+            {headerMenus.map((menu) => (
+              <Link
+                href={menu.href}
+                key={menu.href}
+                className='header-button !px-3 !py-1.5 text-[13px] text-muted-foreground hover:text-foreground sm:text-sm'
+              >
+                {menu.name}
+              </Link>
+            ))}
             <HeaderDropdown label='สำรวจ' links={exploreLinks} />
             <HeaderDropdown label='นโยบาย' links={policyLinks} />
           </div>

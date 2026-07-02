@@ -9,6 +9,8 @@ import {
 import type { ProductDTO } from './dtos'
 import { type ProductRecord, toProductDTO } from './serializers'
 
+export const MAX_PRODUCT_LISTING_LIMIT = 50
+
 export type ProductListingQueryInput = {
   query: string
   category: string
@@ -18,6 +20,18 @@ export type ProductListingQueryInput = {
   price?: string
   rating?: string
   sort?: string
+}
+
+export function normalizeProductListingLimit(limit?: number) {
+  if (
+    limit === undefined ||
+    !Number.isSafeInteger(limit) ||
+    limit <= 0
+  ) {
+    return PAGE_SIZE
+  }
+
+  return Math.min(limit, MAX_PRODUCT_LISTING_LIMIT)
 }
 
 export type ProductListingResult = {
@@ -71,7 +85,7 @@ export async function getProductListing({
   input: ProductListingQueryInput
   deps: ProductListingQueryDeps
 }): Promise<ProductListingResult> {
-  const limit = input.limit || PAGE_SIZE
+  const limit = normalizeProductListingLimit(input.limit)
   const currentPage = normalizePaginationPage(input.page)
   const skip = limit * (currentPage - 1)
   const conditions = buildProductListingConditions(input)

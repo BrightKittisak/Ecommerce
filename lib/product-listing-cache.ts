@@ -4,8 +4,8 @@ import type {
   ProductListingQueryInput,
   ProductListingResult,
 } from './application/products/product-listing-query'
+import { normalizeProductListingLimit } from './application/products/product-listing-query'
 import { createAsyncTtlLruCache } from './async-ttl-lru-cache'
-import { PAGE_SIZE } from './constants'
 import { normalizePaginationPage } from './pagination'
 import {
   buildProductPriceFilter,
@@ -38,7 +38,7 @@ export function createProductListingCacheKey(
     buildProductRatingFilter(input.rating),
     normalizeProductSort(input.sort),
     normalizePaginationPage(input.page),
-    input.limit || PAGE_SIZE,
+    normalizeProductListingLimit(input.limit),
   ]
 
   return createHash('sha256').update(JSON.stringify(keyFacts)).digest('hex')

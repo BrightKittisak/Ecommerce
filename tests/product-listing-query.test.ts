@@ -121,3 +121,37 @@ test('defaults product listing pagination and sort for all filters', async () =>
     limit: 9,
   })
 })
+
+test('normalizes unsafe custom product listing limits', async () => {
+  const observedLimits: number[] = []
+  const deps = {
+    findProducts: async ({ limit }: { limit: number }) => {
+      observedLimits.push(limit)
+      return []
+    },
+    countProducts: async () => 0,
+  }
+
+  await getProductListing({
+    input: {
+      query: 'all',
+      category: 'all',
+      tag: 'all',
+      limit: 999,
+      page: 1,
+    },
+    deps,
+  })
+  await getProductListing({
+    input: {
+      query: 'all',
+      category: 'all',
+      tag: 'all',
+      limit: -1,
+      page: 1,
+    },
+    deps,
+  })
+
+  assert.deepEqual(observedLimits, [50, 9])
+})

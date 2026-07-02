@@ -17,9 +17,13 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer'
 
-export default function Sidebar() {
+export default function Sidebar({
+  initialCategories = [],
+}: {
+  initialCategories?: string[]
+}) {
   const { data: session, status } = useSession()
-  const categories = useCatalogCategories()
+  const categories = useCatalogCategories(initialCategories)
   const isAuthenticated = status === 'authenticated' && session?.user
 
   return (
